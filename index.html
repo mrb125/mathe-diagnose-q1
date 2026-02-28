@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- iPad / PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Q1 Mathe GK">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Q1 Diagnose-Tool: e-Funktionen & Integrale (GK)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Roboto+Mono:wght@500&display=swap');
+
+        :root {
+            --bg-dark: #0f172a;
+            --bg-gradient: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+            --primary-glow: #38bdf8;
+            --secondary-glow: #c084fc;
+            --joker-color: #fbbf24;
+            --text-main: #f8fafc;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --success: #34d399;
+            --error: #f87171;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 900;
+            margin-top: 0;
+        }
+
+        h1 {
+            color: #fff;
+            text-shadow: 0 0 15px var(--primary-glow);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: var(--secondary-glow);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-item span {
+            color: var(--primary-glow);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.5s ease;
+        }
+
+        /* Buttons & Inputs */
+        button {
+            background: linear-gradient(135deg, var(--primary-glow), #0284c7);
+            color: #fff;
+            border: none;
+            padding: 18px 36px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:hover {
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .joker-btn {
+            background: linear-gradient(135deg, var(--joker-color), #d97706);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            font-size: 1rem;
+            padding: 12px 24px;
+            margin-top: 15px;
+            max-width: 250px;
+        }
+
+        .joker-btn:hover {
+            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+        }
+
+        .joker-text {
+            color: var(--joker-color);
+            font-weight: bold;
+            margin-top: 15px;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 15px;
+            border: 1px dashed var(--joker-color);
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .mc-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .mc-option.selected {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 18px;
+            font-size: 1.4rem;
+            margin-top: 25px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: var(--primary-glow);
+            border-radius: 12px;
+            text-align: center;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+        }
+
+        /* Result Section */
+        .result-category {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin: 15px 0;
+            text-align: left;
+            border-radius: 16px;
+            border-left: 6px solid var(--primary-glow);
+        }
+
+        /* Text Styles */
+        .math-text {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 5px 0;
+            color: var(--primary-glow);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* Visual SVG Graph Style */
+        .graph-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+            border: 2px solid var(--primary-glow);
+        }
+
+        .feedback-message {
+            margin-top: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 12px;
+            animation: fadeIn 0.3s;
+        }
+
+        .msg-success {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+        }
+
+        .msg-error {
+            background: rgba(248, 113, 113, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- CERTIFICATE PRINT CSS --- */
+        @media print {
+            body {
+                background: #fff !important;
+                color: #000 !important;
+                display: block;
+            }
+
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                background: none;
+                backdrop-filter: none;
+            }
+
+            .hud,
+            #start-screen,
+            #quiz-screen,
+            button {
+                display: none !important;
+            }
+
+            .screen.active {
+                opacity: 1;
+                transform: none;
+                display: block;
+            }
+
+            h1 {
+                color: #000 !important;
+                text-shadow: none !important;
+                margin-bottom: 50px;
+                text-align: center;
+                border-bottom: 2px solid #ccc;
+                padding-bottom: 20px;
+            }
+
+            h2 {
+                color: #555 !important;
+            }
+
+            .result-category {
+                background: #fdfdfd !important;
+                border: 1px solid #ddd !important;
+                border-left: 6px solid #38bdf8 !important;
+                page-break-inside: avoid;
+            }
+
+            .feedback-text {
+                color: #333 !important;
+            }
+
+            /* Add custom certificate footer */
+            #result-screen::after {
+                content: "Offizielles Q1 Diagnose-Dokument -- NRW Grundkurs Mathematik -- Erfolg muss man sich erarbeiten!";
+                display: block;
+                margin-top: 50px;
+                text-align: center;
+                font-size: 0.9rem;
+                color: #888;
+                border-top: 1px solid #ccc;
+                padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- PHASE 1: STARTBILDSCHIRM -->
+        <div id="start-screen" class="screen active">
+            <h1>Q1 GK Diagnose</h1>
+            <h2>e-Funktionen & Integrale (GK NRW)</h2>
+            <p style="font-size: 1.1rem; color: #94a3b8; margin-top: 20px; line-height: 1.6;">
+                Sammle Erfahrungspunkte (XP) und mach dich fit fürs Abi. Wenn du feststeckst, setze einen Tipp-Joker ein
+                (-50 XP).
+            </p>
+            <button onclick="startTest()">Diagnose Starten</button>
+        </div>
+
+        <!-- PHASE 2: DIAGNOSEBOGEN (QUIZ) -->
+        <div id="quiz-screen" class="screen">
+            <div class="hud">
+                <div class="hud-item" id="level-display">LVL <span>1</span></div>
+                <div class="hud-item" id="xp-display">XP: <span>0</span></div>
+                <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
+            </div>
+
+            <div id="question-category"
+                style="color: var(--secondary-glow); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;">
+                KATEGORIE</div>
+            <div id="question-text" style="font-size: 1.3rem; font-weight: 500; margin: 20px 0; line-height: 1.5;">Lade
+                Daten...</div>
+
+            <div id="input-area"></div>
+
+            <div id="joker-area" style="display: none; text-align: center;">
+                <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp freischalten (-50 XP)</button>
+                <div id="joker-hint" class="joker-text"></div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <button id="next-btn" onclick="submitAnswer()" style="display: none; margin: 30px auto 0;">Antwort
+                Einloggen</button>
+        </div>
+
+        <!-- PHASE 3: DIAGNOSE-AUSWERTUNG -->
+        <div id="result-screen" class="screen">
+            <h1 style="font-size: 2rem;">Zertifikat: Grundkurs Diagnose</h1>
+            <h2 id="final-stats" style="color: var(--text-main); margin-bottom: 40px; text-transform: none;">Gesamt XP:
+                0</h2>
+
+            <div id="feedback-area"></div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.print()"
+                    style="background: linear-gradient(135deg, var(--success), #059669);">📄 Als PDF speichern /
+                    Drucken</button>
+                <button onclick="location.reload()"
+                    style="background: linear-gradient(135deg, var(--secondary-glow), #9333ea);">Neue Diagnose
+                    Starten</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT (Logik) -->
+    <script>
+        // GK-Level Questions (NRW Standard)
+        const allQuestions = [
+            // --- 1. Ableitungsregeln (Ketten/Produktregel) ---
+            {
+                category: "Ableitungsregeln", categoryId: "ableitung", type: "VisualGraph", isFallback: false,
+                text: "Welche Aussage trifft auf die Ableitungsfunktion f'(x) des abgebildeten Graphen von <span class='math-text'>f(x) = e^x</span> zu?",
+                options: ["Der Graph der Ableitung verläuft unterhalb der x-Achse.", "Der Graph der Ableitung ist exakt derselbe wie der abgebildete.", "Der Graph der Ableitung ist eine Ursprungsgerade."], correct: 1,
+                hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!",
+                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                    <!-- Achsen -->
+                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                    <!-- e-Kurve -->
+                    <path d="M 10 95 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
+                    <!-- Marker -->
+                    <text x="5" y="115" font-size="12" fill="#000">0</text>
+                    <text x="85" y="115" font-size="12" fill="#000">x</text>
+                </svg>`
+            },
+            {
+                category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false,
+                text: "Gegeben ist die Bestandsfunktion: <span class='math-text'>f(x) = e^(2x)</span>. Wie lautet die Änderungsrate f'(x)?",
+                options: ["e^(2x)", "2e^(2x)", "2xe^(2x)", "0.5e^(2x)"], correct: 1,
+                hint: "Kettenregel: Schreibe die e-Funktion einfach ab und multipliziere sie mit der Konstante aus dem Exponenten (hier die 2)."
+            },
+            {
+                category: "Ableitungsregeln", categoryId: "ableitung", type: "text", isFallback: false,
+                text: "Gegeben: <span class='math-text'>f(x) = x * e^x</span>.<br>Berechne die 1. Ableitung und klammere e^x aus.<br>(Schreibweise: <i>(x+1)*e^x</i>)",
+                correct: ["(x+1)*e^x", "(1+x)*e^x", "e^x*(x+1)", "e^x*(1+x)"],
+                hint: "Produktregel: Leite den ersten Teil ab und lass den zweiten stehen, plus umgekehrt."
+            },
+            {
+                category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false,
+                text: "Welche Regel(n) benötigst du (neben Faktorregel) zwingend zur Ableitung von <br><span class='math-text'>f(x) = 5 * e^(-0.2x)</span>?",
+                options: ["Nur die Kettenregel", "Nur die Produktregel", "Die Quotientenregel", "Keine, das ist polynomisch"], correct: 0,
+                hint: "Da vorne nur eine simple 5 und kein 'x' steht, brauchen wir keine Produktregel."
+            },
+            // Fallback Ableitung
+            {
+                category: "Ableitungsregeln (Basis)", categoryId: "ableitung", type: "text", isFallback: true,
+                text: "Lass uns einen Schritt zurückgehen. Was ist die Ableitung der ganz normalen e-Funktion <span class='math-text'>f(x) = e^x</span> ?",
+                correct: ["e^x"],
+                hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!"
+            },
+
+            // --- 2. Stammfunktionen ---
+            {
+                category: "Stammfunktionen (Fehlersuche)", categoryId: "stamm", type: "mc", isFallback: false,
+                text: "Finde den Fehler! Max hat die Stammfunktion von <span class='math-text'>f(x) = e^(2x)</span> berechnet. Seine Lösung: <span class='math-text'>F(x) = 2*e^(2x)</span>. Was hat er falsch gemacht?",
+                options: ["Er hat die e-Funktion verändert, sie muss e^x bleiben.", "Er hat abgeleitet statt aufgeleitet.", "Er hat das + c vergessen, ansonsten ist es richtig.", "Das '-' Vorzeichen fehlt vor der 2."], correct: 1,
+                hint: "Wenn vorne eine mal 2 steht, ist das die *innere Ableitung*. Beim *Aufleiten* (Integrieren) müsste dort der Kehrwert (also 1/2) stehen!"
+            },
+            {
+                category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false,
+                text: "Welcher Term beschreibt eine Stammfunktion für <br><span class='math-text'>f(x) = e^(3x)</span>?",
+                options: ["e^(3x)", "3e^(3x)", "(1/3)e^(3x)", "e^(3x) + 3x"], correct: 2,
+                hint: "Beim Aufleiten nimmst du die e-Funktion und rechnest 1 geteilt durch die Zahl, die vor dem x steht."
+            },
+            {
+                category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false,
+                text: "Gesucht ist EINE konkrete Stammfunktion von <br><span class='math-text'>f(x) = 2*e^x</span>.<br>(Lass das + c einfach weg)",
+                correct: ["2*e^x", "2e^x"],
+                hint: "Zahlen, die mit einem Malpunkt (Faktor) an der e-Funktion kleben, bleiben beim Aufleiten einfach stehen!"
+            },
+            {
+                category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false,
+                text: "Bestimme eine Stammfunktion F(x) zu <br><span class='math-text'>f(x) = e^(-x) + 4</span>. (Ohne +c)",
+                correct: ["-e^(-x)+4x", "-1*e^(-x)+4x", "-e^(-x)+4*x"],
+                hint: "Vor dem x steht quasi eine -1. Das kommt beim Aufleiten nach vorne. Und aus der 4 wird 4x."
+            },
+            // Fallback Stammfunktionen
+            {
+                category: "Stammfunktionen (Basis)", categoryId: "stamm", type: "text", isFallback: true,
+                text: "Ganz entspannt. Was ist eine Stammfunktion der Konstanten <span class='math-text'>f(x) = 5</span> ? (Ohne +c)",
+                correct: ["5x", "5*x"],
+                hint: "Das ist einfach: Beim Aufleiten bekommt eine Zahl einfach ein 'x' angehängt."
+            },
+
+            // --- 3. Bestimmte Integrale & Graphen ---
+            {
+                category: "Bestimmte Integrale", categoryId: "integral", type: "VisualGraph", isFallback: false,
+                text: "Die blaue Kurve ist <span class='math-text'>f(x) = e^x</span>. Betrachte die rot schraffierte Fläche von x=0 bis x=1.<br>Ist diese Fläche kleiner, genau gleich oder größer als 1?",
+                options: ["Kleiner als 1", "Genau gleich 1", "Größer als 1"], correct: 2,
+                hint: "Berechne das Integral von 0 bis 1: [e^x] von 0 bis 1 = e^1 - e^0 = e - 1. Da e ≈ 2.71 ist...",
+                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                    <!-- Achsen -->
+                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                    <!-- e-Kurve (approximiert als Pfad) -->
+                    <path d="M 10 90 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
+                    <!-- Fläche -->
+                    <path d="M 10 100 L 10 90 Q 50 80 90 20 L 90 100 Z" fill="rgba(248, 113, 113, 0.4)"/>
+                    <!-- Marker -->
+                    <text x="5" y="115" font-size="12" fill="#000">0</text>
+                    <text x="85" y="115" font-size="12" fill="#000">1</text>
+                </svg>`
+            },
+            {
+                category: "Bestimmte Integrale", categoryId: "integral", type: "mc", isFallback: false,
+                text: "Was passiert, wenn der Graph der untersuchten Funktion komplett unterhalb der x-Achse verläuft?",
+                options: ["Das Integral berechnet einen negativen Wert", "Das Integral ist immer 0", "Der Wert ist positiv, gibt aber nicht die Fläche an", "Darf man nicht integrieren"], correct: 0,
+                hint: "Integrale berechnen Flächen unter Graphen. Flächen unter der x-Achse zählen dabei Minus."
+            },
+            {
+                category: "Bestimmte Integrale", categoryId: "integral", type: "text", isFallback: false,
+                text: "Berechne das Integral von 0 bis ln(2) über <span class='math-text'>e^x dx</span>. <br>(Hinweis: e^ln(2) = 2)",
+                correct: ["1"],
+                hint: "Setze erst ln(2) für x ein (ergibt 2) und ziehe davon ab, was rauskommt, wenn du für x die 0 einsetzt (e^0 = 1)."
+            },
+            // Fallback Integral
+            {
+                category: "Bestimmte Integrale (Basis)", categoryId: "integral", type: "text", isFallback: true,
+                text: "Basiswissen: Wenn das Integral von f(x) positiven Flächeninhalt misst, wofür stehen die Grenzen a und b?",
+                correct: ["x werte", "x-werte", "x", "intervallgrenzen"],
+                hint: "Die zeigen dir, wo die Fläche beginnt und wo sie auf der x-Achse aufhört."
+            },
+
+            // --- 4. Sachzusammenhänge ---
+            {
+                category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false,
+                text: "Betrachte den abgebildeten Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c * e^(kt)</span>. Was lässt sich über den Parameter k aussagen?",
+                options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"], correct: 2,
+                hint: "Der Graph fällt ab (die Menge wird weniger). Das bedeutet exponentiellen Zerfall!",
+                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                    <!-- Achsen -->
+                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                    <!-- Zerfall-Kurve -->
+                    <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
+                    <!-- Marker -->
+                    <text x="5" y="115" font-size="12" fill="#000">0</text>
+                    <text x="100" y="115" font-size="12" fill="#000">t</text>
+                </svg>`
+            },
+            // --- 4. Sachzusammenhänge ---
+            {
+                category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false,
+                text: "Betrachte den abgebildeten Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c * e^(kt)</span>. Was lässt sich über den Parameter k aussagen?",
+                options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"], correct: 2,
+                hint: "Der Graph fällt ab (die Menge wird weniger). Das bedeutet exponentiellen Zerfall!",
+                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                    <!-- Achsen -->
+                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                    <!-- Zerfall-Kurve -->
+                    <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
+                    <!-- Marker -->
+                    <text x="5" y="115" font-size="12" fill="#000">0</text>
+                    <text x="100" y="115" font-size="12" fill="#000">t</text>
+                </svg>`
+            },
+            {
+                category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false,
+                text: "Ein Bestand entwickelt sich nach <br><span class='math-text'>f(t) = 100 * e^(0.5t)</span>.<br>Was bedeutet die 100?",
+                options: ["Wachstumsrate in Prozent", "Maximaler Bestand", "Anfangsbestand zum Zeitpunkt t=0", "Halbwertszeit"], correct: 2,
+                hint: "Setze t=0 in die Funktion ein. Da e^0 = 1 ist, bleibt nur die Vorzahl übrig."
+            },
+            {
+                category: "Sachzusammenhänge", categoryId: "sach", type: "text", isFallback: false,
+                text: "Der Bestand ändert sich nach <br><span class='math-text'>f(t) = 500 * e^(-0.1t)</span>.<br>Handelt es sich um 'Wachstum' oder 'Zerfall'?",
+                correct: ["zerfall"],
+                hint: "Schau dir das Vorzeichen im Exponenten an. Positiv = Wachstum, Negativ = ..."
+            },
+            {
+                category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false,
+                text: "f(t) ist die momentane Zu-/Abflussrate von Wasser (L/min). Was liefert dann das bestimmte Integral über f(t)?",
+                options: ["Die aktuelle Tropfgeschwindigkeit", "Die Gesamte Zunahme/Abnahme an Wasser im Intervall", "Die absolute Maximalmenge", "Die durchschnittliche Geschwindigkeit"], correct: 1,
+                hint: "Wenn man eine Zufluss-Geschwindigkeit (Liter pro Minute) aufleitet, bekommt man die echte Menge (Liter), die dazukam."
+            },
+
+            // --- LEVEL 2 (Harder Questions) ---
+            {
+                category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true,
+                text: "Kombiniere Produkt- und Kettenregel! <br>Leite ab: <span class='math-text'>f(x) = x * e^(2x)</span> <br>(Schreibweise: <i>(2x+1)*e^(2x)</i>)",
+                correct: ["(2x+1)*e^(2x)", "e^(2x)*(2x+1)", "(1+2x)*e^(2x)"],
+                hint: "u = x,  v = e^(2x). Denk dran, dass die innere Ableitung von v die 2 nach vorne holt!"
+            },
+            {
+                category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true,
+                text: "Gegeben ist <span class='math-text'>f(x) = e^x - 2</span>. Welche Aussage zum Flächninhalt im Intervall [0; 2] ist korrekt?",
+                options: ["Der Graph befindet sich komplett oberhalb der x-Achse.", "Das Integral liefert direkt den exakten Flächeninhalt.", "Das Integral muss mit Betragsstrichen an der Nullstelle berechnet werden.", "Die e-Funktion kann keine negativ orientierten Flächen haben."], correct: 2,
+                hint: "Setze f(x) = 0. e^x = 2. Da ln(2) ≈ 0.69 zwischen 0 und 2 liegt, schneidet der Graph die Achse!"
+            }
+        ];
+
+        // Adaptive Logic Tracking
+        let currentQueue = [];
+        let currentIndex = 0;
+        let xp = 0;
+        let level = 1;
+        let streak = 0;
+        let consecutiveMistakesCategory = 0;
+        let lastErrorCategory = "";
+        let selectedOption = null;
+        let questionStartTime = 0;
+        let jokerUsedForCurrent = false;
+
+        const scores = {
+            "ableitung": { correct: 0, total: 4, name: "Ableitungsregeln" },
+            "stamm": { correct: 0, total: 4, name: "Stammfunktionen" },
+            "integral": { correct: 0, total: 3, name: "Bestimmte Integrale" },
+            "sach": { correct: 0, total: 3, name: "Sachzusammenhänge" }
+        };
+
+        function buildQueue() {
+            allQuestions.forEach(q => {
+                if (!q.isFallback && !q.isLevel2) {
+                    currentQueue.push(q);
+                    // Dynamically calculate totals based on queue, but for now we manually bumped it
+                }
+            });
+        }
+
+        function buildLevel2Queue() {
+            allQuestions.forEach(q => {
+                if (q.isLevel2) currentQueue.push(q);
+            });
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = `<div class="feedback-message msg-success" style="animation: none;">🔥 LEVEL 2 ERREICHT! Neue, schwierigere Aufgaben freigeschaltet! 🔥</div>`;
+            setTimeout(() => {
+                loadQuestion();
+            }, 3000);
+        }
+
+        function startTest() {
+            buildQueue();
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            // Start the timer and reset joker status
+            questionStartTime = Date.now();
+            jokerUsedForCurrent = false;
+
+            if (currentIndex >= currentQueue.length) {
+                // If Level 2 is reached, unlocked harder questions
+                if (level >= 2 && currentQueue.length === allQuestions.filter(q => !q.isFallback && !q.isLevel2).length) {
+                    buildLevel2Queue();
+                } else {
+                    showResults();
+                    return;
+                }
+            }
+
+            const q = currentQueue[currentIndex];
+            document.getElementById('question-category').innerText = q.category;
+            document.getElementById('question-text').innerHTML = q.text;
+
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = "";
+
+            // JOKER reset
+            const jokerArea = document.getElementById('joker-area');
+            const jokerText = document.getElementById('joker-hint');
+            const jokerBtn = document.getElementById('btn-joker');
+            jokerText.style.display = "none";
+            jokerText.innerText = "";
+
+            if (q.hint && xp >= 50) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "1";
+            } else if (q.hint) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "0.5";
+            } else {
+                jokerArea.style.display = "none";
+            }
+
+            selectedOption = null;
+
+            // Visual Graphic Check
+            if (q.type === 'VisualGraph') {
+                const graphDiv = document.createElement('div');
+                graphDiv.className = 'graph-container';
+                graphDiv.innerHTML = q.graphSVG;
+                inputArea.appendChild(graphDiv);
+
+                // MC Render für Visual
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'mc') {
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'text') {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'text-answer';
+                input.placeholder = "Hier Term / Wort tippen...";
+                input.onkeyup = (e) => { if (e.key === 'Enter') submitAnswer(); };
+                inputArea.appendChild(input);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+            updateProgress();
+        }
+
+        function renderMCOptions(q, container) {
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'mc-options';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'mc-option';
+                btn.innerHTML = opt.replace(/e\^\((.*?)\)/g, 'e<sup>$1</sup>');
+                btn.onclick = () => {
+                    document.querySelectorAll('.mc-option').forEach(el => el.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOption = index;
+                };
+                optionsDiv.appendChild(btn);
+            });
+            container.appendChild(optionsDiv);
+        }
+
+        function useJoker() {
+            if (xp >= 50) {
+                xp -= 50;
+                jokerUsedForCurrent = true;
+                document.getElementById('xp-display').querySelector('span').innerText = xp;
+
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = currentQueue[currentIndex].hint;
+                hintDiv.style.display = "block";
+
+                document.getElementById('btn-joker').disabled = true;
+                document.getElementById('btn-joker').style.opacity = "0.2";
+            } else {
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = "Nicht genug XP! Du brauchst 50 XP für einen Tipp.";
+                hintDiv.style.color = "var(--error)";
+                hintDiv.style.display = "block";
+                setTimeout(() => {
+                    hintDiv.style.display = "none";
+                    hintDiv.style.color = "var(--joker-color)";
+                }, 2000);
+            }
+        }
+
+        function submitAnswer() {
+            const q = currentQueue[currentIndex];
+            let isCorrect = false;
+
+            if (q.type === 'mc' || q.type === 'VisualGraph') {
+                if (selectedOption === null) return;
+                isCorrect = (selectedOption === q.correct);
+            } else if (q.type === 'text') {
+                const userInput = document.getElementById('text-answer').value.trim().toLowerCase().replace(/\s+/g, '');
+                if (userInput === "") return;
+                const corrects = q.correct.map(c => c.toLowerCase().replace(/\s+/g, ''));
+                isCorrect = corrects.includes(userInput);
+            }
+
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('joker-area').style.display = 'none'; // Hide joker on submit
+            const inputArea = document.getElementById('input-area');
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = "feedback-message " + (isCorrect ? "msg-success" : "msg-error");
+
+            if (isCorrect) {
+                streak++;
+
+                // Speedrun Bonus Logic
+                const timeTakenStr = ((Date.now() - questionStartTime) / 1000);
+                let speedBonus = 0;
+                let bonusMsg = "";
+
+                if (timeTakenStr <= 10.0 && !jokerUsedForCurrent && !q.isFallback) {
+                    speedBonus = 50;
+                    bonusMsg = `<br><span style="color:var(--joker-color); font-size: 0.9rem;">⚡ QUICK-BRAIN BONUS (+50 XP) - ${timeTakenStr.toFixed(1)}s</span>`;
+                }
+
+                let xpGain = 100 + (streak * 20) + speedBonus;
+                xp += xpGain;
+
+                // Nur normale Fragen fließen in die Score-Rückmeldung ein
+                if (!q.isFallback) scores[q.categoryId].correct++;
+
+                feedbackDiv.innerHTML = `Richtig! (+${xpGain} XP)` + bonusMsg;
+
+                // Adaptive Reset
+                consecutiveMistakesCategory = 0;
+            } else {
+                streak = 0;
+                let correctDisplay;
+                if (q.type === 'text') {
+                    correctDisplay = q.correct[0];
+                } else {
+                    correctDisplay = q.options[q.correct];
+                }
+
+                feedbackDiv.innerHTML = `Falsch. Richtig wäre: <b>${correctDisplay}</b>`;
+
+                // ADAPTIVE DIFFICULTY TRIGGER
+                if (!q.isFallback) {
+                    if (lastErrorCategory === q.categoryId) {
+                        consecutiveMistakesCategory++;
+                    } else {
+                        consecutiveMistakesCategory = 1;
+                        lastErrorCategory = q.categoryId;
+                    }
+
+                    // 2 FEHLER = Fallback injecten
+                    if (consecutiveMistakesCategory === 2) {
+                        const fallbackQ = allQuestions.find(fb => fb.isFallback && fb.categoryId === q.categoryId);
+                        if (fallbackQ) {
+                            // Inject directly after current
+                            currentQueue.splice(currentIndex + 1, 0, fallbackQ);
+                            feedbackDiv.innerHTML += `<br><br><span style="color:var(--joker-color);">⚠️ Sicherheitsnetz aktiviert. Nächste Aufgabe prüft Basics!</span>`;
+                        }
+                        consecutiveMistakesCategory = 0; // reset after trigger
+                    }
+                }
+            }
+
+            inputArea.appendChild(feedbackDiv);
+            const newLevel = Math.floor(xp / 250) + 1; // Level Up every 250 XP
+            if (newLevel > level) {
+                level = newLevel;
+                feedbackDiv.innerHTML += `<div style="color:var(--primary-glow); margin-top:10px;">LEVEL UP: STUFE ${level}!</div>`;
+            }
+
+            document.getElementById('xp-display').querySelector('span').innerText = xp;
+            document.getElementById('level-display').querySelector('span').innerText = level;
+
+            const streakSpan = document.getElementById('streak-display').querySelector('span');
+            streakSpan.innerText = streak;
+            if (streak >= 3) streakSpan.classList.add('streak-fire');
+            else streakSpan.classList.remove('streak-fire');
+
+            currentIndex++;
+            setTimeout(loadQuestion, 3000);
+        }
+
+        function updateProgress() {
+            // Adaptive Queue kann ihre Länge ändern (durch injections), daher relativ berechnen
+            const percent = (currentIndex / currentQueue.length) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function showResults() {
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            document.getElementById('final-stats').innerText = `Lernerfolg: ${xp} XP | Level ${level}`;
+
+            const feedbackArea = document.getElementById('feedback-area');
+            feedbackArea.innerHTML = "";
+
+            for (const key in scores) {
+                const s = scores[key];
+                const catDiv = document.createElement('div');
+                catDiv.className = 'result-category';
+
+                let ratio = (s.correct / s.total);
+                let color = ratio === 1 ? 'var(--success)' : (ratio >= 0.5 ? '#f59e0b' : 'var(--error)');
+                catDiv.style.borderLeftColor = color;
+
+                let fbText = "";
+                let specificHint = "";
+
+                if (key === "ableitung") {
+                    specificHint = "Wiederhole die Kettenregel (Innere mal Äußere Ableitung) und die Produktregel. Schau dir speziell das Ausklammern von e^x an.";
+                } else if (key === "stamm") {
+                    specificHint = "Beim Aufleiten von e^(kx) musst du durch 'k' teilen. Erinnere dich: Die Konstante bleibt beim Ableiten und Aufleiten stehen!";
+                } else if (key === "integral") {
+                    specificHint = "Integrale messen Flächenbilanzen. Achte darauf, wo der Graph die x-Achse schneidet, und teile die Fläche ggf. am Nullpunkt auf (Betragsstriche).";
+                } else if (key === "sach") {
+                    specificHint = "Erinnere dich: f(t) = c*e^(kt). 'c' ist der Startwert. Bei k>0 haben wir Wachstum, bei k<0 Zerfall. Das Integral einer Änderungsrate liefert die hinzukommende Menge.";
+                }
+
+                if (ratio === 1) {
+                    fbText = `Exzellent (${s.correct}/${s.total}). Du bist in diesem Bereich bestens für die Klausur vorbereitet!`;
+                } else if (ratio >= 0.5) {
+                    fbText = `Solide (${s.correct}/${s.total}). Du hast die Basics verstanden, baust aber noch kleine Fehler ein.<br><strong style="color:var(--joker-color); font-size:0.95rem; display:inline-block; margin-top:8px;">💡 Tipp für die Klausur: ${specificHint}</strong>`;
+                } else {
+                    fbText = `Förderbedarf (${s.correct}/${s.total}). Dieser Bereich kostet dich in der Klausur noch viele Punkte.<br><strong style="color:var(--error); font-size:0.95rem; display:inline-block; margin-top:8px;">🎯 Dein Lernplan:</strong><br><span style="font-size:0.95rem; color:#cbd5e1; display:inline-block; margin-top:4px;">${specificHint}</span>`;
+                }
+
+                catDiv.innerHTML = `
+                    <h3 style="margin:0; font-size:1.1rem; color: ${color};">${s.name}</h3>
+                    <div class="feedback-text">${fbText}</div>
+                `;
+                feedbackArea.appendChild(catDiv);
+            }
+        }
+    </script>
+</body>
+
+</html>
