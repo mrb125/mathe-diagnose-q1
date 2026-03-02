@@ -870,8 +870,16 @@
         if (scoresObj.beschraenkt)  payload.BeschraenktesWachstum  = `${scoresObj.beschraenkt.correct}/${scoresObj.beschraenkt.total}`;
 
         // Feature 9: Fehleranalyse
+        const fehlerKeys = {
+            ableitung:   "Ableitungsregeln_Fehler",
+            stamm:       "Stammfunktionen_Fehler",
+            integral:    "Integrale_Fehler",
+            sach:        "Sachaufgaben_Fehler",
+            graph:       "Graphenanalyse_Fehler",
+            beschraenkt: "BeschraenktesWachstum_Fehler"
+        };
         for (const catId of selectedCategories) {
-            const key = catId.charAt(0).toUpperCase() + catId.slice(1) + "_Fehler";
+            const key = fehlerKeys[catId] || (catId + "_Fehler");
             payload[key] = (wrongChoices[catId] || []).join(" | ").substring(0, 400) || "";
         }
 
