@@ -4,16 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- iPad / PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Q1 Mathe GK">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="manifest" href="manifest.json">
     <title>Q1 Diagnose-Tool: e-Funktionen & Integrale (GK)</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Roboto+Mono:wght@500&display=swap');
-
         :root {
             --bg-dark: #0f172a;
             --bg-gradient: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
@@ -28,9 +23,8 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
+            margin: 0; padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
             background: var(--bg-gradient);
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -49,7 +43,7 @@
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             padding: 40px;
@@ -58,868 +52,1511 @@
             margin: 20px 0;
         }
 
-        h1,
-        h2,
-        h3 {
-            font-weight: 900;
-            margin-top: 0;
-        }
+        h1, h2, h3 { font-weight: 900; margin-top: 0; }
+        h1 { color: #fff; text-shadow: 0 0 15px var(--primary-glow); font-size: 2.2rem; margin-bottom: 10px; }
+        h2 { font-size: 1.2rem; color: var(--secondary-glow); letter-spacing: 2px; text-transform: uppercase; }
 
-        h1 {
-            color: #fff;
-            text-shadow: 0 0 15px var(--primary-glow);
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            color: var(--secondary-glow);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .screen {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease-out;
-        }
-
-        .screen.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .screen { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-out; }
+        .screen.active { display: block; opacity: 1; transform: translateY(0); }
 
         /* HUD */
         .hud {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.8);
-            padding: 15px 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            border: 1px solid var(--glass-border);
-            font-size: 1.1rem;
-            font-weight: 700;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15,23,42,0.8); padding: 12px 20px; border-radius: 12px;
+            margin-bottom: 20px; border: 1px solid var(--glass-border);
+            font-size: 1rem; font-weight: 700; flex-wrap: wrap; gap: 8px;
         }
-
-        .hud-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .hud-item span {
-            color: var(--primary-glow);
-        }
+        .hud-item { display: flex; align-items: center; gap: 8px; }
+        .hud-item span { color: var(--primary-glow); }
 
         .progress-bar-container {
-            width: 100%;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            margin-top: 30px;
-            overflow: hidden;
+            width: 100%; height: 12px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; margin-top: 20px; overflow: hidden;
         }
+        .progress-bar { height: 100%; width: 0%; background: var(--primary-glow); box-shadow: 0 0 10px var(--primary-glow); transition: width 0.5s ease; }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--primary-glow);
-            box-shadow: 0 0 10px var(--primary-glow);
-            transition: width 0.5s ease;
-        }
-
-        /* Buttons & Inputs */
+        /* Buttons */
         button {
             background: linear-gradient(135deg, var(--primary-glow), #0284c7);
-            color: #fff;
-            border: none;
-            padding: 18px 36px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            font-family: 'Outfit', sans-serif;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            margin-top: 30px;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-            width: 100%;
-            max-width: 350px;
+            color: #fff; border: none; padding: 18px 36px; font-size: 1.2rem;
+            font-weight: 700; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            border-radius: 12px; cursor: pointer; transition: all 0.2s ease;
+            text-transform: uppercase; margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(56,189,248,0.3); width: 100%; max-width: 350px;
         }
-
-        button:active {
-            transform: scale(0.96);
-        }
-
-        button:hover {
-            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
-            transform: translateY(-2px);
-        }
+        button:active { transform: scale(0.96); }
+        button:hover { box-shadow: 0 6px 20px rgba(56,189,248,0.5); transform: translateY(-2px); }
+        button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
         .joker-btn {
             background: linear-gradient(135deg, var(--joker-color), #d97706);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
-            font-size: 1rem;
-            padding: 12px 24px;
-            margin-top: 15px;
-            max-width: 250px;
+            box-shadow: 0 4px 15px rgba(251,191,36,0.3);
+            font-size: 0.95rem; padding: 12px 20px; margin-top: 12px; max-width: 230px;
         }
+        .joker-btn:hover { box-shadow: 0 6px 20px rgba(251,191,36,0.5); }
 
-        .joker-btn:hover {
-            box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+        .fifty-btn {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+            font-size: 0.95rem; padding: 12px 20px; margin-top: 12px; max-width: 180px;
         }
+        .fifty-btn:hover { box-shadow: 0 6px 20px rgba(139,92,246,0.5); }
 
         .joker-text {
-            color: var(--joker-color);
-            font-weight: bold;
-            margin-top: 15px;
-            background: rgba(251, 191, 36, 0.1);
-            padding: 15px;
-            border: 1px dashed var(--joker-color);
-            border-radius: 10px;
-            display: none;
-            animation: fadeIn 0.3s;
+            color: var(--joker-color); font-weight: bold; margin-top: 12px;
+            background: rgba(251,191,36,0.1); padding: 12px 15px;
+            border: 1px dashed var(--joker-color); border-radius: 10px;
+            display: none; animation: fadeIn 0.3s; text-align: left;
         }
 
-        .mc-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 25px;
+        .hud-formula-btn {
+            background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3);
+            color: var(--primary-glow); padding: 8px 14px; font-size: 0.82rem;
+            margin-top: 0; width: auto; max-width: none; text-transform: none;
+            box-shadow: none; border-radius: 8px;
         }
+        .hud-formula-btn:hover { background: rgba(56,189,248,0.2); transform: none; }
 
+        /* MC options */
+        .mc-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
         .mc-option {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 18px 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            text-align: left;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 16px 18px; border-radius: 12px; cursor: pointer;
+            font-size: 1rem; font-weight: 500; transition: all 0.2s; text-align: left;
         }
+        .mc-option.selected { background: rgba(56,189,248,0.15); border-color: var(--primary-glow); box-shadow: 0 0 15px rgba(56,189,248,0.2); }
+        .mc-option.eliminated { opacity: 0.18; pointer-events: none; text-decoration: line-through; }
 
-        .mc-option.selected {
-            background: rgba(56, 189, 248, 0.15);
-            border-color: var(--primary-glow);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+        /* Text inputs */
+        input[type="text"], input[type="number"] {
+            width: 80%; padding: 16px; font-size: 1.3rem; margin-top: 20px;
+            background: rgba(15,23,42,0.8); border: 2px solid rgba(255,255,255,0.2);
+            color: var(--primary-glow); border-radius: 12px; text-align: center;
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
         }
+        input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--primary-glow); }
 
-        input[type="text"] {
-            width: 80%;
-            padding: 18px;
-            font-size: 1.4rem;
-            margin-top: 25px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            color: var(--primary-glow);
-            border-radius: 12px;
-            text-align: center;
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--primary-glow);
-        }
-
-        /* Result Section */
-        .result-category {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            margin: 15px 0;
-            text-align: left;
-            border-radius: 16px;
-            border-left: 6px solid var(--primary-glow);
-        }
-
-        /* Text Styles */
-        .math-text {
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1.2rem;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 4px 10px;
-            border-radius: 6px;
-            display: inline-block;
-            margin: 5px 0;
-            color: var(--primary-glow);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-        }
-
-        /* Visual SVG Graph Style */
-        .graph-container {
-            background: #fff;
-            border-radius: 12px;
-            padding: 10px;
-            margin: 20px auto;
-            max-width: 400px;
-            border: 2px solid var(--primary-glow);
-        }
-
+        /* Feedback */
         .feedback-message {
-            margin-top: 25px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            padding: 15px;
-            border-radius: 12px;
-            animation: fadeIn 0.3s;
+            margin-top: 20px; font-weight: 700; font-size: 1.1rem;
+            padding: 15px; border-radius: 12px; animation: fadeIn 0.3s;
+        }
+        .msg-success { background: rgba(52,211,153,0.1); color: var(--success); border: 1px solid rgba(52,211,153,0.3); }
+        .msg-error { background: rgba(248,113,113,0.1); color: var(--error); border: 1px solid rgba(248,113,113,0.3); }
+
+        /* Explanation box (Feature 1) */
+        .explanation-box {
+            background: rgba(248,113,113,0.07); border: 1px solid rgba(248,113,113,0.25);
+            border-radius: 10px; padding: 12px 16px; margin-top: 10px;
+            font-size: 0.93rem; color: #fca5a5; text-align: left;
+            animation: fadeIn 0.3s; line-height: 1.55; font-weight: 400;
         }
 
-        .msg-success {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(52, 211, 153, 0.3);
+        /* Challenge badge (Feature 10) */
+        .challenge-badge {
+            color: #fb923c; font-size: 0.88rem; font-weight: 700;
+            padding: 8px 14px; background: rgba(251,146,60,0.1);
+            border: 1px solid rgba(251,146,60,0.3); border-radius: 10px;
+            animation: fadeIn 0.3s; margin-top: 8px; display: inline-block;
         }
 
-        .msg-error {
-            background: rgba(248, 113, 113, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(248, 113, 113, 0.3);
+        /* Graph container */
+        .graph-container {
+            background: #fff; border-radius: 12px; padding: 10px;
+            margin: 15px auto; max-width: 400px; border: 2px solid var(--primary-glow);
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Result screen */
+        .result-category {
+            background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.05);
+            padding: 18px; margin: 12px 0; text-align: left;
+            border-radius: 16px; border-left: 6px solid var(--primary-glow);
+        }
+        .math-text {
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
+            font-size: 1.1rem; background: rgba(0,0,0,0.4); padding: 3px 8px;
+            border-radius: 6px; display: inline-block; margin: 4px 0;
+            color: var(--primary-glow); border: 1px solid rgba(56,189,248,0.2);
         }
 
-        /* --- CERTIFICATE PRINT CSS --- */
+        /* Streak animation */
+        .streak-fire { color: var(--joker-color) !important; text-shadow: 0 0 10px var(--joker-color); animation: streakPulse 0.7s ease-in-out infinite alternate; }
+        @keyframes streakPulse { from { transform: scale(1); } to { transform: scale(1.3); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Resources */
+        .resources-section { margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); }
+        .resources-title { font-size: 0.76rem; color: var(--secondary-glow); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .resource-links { display: flex; flex-wrap: wrap; gap: 8px; }
+        .resource-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; text-decoration: none; font-weight: 600; transition: all 0.2s; }
+        .resource-link.video { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.25); }
+        .resource-link.video:hover { background: rgba(239,68,68,0.25); }
+        .resource-link.web { background: rgba(56,189,248,0.08); color: var(--primary-glow); border: 1px solid rgba(56,189,248,0.2); }
+        .resource-link.web:hover { background: rgba(56,189,248,0.18); }
+
+        /* ─── Feature 2: Selfcheck Screen ─── */
+        .selfcheck-category {
+            background: rgba(15,23,42,0.6); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 14px 18px; margin: 10px 0;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px; text-align: left;
+        }
+        .selfcheck-cat-name { font-weight: 700; font-size: 0.95rem; min-width: 160px; }
+        .selfcheck-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .selfcheck-btn {
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+            color: var(--text-main); padding: 8px 14px; font-size: 0.85rem;
+            margin-top: 0; width: auto; max-width: none; border-radius: 8px;
+            box-shadow: none; text-transform: none; font-weight: 600;
+        }
+        .selfcheck-btn:hover { transform: none; box-shadow: none; }
+        .selfcheck-btn.sel-sicher  { background: rgba(52,211,153,0.2); border-color: var(--success); color: var(--success); }
+        .selfcheck-btn.sel-unsicher { background: rgba(245,158,11,0.2); border-color: #f59e0b; color: #f59e0b; }
+        .selfcheck-btn.sel-garnicht { background: rgba(248,113,113,0.2); border-color: var(--error); color: var(--error); }
+
+        /* Selfcheck result comparison (Feature 2) */
+        .selfcheck-compare {
+            background: rgba(15,23,42,0.6); border: 1px solid var(--glass-border);
+            border-radius: 14px; padding: 18px; margin: 16px 0; text-align: left;
+        }
+        .selfcheck-compare h3 { font-size: 0.82rem; color: var(--secondary-glow); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .selfcheck-compare table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .selfcheck-compare th { color: #94a3b8; text-align: left; padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; font-size: 0.82rem; }
+        .selfcheck-compare td { padding: 7px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* ─── Feature 5: Category selection ─── */
+        .cat-select-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 8px; margin: 12px 0; text-align: left;
+        }
+        .cat-select-item {
+            display: flex; align-items: center; gap: 9px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            border-radius: 9px; padding: 10px 13px; cursor: pointer;
+            font-size: 0.88rem; color: var(--text-main); transition: border-color 0.2s;
+        }
+        .cat-select-item:hover { border-color: var(--primary-glow); }
+        .cat-select-item input[type="checkbox"] {
+            width: 17px; height: 17px; padding: 0; margin: 0;
+            accent-color: var(--primary-glow); cursor: pointer; flex-shrink: 0;
+        }
+
+        /* ─── Feature 7: Formula Modal ─── */
+        .formula-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.72); z-index: 1000;
+            justify-content: center; align-items: center; padding: 16px;
+        }
+        .formula-overlay.open { display: flex; }
+        .formula-modal {
+            background: #0f172a; border: 1px solid var(--primary-glow);
+            border-radius: 16px; padding: 26px; max-width: 600px; width: 100%;
+            max-height: 82vh; overflow-y: auto; text-align: left;
+            box-shadow: 0 0 40px rgba(56,189,248,0.2);
+        }
+        .formula-section-title {
+            color: var(--primary-glow); font-size: 0.82rem; text-transform: uppercase;
+            letter-spacing: 2px; font-weight: 800; margin: 18px 0 8px;
+            border-bottom: 1px solid rgba(56,189,248,0.2); padding-bottom: 5px;
+        }
+        .formula-section-title:first-child { margin-top: 0; }
+        .formula-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 8px; }
+        .formula-table th { color: var(--secondary-glow); text-align: left; padding: 5px 8px; font-weight: 700; font-size: 0.82rem; }
+        .formula-table td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .formula-table td:first-child { color: #94a3b8; }
+        .formula-table td:last-child { font-family: ui-monospace, monospace; color: var(--primary-glow); }
+        .formula-note { background: rgba(251,191,36,0.08); border-left: 3px solid var(--joker-color); padding: 8px 12px; border-radius: 0 6px 6px 0; font-size: 0.86rem; color: #fde68a; margin: 8px 0; line-height: 1.5; }
+        .formula-block { font-family: ui-monospace, monospace; background: rgba(0,0,0,0.3); padding: 10px 14px; border-radius: 8px; color: var(--primary-glow); font-size: 0.95rem; margin: 8px 0; }
+        .formula-close-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 24px; border-radius: 8px; margin-top: 18px; font-size: 0.9rem; width: auto; max-width: none; text-transform: none; box-shadow: none; }
+
+        /* ─── Feature 3: Review button ─── */
+        .review-btn {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 4px 15px rgba(5,150,105,0.3);
+            font-size: 1rem; padding: 14px 28px; max-width: 300px;
+        }
+        .review-btn:hover { box-shadow: 0 6px 20px rgba(5,150,105,0.5); }
+
+        /* ─── Print ─── */
         @media print {
-            body {
-                background: #fff !important;
-                color: #000 !important;
-                display: block;
-            }
-
-            .container {
-                box-shadow: none;
-                border: none;
-                width: 100%;
-                max-width: 100%;
-                margin: 0;
-                padding: 0;
-                background: none;
-                backdrop-filter: none;
-            }
-
-            .hud,
-            #start-screen,
-            #quiz-screen,
-            button {
-                display: none !important;
-            }
-
-            .screen.active {
-                opacity: 1;
-                transform: none;
-                display: block;
-            }
-
-            h1 {
-                color: #000 !important;
-                text-shadow: none !important;
-                margin-bottom: 50px;
-                text-align: center;
-                border-bottom: 2px solid #ccc;
-                padding-bottom: 20px;
-            }
-
-            h2 {
-                color: #555 !important;
-            }
-
-            .result-category {
-                background: #fdfdfd !important;
-                border: 1px solid #ddd !important;
-                border-left: 6px solid #38bdf8 !important;
-                page-break-inside: avoid;
-            }
-
-            .feedback-text {
-                color: #333 !important;
-            }
-
-            /* Add custom certificate footer */
-            #result-screen::after {
-                content: "Offizielles Q1 Diagnose-Dokument -- NRW Grundkurs Mathematik -- Erfolg muss man sich erarbeiten!";
-                display: block;
-                margin-top: 50px;
-                text-align: center;
-                font-size: 0.9rem;
-                color: #888;
-                border-top: 1px solid #ccc;
-                padding-top: 20px;
-            }
+            body { background: #fff !important; color: #000 !important; display: block; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; padding: 0; background: none; backdrop-filter: none; }
+            .hud, #start-screen, #selfcheck-screen, #quiz-screen, button, .resources-section, .selfcheck-compare { display: none !important; }
+            .screen.active { opacity: 1; transform: none; display: block; }
+            h1 { color: #000 !important; text-shadow: none !important; margin-bottom: 50px; text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 20px; }
+            h2 { color: #555 !important; }
+            .result-category { background: #fdfdfd !important; border: 1px solid #ddd !important; border-left: 6px solid #38bdf8 !important; page-break-inside: avoid; }
+            .feedback-text { color: #333 !important; }
+            #result-screen::after { content: "Offizielles Q1 Diagnose-Dokument -- NRW Grundkurs Mathematik -- Erfolg muss man sich erarbeiten!"; display: block; margin-top: 50px; text-align: center; font-size: 0.9rem; color: #888; border-top: 1px solid #ccc; padding-top: 20px; }
         }
     </style>
 </head>
 
 <body>
+<div class="container">
 
-    <div class="container">
-        <!-- PHASE 1: STARTBILDSCHIRM -->
-        <div id="start-screen" class="screen active">
-            <h1>Q1 GK Diagnose</h1>
-            <h2>e-Funktionen & Integrale (GK NRW)</h2>
-            <p style="font-size: 1.1rem; color: #94a3b8; margin-top: 20px; line-height: 1.6;">
-                Sammle Erfahrungspunkte (XP) und mach dich fit fürs Abi. Wenn du feststeckst, setze einen Tipp-Joker ein
-                (-50 XP).
-            </p>
-            <button onclick="startTest()">Diagnose Starten</button>
+    <!-- ══════════════════════════════════════════
+         PHASE 1: START-SCREEN
+    ══════════════════════════════════════════ -->
+    <div id="start-screen" class="screen active">
+        <h1>Q1 GK Diagnose</h1>
+        <h2>e-Funktionen & Integrale (GK NRW)</h2>
+        <p style="font-size:1rem; color:#94a3b8; margin-top:16px; line-height:1.6;">
+            Sammle XP, mach dich fit fürs Abi. Nutze Tipp- und 50:50-Joker (je −50 XP).
+        </p>
+
+        <input type="text" id="student-name" maxlength="40" placeholder="Dein Name (für Zertifikat)..."
+            style="width:70%; padding:14px; font-size:1rem; margin-top:16px; background:rgba(15,23,42,0.8); border:2px solid rgba(255,255,255,0.2); color:var(--primary-glow); border-radius:12px; text-align:center; font-family:system-ui,-apple-system,sans-serif; box-sizing:border-box;">
+        <div id="best-score-display" style="font-size:0.88rem; color:#64748b; margin-top:8px;"></div>
+
+        <!-- Feature 5: Kategorienauswahl -->
+        <div style="margin-top:20px; text-align:left;">
+            <div style="font-size:0.8rem; color:var(--secondary-glow); font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;">
+                Kategorien wählen
+            </div>
+            <div class="cat-select-grid" id="category-checkboxes"></div>
         </div>
 
-        <!-- PHASE 2: DIAGNOSEBOGEN (QUIZ) -->
-        <div id="quiz-screen" class="screen">
-            <div class="hud">
-                <div class="hud-item" id="level-display">LVL <span>1</span></div>
-                <div class="hud-item" id="xp-display">XP: <span>0</span></div>
-                <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
-            </div>
+        <button onclick="showSelfCheck()">Diagnose Starten</button>
+        <div id="review-btn-area" style="margin-top:0;"></div>
+    </div>
 
-            <div id="question-category"
-                style="color: var(--secondary-glow); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;">
-                KATEGORIE</div>
-            <div id="question-text" style="font-size: 1.3rem; font-weight: 500; margin: 20px 0; line-height: 1.5;">Lade
-                Daten...</div>
+    <!-- ══════════════════════════════════════════
+         PHASE 2: SELBSTEINSCHÄTZUNG (Feature 2)
+    ══════════════════════════════════════════ -->
+    <div id="selfcheck-screen" class="screen">
+        <h1>Selbsteinschätzung</h1>
+        <h2>Wie sicher bist du?</h2>
+        <p style="font-size:0.95rem; color:#94a3b8; margin-top:12px; line-height:1.6;">
+            Schätze dich vor dem Quiz ein – am Ende siehst du, wie gut du dich kennst.
+        </p>
+        <div id="selfcheck-content" style="margin-top:16px;"></div>
+        <button onclick="startQuiz()" style="margin-top:24px;">Quiz starten</button>
+        <button onclick="showScreen('start-screen')"
+            style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); box-shadow:none; max-width:200px; font-size:0.9rem; padding:12px;">
+            ← Zurück
+        </button>
+    </div>
 
-            <div id="input-area"></div>
-
-            <div id="joker-area" style="display: none; text-align: center;">
-                <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp freischalten (-50 XP)</button>
-                <div id="joker-hint" class="joker-text"></div>
-            </div>
-
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar"></div>
-            </div>
-
-            <button id="next-btn" onclick="submitAnswer()" style="display: none; margin: 30px auto 0;">Antwort
-                Einloggen</button>
+    <!-- ══════════════════════════════════════════
+         PHASE 3: QUIZ-SCREEN
+    ══════════════════════════════════════════ -->
+    <div id="quiz-screen" class="screen">
+        <div class="hud">
+            <div class="hud-item" id="level-display">LVL <span>1</span></div>
+            <div class="hud-item" id="xp-display">XP: <span>0</span></div>
+            <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
+            <!-- Feature 7: Formelblatt-Button -->
+            <button class="hud-formula-btn" onclick="toggleFormulaSheet()">📋 Formelblatt</button>
         </div>
 
-        <!-- PHASE 3: DIAGNOSE-AUSWERTUNG -->
-        <div id="result-screen" class="screen">
-            <h1 style="font-size: 2rem;">Zertifikat: Grundkurs Diagnose</h1>
-            <h2 id="final-stats" style="color: var(--text-main); margin-bottom: 40px; text-transform: none;">Gesamt XP:
-                0</h2>
+        <div id="question-category" style="color:var(--secondary-glow); font-weight:700; font-size:0.85rem; letter-spacing:2px; text-transform:uppercase;">KATEGORIE</div>
+        <div id="question-text" style="font-size:1.25rem; font-weight:500; margin:18px 0; line-height:1.55;">Lade Daten...</div>
 
-            <div id="feedback-area"></div>
+        <div id="input-area"></div>
 
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="window.print()"
-                    style="background: linear-gradient(135deg, var(--success), #059669);">📄 Als PDF speichern /
-                    Drucken</button>
-                <button onclick="location.reload()"
-                    style="background: linear-gradient(135deg, var(--secondary-glow), #9333ea);">Neue Diagnose
-                    Starten</button>
+        <!-- Feature 4: Doppel-Joker -->
+        <div id="joker-area" style="display:none; text-align:center;">
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp (−50 XP)</button>
+                <button class="fifty-btn" id="btn-fifty" onclick="useFifty()">50:50 (−50 XP)</button>
             </div>
+            <div id="joker-hint" class="joker-text"></div>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <button id="next-btn" onclick="submitAnswer()" style="display:none; margin:24px auto 0;">Antwort Einloggen</button>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         PHASE 4: AUSWERTUNG
+    ══════════════════════════════════════════ -->
+    <div id="result-screen" class="screen">
+        <h1 id="cert-title" style="font-size:2rem;">Zertifikat: Grundkurs Diagnose</h1>
+        <h2 id="final-stats" style="color:var(--text-main); margin-bottom:30px; text-transform:none;">Gesamt XP: 0</h2>
+
+        <!-- Feature 2: Selbsteinschätzungs-Vergleich -->
+        <div id="selfcheck-result-area"></div>
+
+        <div id="feedback-area"></div>
+
+        <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap; margin-top:20px;">
+            <button onclick="window.print()" style="background:linear-gradient(135deg,var(--success),#059669);">📄 Als PDF speichern</button>
+            <button onclick="location.reload()" style="background:linear-gradient(135deg,var(--secondary-glow),#9333ea);">Neue Diagnose</button>
         </div>
     </div>
 
-    <!-- SCRIPT (Logik) -->
-    <script>
-        // GK-Level Questions (NRW Standard)
-        const allQuestions = [
-            // --- 1. Ableitungsregeln (Ketten/Produktregel) ---
-            {
-                category: "Ableitungsregeln", categoryId: "ableitung", type: "VisualGraph", isFallback: false,
-                text: "Welche Aussage trifft auf die Ableitungsfunktion f'(x) des abgebildeten Graphen von <span class='math-text'>f(x) = e^x</span> zu?",
-                options: ["Der Graph der Ableitung verläuft unterhalb der x-Achse.", "Der Graph der Ableitung ist exakt derselbe wie der abgebildete.", "Der Graph der Ableitung ist eine Ursprungsgerade."], correct: 1,
-                hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!",
-                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                    <!-- Achsen -->
-                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                    <!-- e-Kurve -->
-                    <path d="M 10 95 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
-                    <!-- Marker -->
-                    <text x="5" y="115" font-size="12" fill="#000">0</text>
-                    <text x="85" y="115" font-size="12" fill="#000">x</text>
-                </svg>`
-            },
-            {
-                category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false,
-                text: "Gegeben ist die Bestandsfunktion: <span class='math-text'>f(x) = e^(2x)</span>. Wie lautet die Änderungsrate f'(x)?",
-                options: ["e^(2x)", "2e^(2x)", "2xe^(2x)", "0.5e^(2x)"], correct: 1,
-                hint: "Kettenregel: Schreibe die e-Funktion einfach ab und multipliziere sie mit der Konstante aus dem Exponenten (hier die 2)."
-            },
-            {
-                category: "Ableitungsregeln", categoryId: "ableitung", type: "text", isFallback: false,
-                text: "Gegeben: <span class='math-text'>f(x) = x * e^x</span>.<br>Berechne die 1. Ableitung und klammere e^x aus.<br>(Schreibweise: <i>(x+1)*e^x</i>)",
-                correct: ["(x+1)*e^x", "(1+x)*e^x", "e^x*(x+1)", "e^x*(1+x)"],
-                hint: "Produktregel: Leite den ersten Teil ab und lass den zweiten stehen, plus umgekehrt."
-            },
-            {
-                category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false,
-                text: "Welche Regel(n) benötigst du (neben Faktorregel) zwingend zur Ableitung von <br><span class='math-text'>f(x) = 5 * e^(-0.2x)</span>?",
-                options: ["Nur die Kettenregel", "Nur die Produktregel", "Die Quotientenregel", "Keine, das ist polynomisch"], correct: 0,
-                hint: "Da vorne nur eine simple 5 und kein 'x' steht, brauchen wir keine Produktregel."
-            },
-            // Fallback Ableitung
-            {
-                category: "Ableitungsregeln (Basis)", categoryId: "ableitung", type: "text", isFallback: true,
-                text: "Lass uns einen Schritt zurückgehen. Was ist die Ableitung der ganz normalen e-Funktion <span class='math-text'>f(x) = e^x</span> ?",
-                correct: ["e^x"],
-                hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!"
-            },
+</div><!-- .container -->
 
-            // --- 2. Stammfunktionen ---
-            {
-                category: "Stammfunktionen (Fehlersuche)", categoryId: "stamm", type: "mc", isFallback: false,
-                text: "Finde den Fehler! Max hat die Stammfunktion von <span class='math-text'>f(x) = e^(2x)</span> berechnet. Seine Lösung: <span class='math-text'>F(x) = 2*e^(2x)</span>. Was hat er falsch gemacht?",
-                options: ["Er hat die e-Funktion verändert, sie muss e^x bleiben.", "Er hat abgeleitet statt aufgeleitet.", "Er hat das + c vergessen, ansonsten ist es richtig.", "Das '-' Vorzeichen fehlt vor der 2."], correct: 1,
-                hint: "Wenn vorne eine mal 2 steht, ist das die *innere Ableitung*. Beim *Aufleiten* (Integrieren) müsste dort der Kehrwert (also 1/2) stehen!"
-            },
-            {
-                category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false,
-                text: "Welcher Term beschreibt eine Stammfunktion für <br><span class='math-text'>f(x) = e^(3x)</span>?",
-                options: ["e^(3x)", "3e^(3x)", "(1/3)e^(3x)", "e^(3x) + 3x"], correct: 2,
-                hint: "Beim Aufleiten nimmst du die e-Funktion und rechnest 1 geteilt durch die Zahl, die vor dem x steht."
-            },
-            {
-                category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false,
-                text: "Gesucht ist EINE konkrete Stammfunktion von <br><span class='math-text'>f(x) = 2*e^x</span>.<br>(Lass das + c einfach weg)",
-                correct: ["2*e^x", "2e^x"],
-                hint: "Zahlen, die mit einem Malpunkt (Faktor) an der e-Funktion kleben, bleiben beim Aufleiten einfach stehen!"
-            },
-            {
-                category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false,
-                text: "Bestimme eine Stammfunktion F(x) zu <br><span class='math-text'>f(x) = e^(-x) + 4</span>. (Ohne +c)",
-                correct: ["-e^(-x)+4x", "-1*e^(-x)+4x", "-e^(-x)+4*x"],
-                hint: "Vor dem x steht quasi eine -1. Das kommt beim Aufleiten nach vorne. Und aus der 4 wird 4x."
-            },
-            // Fallback Stammfunktionen
-            {
-                category: "Stammfunktionen (Basis)", categoryId: "stamm", type: "text", isFallback: true,
-                text: "Ganz entspannt. Was ist eine Stammfunktion der Konstanten <span class='math-text'>f(x) = 5</span> ? (Ohne +c)",
-                correct: ["5x", "5*x"],
-                hint: "Das ist einfach: Beim Aufleiten bekommt eine Zahl einfach ein 'x' angehängt."
-            },
+<!-- ══════════════════════════════════════════
+     Feature 7: FORMELBLATT MODAL
+══════════════════════════════════════════ -->
+<div class="formula-overlay" id="formula-overlay" onclick="closeFormulaSheet(event)">
+    <div class="formula-modal" onclick="event.stopPropagation()">
+        <h1 style="font-size:1.4rem; margin-bottom:0;">📋 Formelblatt</h1>
+        <h2 style="font-size:0.8rem; margin-top:4px; margin-bottom:20px;">Q1 GK – e-Funktionen & Integrale</h2>
 
-            // --- 3. Bestimmte Integrale & Graphen ---
-            {
-                category: "Bestimmte Integrale", categoryId: "integral", type: "VisualGraph", isFallback: false,
-                text: "Die blaue Kurve ist <span class='math-text'>f(x) = e^x</span>. Betrachte die rot schraffierte Fläche von x=0 bis x=1.<br>Ist diese Fläche kleiner, genau gleich oder größer als 1?",
-                options: ["Kleiner als 1", "Genau gleich 1", "Größer als 1"], correct: 2,
-                hint: "Berechne das Integral von 0 bis 1: [e^x] von 0 bis 1 = e^1 - e^0 = e - 1. Da e ≈ 2.71 ist...",
-                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                    <!-- Achsen -->
-                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                    <!-- e-Kurve (approximiert als Pfad) -->
-                    <path d="M 10 90 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
-                    <!-- Fläche -->
-                    <path d="M 10 100 L 10 90 Q 50 80 90 20 L 90 100 Z" fill="rgba(248, 113, 113, 0.4)"/>
-                    <!-- Marker -->
-                    <text x="5" y="115" font-size="12" fill="#000">0</text>
-                    <text x="85" y="115" font-size="12" fill="#000">1</text>
-                </svg>`
-            },
-            {
-                category: "Bestimmte Integrale", categoryId: "integral", type: "mc", isFallback: false,
-                text: "Was passiert, wenn der Graph der untersuchten Funktion komplett unterhalb der x-Achse verläuft?",
-                options: ["Das Integral berechnet einen negativen Wert", "Das Integral ist immer 0", "Der Wert ist positiv, gibt aber nicht die Fläche an", "Darf man nicht integrieren"], correct: 0,
-                hint: "Integrale berechnen Flächen unter Graphen. Flächen unter der x-Achse zählen dabei Minus."
-            },
-            {
-                category: "Bestimmte Integrale", categoryId: "integral", type: "text", isFallback: false,
-                text: "Berechne das Integral von 0 bis ln(2) über <span class='math-text'>e^x dx</span>. <br>(Hinweis: e^ln(2) = 2)",
-                correct: ["1"],
-                hint: "Setze erst ln(2) für x ein (ergibt 2) und ziehe davon ab, was rauskommt, wenn du für x die 0 einsetzt (e^0 = 1)."
-            },
-            // Fallback Integral
-            {
-                category: "Bestimmte Integrale (Basis)", categoryId: "integral", type: "text", isFallback: true,
-                text: "Basiswissen: Wenn das Integral von f(x) positiven Flächeninhalt misst, wofür stehen die Grenzen a und b?",
-                correct: ["x werte", "x-werte", "x", "intervallgrenzen"],
-                hint: "Die zeigen dir, wo die Fläche beginnt und wo sie auf der x-Achse aufhört."
-            },
+        <div class="formula-section-title">Ableitungsregeln</div>
+        <table class="formula-table">
+            <tr><th>Regel</th><th>Formel</th></tr>
+            <tr><td>Potenzregel</td><td>(xⁿ)' = n · xⁿ⁻¹</td></tr>
+            <tr><td>Faktorregel</td><td>(c · f)' = c · f'</td></tr>
+            <tr><td>e-Funktion</td><td>(e^x)' = e^x</td></tr>
+            <tr><td>Kettenregel</td><td>(e^(kx))' = k · e^(kx)</td></tr>
+            <tr><td>Produktregel</td><td>(u · v)' = u'·v + u·v'</td></tr>
+        </table>
 
-            // --- 4. Sachzusammenhänge ---
-            {
-                category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false,
-                text: "Betrachte den abgebildeten Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c * e^(kt)</span>. Was lässt sich über den Parameter k aussagen?",
-                options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"], correct: 2,
-                hint: "Der Graph fällt ab (die Menge wird weniger). Das bedeutet exponentiellen Zerfall!",
-                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                    <!-- Achsen -->
-                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                    <!-- Zerfall-Kurve -->
-                    <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
-                    <!-- Marker -->
-                    <text x="5" y="115" font-size="12" fill="#000">0</text>
-                    <text x="100" y="115" font-size="12" fill="#000">t</text>
-                </svg>`
-            },
-            // --- 4. Sachzusammenhänge ---
-            {
-                category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false,
-                text: "Betrachte den abgebildeten Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c * e^(kt)</span>. Was lässt sich über den Parameter k aussagen?",
-                options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"], correct: 2,
-                hint: "Der Graph fällt ab (die Menge wird weniger). Das bedeutet exponentiellen Zerfall!",
-                graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                    <!-- Achsen -->
-                    <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                    <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                    <!-- Zerfall-Kurve -->
-                    <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
-                    <!-- Marker -->
-                    <text x="5" y="115" font-size="12" fill="#000">0</text>
-                    <text x="100" y="115" font-size="12" fill="#000">t</text>
-                </svg>`
-            },
-            {
-                category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false,
-                text: "Ein Bestand entwickelt sich nach <br><span class='math-text'>f(t) = 100 * e^(0.5t)</span>.<br>Was bedeutet die 100?",
-                options: ["Wachstumsrate in Prozent", "Maximaler Bestand", "Anfangsbestand zum Zeitpunkt t=0", "Halbwertszeit"], correct: 2,
-                hint: "Setze t=0 in die Funktion ein. Da e^0 = 1 ist, bleibt nur die Vorzahl übrig."
-            },
-            {
-                category: "Sachzusammenhänge", categoryId: "sach", type: "text", isFallback: false,
-                text: "Der Bestand ändert sich nach <br><span class='math-text'>f(t) = 500 * e^(-0.1t)</span>.<br>Handelt es sich um 'Wachstum' oder 'Zerfall'?",
-                correct: ["zerfall"],
-                hint: "Schau dir das Vorzeichen im Exponenten an. Positiv = Wachstum, Negativ = ..."
-            },
-            {
-                category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false,
-                text: "f(t) ist die momentane Zu-/Abflussrate von Wasser (L/min). Was liefert dann das bestimmte Integral über f(t)?",
-                options: ["Die aktuelle Tropfgeschwindigkeit", "Die Gesamte Zunahme/Abnahme an Wasser im Intervall", "Die absolute Maximalmenge", "Die durchschnittliche Geschwindigkeit"], correct: 1,
-                hint: "Wenn man eine Zufluss-Geschwindigkeit (Liter pro Minute) aufleitet, bekommt man die echte Menge (Liter), die dazukam."
-            },
+        <div class="formula-section-title">Aufleiten / Stammfunktionen</div>
+        <table class="formula-table">
+            <tr><th>Funktion f(x)</th><th>Stammfunktion F(x)</th></tr>
+            <tr><td>xⁿ  (n ≠ −1)</td><td>xⁿ⁺¹ / (n+1)</td></tr>
+            <tr><td>c (Konstante)</td><td>c · x</td></tr>
+            <tr><td>e^x</td><td>e^x</td></tr>
+            <tr><td>e^(kx)</td><td>(1/k) · e^(kx)</td></tr>
+        </table>
 
-            // --- LEVEL 2 (Harder Questions) ---
-            {
-                category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true,
-                text: "Kombiniere Produkt- und Kettenregel! <br>Leite ab: <span class='math-text'>f(x) = x * e^(2x)</span> <br>(Schreibweise: <i>(2x+1)*e^(2x)</i>)",
-                correct: ["(2x+1)*e^(2x)", "e^(2x)*(2x+1)", "(1+2x)*e^(2x)"],
-                hint: "u = x,  v = e^(2x). Denk dran, dass die innere Ableitung von v die 2 nach vorne holt!"
-            },
-            {
-                category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true,
-                text: "Gegeben ist <span class='math-text'>f(x) = e^x - 2</span>. Welche Aussage zum Flächninhalt im Intervall [0; 2] ist korrekt?",
-                options: ["Der Graph befindet sich komplett oberhalb der x-Achse.", "Das Integral liefert direkt den exakten Flächeninhalt.", "Das Integral muss mit Betragsstrichen an der Nullstelle berechnet werden.", "Die e-Funktion kann keine negativ orientierten Flächen haben."], correct: 2,
-                hint: "Setze f(x) = 0. e^x = 2. Da ln(2) ≈ 0.69 zwischen 0 und 2 liegt, schneidet der Graph die Achse!"
+        <div class="formula-section-title">Bestimmtes Integral</div>
+        <div class="formula-block">∫[a→b] f(x) dx  =  F(b) − F(a)</div>
+        <div class="formula-note">⚠️ Vorzeichenwechsel: Hat f(x) eine Nullstelle zwischen a und b, das Integral in Teilbereiche aufteilen und Beträge addieren!</div>
+
+        <div class="formula-section-title">Wachstum & Zerfall</div>
+        <div class="formula-block">f(t) = c · e^(k·t)</div>
+        <table class="formula-table">
+            <tr><th>Symbol</th><th>Bedeutung</th></tr>
+            <tr><td>c</td><td>Startwert: f(0) = c</td></tr>
+            <tr><td>k &gt; 0</td><td>Exponentielles Wachstum</td></tr>
+            <tr><td>k &lt; 0</td><td>Exponentieller Zerfall</td></tr>
+        </table>
+
+        <div class="formula-section-title">Beschränktes Wachstum</div>
+        <div class="formula-block">f(t) = S − (S − f₀) · e^(−k·t)</div>
+        <table class="formula-table">
+            <tr><th>Symbol</th><th>Bedeutung</th></tr>
+            <tr><td>S</td><td>Sättigungsgrenze (Grenzwert für t → ∞)</td></tr>
+            <tr><td>f₀</td><td>Anfangswert f(0)</td></tr>
+            <tr><td>k &gt; 0</td><td>Wachstumsrate</td></tr>
+        </table>
+        <div class="formula-note">Merke: Für t → ∞ gilt e^(−kt) → 0, also f(t) → S.</div>
+
+        <button class="formula-close-btn" onclick="toggleFormulaSheet()">✕ Schließen</button>
+    </div>
+</div>
+
+<script>
+    // ══════════════════════════════════════════════════════
+    // FRAGEN-DATEN (mit explanation + difficulty + isChallengeOnly)
+    // ══════════════════════════════════════════════════════
+    const allQuestions = [
+
+        // ─── 1. Ableitungsregeln ────────────────────────
+        {
+            category: "Ableitungsregeln", categoryId: "ableitung", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Welche Aussage trifft auf die Ableitungsfunktion f'(x) des abgebildeten Graphen von <span class='math-text'>f(x) = e^x</span> zu?",
+            options: ["Der Graph der Ableitung verläuft unterhalb der x-Achse.", "Der Graph der Ableitung ist exakt derselbe wie der abgebildete.", "Der Graph der Ableitung ist eine Ursprungsgerade."],
+            correct: 1,
+            hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!",
+            explanation: "Die natürliche Exponentialfunktion ist die einzige Funktion, die ihre eigene Ableitung ist: (eˣ)' = eˣ. Der Graph der Ableitung ist daher identisch mit dem Ausgangsgraphen.",
+            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                <path d="M 10 95 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
+                <text x="5" y="115" font-size="12" fill="#000">0</text>
+                <text x="85" y="115" font-size="12" fill="#000">x</text>
+            </svg>`
+        },
+        {
+            category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Gegeben ist <span class='math-text'>f(x) = e^(2x)</span>. Wie lautet die Ableitung f'(x)?",
+            options: ["e^(2x)", "2e^(2x)", "2xe^(2x)", "0.5e^(2x)"],
+            correct: 1,
+            hint: "Kettenregel: Schreibe die e-Funktion ab und multipliziere mit der Konstante aus dem Exponenten (hier: 2).",
+            explanation: "Kettenregel: äußere Funktion eᵘ bleibt, mal innere Ableitung. u = 2x, u' = 2 → f'(x) = 2·e^(2x)."
+        },
+        {
+            category: "Ableitungsregeln", categoryId: "ableitung", type: "text", isFallback: false, difficulty: "medium",
+            text: "Gegeben: <span class='math-text'>f(x) = x · e^x</span>.<br>Berechne f'(x) und klammere e^x aus.<br>(Schreibweise: <i>(x+1)*e^x</i>)",
+            correct: ["(x+1)*e^x", "(1+x)*e^x", "e^x*(x+1)", "e^x*(1+x)"],
+            hint: "Produktregel: (u·v)' = u'·v + u·v'. Hier u = x, v = eˣ.",
+            explanation: "Produktregel: u=x (u'=1), v=eˣ (v'=eˣ). Ergibt: 1·eˣ + x·eˣ = eˣ·(1+x)."
+        },
+        {
+            category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Welche Regel benötigst du zwingend zur Ableitung von <span class='math-text'>f(x) = 5 · e^(−0.2x)</span>?",
+            options: ["Nur die Kettenregel", "Nur die Produktregel", "Die Quotientenregel", "Keine, das ist polynomisch"],
+            correct: 0,
+            hint: "Da vorne nur eine konstante 5 steht (kein x-Term), braucht man keine Produktregel.",
+            explanation: "Die 5 ist ein konstanter Faktor (Faktorregel). Für den Exponenten −0,2x braucht man die Kettenregel: f'(x) = 5·(−0,2)·e^(−0,2x) = −e^(−0,2x)."
+        },
+        // Fallback Ableitung
+        {
+            category: "Ableitungsregeln (Basis)", categoryId: "ableitung", type: "text", isFallback: true, difficulty: "easy",
+            text: "Lass uns einen Schritt zurückgehen. Was ist die Ableitung der einfachen e-Funktion <span class='math-text'>f(x) = e^x</span>?",
+            correct: ["e^x"],
+            hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!"
+        },
+        // Challenge Ableitung (Feature 10)
+        {
+            category: "Ableitungsregeln (Herausforderung)", categoryId: "ableitung", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "Leite ab: <span class='math-text'>f(x) = e^(x²)</span>. Welches ist f'(x)?",
+            options: ["e^(x²)", "x · e^(x²)", "2x · e^(x²)", "e^(2x)"],
+            correct: 2,
+            hint: "Kettenregel mit u = x². u' = 2x. Also: f'(x) = u' · e^(u) = 2x · e^(x²).",
+            explanation: "Kettenregel: äußere Funktion eᵘ, innere Funktion u = x² mit u' = 2x. → f'(x) = 2x·e^(x²)."
+        },
+
+        // ─── 2. Stammfunktionen ────────────────────────
+        {
+            category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false, difficulty: "medium",
+            text: "Finde den Fehler! Max berechnet die Stammfunktion von <span class='math-text'>f(x) = e^(2x)</span> und kommt auf <span class='math-text'>F(x) = 2·e^(2x)</span>. Was ist falsch?",
+            options: ["Er hat die e-Funktion verändert.", "Er hat abgeleitet statt aufgeleitet.", "Das +c fehlt, sonst ist es richtig.", "Das Minus-Vorzeichen fehlt."],
+            correct: 1,
+            hint: "Eine mal-2 vorne ist die innere Ableitung. Beim Aufleiten muss dort der Kehrwert (1/2) stehen!",
+            explanation: "Beim Aufleiten von e^(kx) gilt: ∫e^(2x)dx = (1/2)·e^(2x). Max hat mit 2 multipliziert (= ableiten) statt durch 2 zu teilen (= aufleiten)."
+        },
+        {
+            category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Welcher Term ist eine Stammfunktion von <span class='math-text'>f(x) = e^(3x)</span>?",
+            options: ["e^(3x)", "3e^(3x)", "(1/3)e^(3x)", "e^(3x) + 3x"],
+            correct: 2,
+            hint: "Beim Aufleiten: e-Funktion behalten, durch k (die Zahl vor x) dividieren.",
+            explanation: "Aufleiten von e^(kx): ∫e^(3x)dx = (1/3)·e^(3x). Der Kehrwert 1/3 der inneren Ableitung 3 kommt als Faktor davor."
+        },
+        {
+            category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false, difficulty: "easy",
+            text: "Gesucht ist eine Stammfunktion von <span class='math-text'>f(x) = 2·e^x</span>. (Ohne +c)",
+            correct: ["2*e^x", "2e^x"],
+            hint: "Konstante Faktoren bleiben beim Aufleiten unverändert stehen.",
+            explanation: "Ein konstanter Faktor bleibt beim Aufleiten stehen: ∫2·eˣ dx = 2·∫eˣ dx = 2·eˣ."
+        },
+        {
+            category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false, difficulty: "medium",
+            text: "Bestimme eine Stammfunktion F(x) zu <span class='math-text'>f(x) = e^(−x) + 4</span>. (Ohne +c)",
+            correct: ["-e^(-x)+4x", "-1*e^(-x)+4x", "-e^(-x)+4*x"],
+            hint: "Vor dem x im Exponenten steht −1. Der Kehrwert davon ist auch −1. Aus der 4 wird 4x.",
+            explanation: "∫e^(-x)dx = (1/−1)·e^(−x) = −e^(−x). Die Konstante 4 wird zu 4x. → F(x) = −e^(−x) + 4x."
+        },
+        // Fallback Stammfunktionen
+        {
+            category: "Stammfunktionen (Basis)", categoryId: "stamm", type: "text", isFallback: true, difficulty: "easy",
+            text: "Ganz entspannt. Was ist eine Stammfunktion der Konstanten <span class='math-text'>f(x) = 5</span>? (Ohne +c)",
+            correct: ["5x", "5*x"],
+            hint: "Beim Aufleiten bekommt eine Zahl einfach ein 'x' angehängt."
+        },
+        // Challenge Stammfunktionen (Feature 10)
+        {
+            category: "Stammfunktionen (Herausforderung)", categoryId: "stamm", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "Welche Stammfunktion ist korrekt für <span class='math-text'>f(x) = e^(−2x)</span>?",
+            options: ["e^(−2x)", "−e^(−2x)", "−½ · e^(−2x)", "½ · e^(−2x)"],
+            correct: 2,
+            hint: "k = −2. Kehrwert von −2 ist −½. → F(x) = (1/−2)·e^(−2x) = −½·e^(−2x).",
+            explanation: "∫e^(−2x)dx = (1/−2)·e^(−2x) = −½·e^(−2x). Der Kehrwert der inneren Ableitung k = −2 liefert den Faktor −½."
+        },
+
+        // ─── 3. Bestimmte Integrale ──────────────────────
+        {
+            category: "Bestimmte Integrale", categoryId: "integral", type: "VisualGraph", isFallback: false, difficulty: "medium",
+            text: "Die blaue Kurve ist <span class='math-text'>f(x) = e^x</span>. Betrachte die rot schraffierte Fläche von x=0 bis x=1. Ist diese Fläche kleiner, gleich oder größer als 1?",
+            options: ["Kleiner als 1", "Genau gleich 1", "Größer als 1"],
+            correct: 2,
+            hint: "Berechne: [e^x] von 0 bis 1 = e¹ − e⁰ = e − 1 ≈ 2,718 − 1 = 1,718.",
+            explanation: "∫₀¹ eˣ dx = [eˣ]₀¹ = e¹ − e⁰ = e − 1 ≈ 1,718. Da e ≈ 2,718 ist, ist die Fläche größer als 1.",
+            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                <path d="M 10 90 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
+                <path d="M 10 100 L 10 90 Q 50 80 90 20 L 90 100 Z" fill="rgba(248,113,113,0.4)"/>
+                <text x="5" y="115" font-size="12" fill="#000">0</text>
+                <text x="85" y="115" font-size="12" fill="#000">1</text>
+            </svg>`
+        },
+        {
+            category: "Bestimmte Integrale", categoryId: "integral", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Was passiert, wenn der Graph der untersuchten Funktion komplett unterhalb der x-Achse verläuft?",
+            options: ["Das Integral berechnet einen negativen Wert", "Das Integral ist immer 0", "Der Wert ist positiv, gibt aber nicht die Fläche an", "Darf man nicht integrieren"],
+            correct: 0,
+            hint: "Integrale berechnen orientierte Flächen. Flächen unter der x-Achse gehen negativ ein.",
+            explanation: "Das bestimmte Integral liefert eine orientierte Fläche. Liegt der Graph ganz unter der x-Achse, ist der Integralwert negativ. Der geometrische Flächeninhalt wäre der Betrag davon."
+        },
+        {
+            category: "Bestimmte Integrale", categoryId: "integral", type: "text", isFallback: false, difficulty: "medium",
+            text: "Berechne: <span class='math-text'>∫[0 bis ln(2)] e^x dx</span>. (Hinweis: e^ln(2) = 2)",
+            correct: ["1"],
+            numericInput: true,
+            hint: "Setze ln(2) für x ein (ergibt 2) und ziehe den Wert bei x = 0 ab (e⁰ = 1).",
+            explanation: "[eˣ]₀^ln(2) = e^(ln2) − e⁰ = 2 − 1 = 1. Das Ergebnis ist genau 1."
+        },
+        // Fallback Integral
+        {
+            category: "Bestimmte Integrale (Basis)", categoryId: "integral", type: "text", isFallback: true, difficulty: "easy",
+            text: "Basiswissen: Wofür stehen die Grenzen a und b beim bestimmten Integral?",
+            correct: ["x werte", "x-werte", "x", "intervallgrenzen"],
+            hint: "Die Grenzen zeigen, wo die Fläche auf der x-Achse beginnt und aufhört."
+        },
+        // Challenge Integral (Feature 10)
+        {
+            category: "Bestimmte Integrale (Herausforderung)", categoryId: "integral", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "Berechne <span class='math-text'>∫[0 bis 2] 3·e^x dx</span>. Welches Ergebnis ist korrekt? (e² ≈ 7,39)",
+            options: ["3·(e² − 1) ≈ 19,2", "e² − 1 ≈ 6,4", "3·e² ≈ 22,2", "3·e ≈ 8,2"],
+            correct: 0,
+            hint: "Faktorregel: 3 bleibt vor dem Integral stehen. Dann: 3·[eˣ]₀² = 3·(e² − 1).",
+            explanation: "∫₀² 3eˣ dx = 3·[eˣ]₀² = 3·(e² − e⁰) = 3·(e² − 1) ≈ 3·6,389 ≈ 19,2."
+        },
+
+        // ─── 4. Sachzusammenhänge ────────────────────────
+        {
+            category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Betrachte den Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c · e^(kt)</span>. Was lässt sich über den Parameter k sagen?",
+            options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"],
+            correct: 2,
+            hint: "Der Graph fällt ab – die Menge wird weniger. Das bedeutet exponentiellen Zerfall!",
+            explanation: "Ein fallender Graph bedeutet, dass f(t) mit der Zeit abnimmt. Bei f(t) = c·e^(kt) ist das genau dann der Fall, wenn k < 0, denn e^(kt) → 0 für t → ∞.",
+            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
+                <text x="5" y="115" font-size="12" fill="#000">0</text>
+                <text x="100" y="115" font-size="12" fill="#000">t</text>
+            </svg>`
+        },
+        {
+            category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Ein Bestand entwickelt sich nach <span class='math-text'>f(t) = 100 · e^(0.5t)</span>. Was bedeutet die 100?",
+            options: ["Wachstumsrate in Prozent", "Maximaler Bestand", "Anfangsbestand zum Zeitpunkt t=0", "Halbwertszeit"],
+            correct: 2,
+            hint: "Setze t=0 ein. Da e⁰ = 1 ist, bleibt nur der Vorfaktor übrig.",
+            explanation: "Für t=0: f(0) = 100·e⁰ = 100·1 = 100. Der Faktor c vor der e-Funktion ist immer der Anfangswert (Startwert) zum Zeitpunkt t = 0."
+        },
+        {
+            category: "Sachzusammenhänge", categoryId: "sach", type: "text", isFallback: false, difficulty: "easy",
+            text: "Der Bestand ändert sich nach <span class='math-text'>f(t) = 500 · e^(−0.1t)</span>. Handelt es sich um 'Wachstum' oder 'Zerfall'?",
+            correct: ["zerfall"],
+            hint: "Schau auf das Vorzeichen von k. Positiv = Wachstum, Negativ = ?",
+            explanation: "k = −0,1 ist negativ. Damit wird e^(−0,1t) mit der Zeit kleiner, der Bestand nimmt ab → exponentieller Zerfall."
+        },
+        {
+            category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false, difficulty: "medium",
+            text: "f(t) ist die Zuflussrate von Wasser (L/min). Was liefert das bestimmte Integral über f(t)?",
+            options: ["Die aktuelle Tropfgeschwindigkeit", "Die gesamte Zu-/Abnahme an Wasser im Intervall", "Die maximale Wassermenge", "Die durchschnittliche Geschwindigkeit"],
+            correct: 1,
+            hint: "Wenn man eine Geschwindigkeit (L/min) aufleitet, bekommt man die echte Menge (Liter).",
+            explanation: "Integration summiert eine Rate über die Zeit: Liter/Minute × Minuten = Liter. Das Integral einer Zuflussrate liefert die gesamte Wassermenge, die im Intervall dazukam."
+        },
+        // Fallback Sachzusammenhänge
+        {
+            category: "Sachzusammenhänge (Basis)", categoryId: "sach", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Basiswissen: Welche allgemeine Form hat eine Funktion mit exponentiellem Wachstum oder Zerfall?",
+            options: ["f(t) = m·t + b", "f(t) = c·e^(kt)", "f(t) = S − S·e^(−kt)", "f(t) = a·t²"],
+            correct: 1,
+            hint: "c ist der Startwert (f(0)), k > 0 bedeutet Wachstum, k < 0 bedeutet Zerfall."
+        },
+        // Challenge Sachzusammenhänge (Feature 10)
+        {
+            category: "Sachzusammenhänge (Herausforderung)", categoryId: "sach", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "Ein Bestand f(t) = 1000·e^(−0,5t). Wie groß ist er nach t = 2? (e^(−1) ≈ 0,37)",
+            options: ["ca. 630", "ca. 370", "ca. 500", "ca. 1000"],
+            correct: 1,
+            hint: "Setze t = 2 ein: f(2) = 1000·e^(−0,5·2) = 1000·e^(−1) ≈ 1000·0,37.",
+            explanation: "f(2) = 1000·e^(−1) ≈ 1000·0,368 ≈ 370. Nach 2 Zeiteinheiten sind noch ca. 37 % des Anfangsbestands vorhanden."
+        },
+
+        // ─── 5. Graphenanalyse ───────────────────────────
+        {
+            category: "Graphenanalyse", categoryId: "graph", type: "VisualGraph", isFallback: false, difficulty: "hard",
+            text: "Der Graph zeigt <span class='math-text'>f(x) = x · e^(−x)</span>. Die gestrichelte Linie markiert einen besonderen Punkt. Wo liegt das Maximum?",
+            options: ["Bei x = 0", "Bei x ≈ 1", "Bei x ≈ 2", "f wächst immer – kein Maximum"],
+            correct: 1,
+            hint: "Produktregel: f'(x) = e^(−x) − x·e^(−x) = e^(−x)·(1−x). Das wird 0 bei x = 1.",
+            explanation: "f'(x) = e^(−x)·(1−x) = 0 → x = 1 (da e^(−x) ≠ 0). Für x < 1 ist f' > 0 (steigend), für x > 1 ist f' < 0 (fallend) → Hochpunkt bei x = 1.",
+            graphSVG: `<svg viewBox="-10 -10 120 125" style="width:100%; height:160px;">
+                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                <path d="M 10 100 C 15 99 25 5 40 12 C 55 20 72 55 100 78" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
+                <line x1="40" y1="10" x2="40" y2="100" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4"/>
+                <line x1="40" y1="98" x2="40" y2="102" stroke="#000" stroke-width="1.5"/>
+                <line x1="70" y1="98" x2="70" y2="102" stroke="#000" stroke-width="1.5"/>
+                <line x1="100" y1="98" x2="100" y2="102" stroke="#000" stroke-width="1.5"/>
+                <text x="5" y="116" font-size="11" fill="#000">0</text>
+                <text x="36" y="116" font-size="11" fill="#f59e0b">1</text>
+                <text x="66" y="116" font-size="11" fill="#000">2</text>
+                <text x="96" y="116" font-size="11" fill="#000">3</text>
+                <text x="103" y="103" font-size="12" fill="#000">x</text>
+            </svg>`
+        },
+        {
+            category: "Graphenanalyse", categoryId: "graph", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Der Graph von <span class='math-text'>f'(x)</span> schneidet die x-Achse von oben nach unten (Vorzeichenwechsel + → −). Was folgt für <span class='math-text'>f(x)</span>?",
+            options: ["f(x) hat dort ein Minimum", "f(x) hat dort ein Maximum", "f(x) hat dort eine Wendestelle", "f'(x) = 0 bedeutet: f ist konstant"],
+            correct: 1,
+            hint: "Wechsel f'(x): + → − bedeutet: f steigt vorher, fällt danach → Hochpunkt!",
+            explanation: "Vorzeichenwechsel von f': (+) → (−) bedeutet: f steigt davor und fällt danach. Das ist die Definition eines lokalen Maximums (Hochpunkt)."
+        },
+        {
+            category: "Graphenanalyse", categoryId: "graph", type: "mc", isFallback: false, difficulty: "medium",
+            text: "Welches Verhalten zeigt <span class='math-text'>f(x) = x² · e^x</span> für x → −∞?",
+            options: ["f(x) → +∞", "f(x) → −∞", "f(x) → 0", "f(x) schwankt ohne Grenzwert"],
+            correct: 2,
+            hint: "e^x dominiert jedes Polynom: für x → −∞ geht e^x viel schneller gegen 0 als x² gegen ∞ wächst.",
+            explanation: "e^x strebt für x → −∞ gegen 0 – deutlich stärker als x² gegen ∞ wächst. Das Produkt x²·e^x geht daher gegen 0 (e dominiert jedes Polynom)."
+        },
+        // Fallback Graphenanalyse
+        {
+            category: "Graphenanalyse (Basis)", categoryId: "graph", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Was charakterisiert einen Hochpunkt (lokales Maximum) in einem Graphen?",
+            options: ["Der Graph erreicht dort den höchsten Wert der Umgebung – danach fällt er wieder.", "Die Funktion wird ab hier negativ.", "Die Ableitung ist dort maximal groß.", "Der Graph verläuft dort senkrecht."],
+            correct: 0,
+            hint: "Hochpunkt = höchster Punkt in der Umgebung. Vorher steigt f, danach fällt f."
+        },
+        // Challenge Graphenanalyse (Feature 10)
+        {
+            category: "Graphenanalyse (Herausforderung)", categoryId: "graph", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "f(x) = x²·e^(−x). Wo liegt ein lokales Minimum für x > 0? (Tipp: f'(x) = x·e^(−x)·(2−x))",
+            options: ["x = 0", "x = 1", "x = 2", "Kein Minimum für x > 0"],
+            correct: 2,
+            hint: "f'(x) = 0 bei x = 0 und x = 2. Prüfe Vorzeichenwechsel von f' bei x = 2.",
+            explanation: "f'(x) = x·e^(−x)·(2−x) = 0 bei x=0 und x=2. Bei x=2: f' wechselt von + nach − → Hochpunkt bei x=2, nicht Minimum. Für x > 2 ist f' < 0 → kein Minimum, f fällt. Richtig: bei x=2 liegt ein Hochpunkt."
+        },
+
+        // ─── 6. Beschränktes Wachstum ───────────────────
+        {
+            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Die gestrichelte Linie zeigt eine waagerechte Asymptote. Welches Wachstumsmodell beschreibt der Graph?",
+            options: ["Unbeschränktes exponentielles Wachstum", "Beschränktes Wachstum (Sättigungsgrenze S)", "Exponentieller Zerfall", "Lineares Wachstum"],
+            correct: 1,
+            hint: "Der Graph wächst immer langsamer und nähert sich S an, überschreitet sie aber nie.",
+            explanation: "Die waagerechte Asymptote S ist die Sättigungsgrenze. Der Graph nähert sich S für t → ∞ an, ohne sie je zu überschreiten – typisches Merkmal des beschränkten Wachstums.",
+            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
+                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
+                <line x1="10" y1="12" x2="110" y2="12" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="7,4"/>
+                <path d="M 10 88 C 18 50 38 14 100 12" fill="transparent" stroke="#34d399" stroke-width="4"/>
+                <text x="5" y="115" font-size="11" fill="#000">0</text>
+                <text x="100" y="115" font-size="11" fill="#000">t</text>
+                <text x="112" y="15" font-size="11" fill="#f59e0b">S</text>
+            </svg>`
+        },
+        {
+            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "mc", isFallback: false, difficulty: "medium",
+            text: "Die Funktion <span class='math-text'>f(t) = 200 − 180 · e^(−0.3t)</span> beschreibt beschränktes Wachstum. Wie groß ist die Sättigungsgrenze S?",
+            options: ["S = 180", "S = 200", "S = 0,3", "S = 20"],
+            correct: 1,
+            hint: "Für t → ∞ gilt e^(−0,3t) → 0. Es bleibt: f → 200 − 0 = 200.",
+            explanation: "Für t → ∞ gilt e^(−0,3t) → 0. Also f(t) → 200 − 180·0 = 200. Die Sättigungsgrenze ist S = 200."
+        },
+        {
+            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "text", isFallback: false, difficulty: "medium",
+            text: "Gegeben: <span class='math-text'>f(t) = 500 · (1 − e^(−0.2t))</span>. Welchen Wert hat <span class='math-text'>f(0)</span>? (Tipp: e⁰ = 1)",
+            correct: ["0"],
+            numericInput: true,
+            hint: "Setze t = 0 ein: f(0) = 500·(1 − e⁰) = 500·(1 − 1) = 500·0 = ?",
+            explanation: "f(0) = 500·(1 − e⁰) = 500·(1 − 1) = 500·0 = 0. Bei dieser Form beschränkten Wachstums startet die Funktion immer bei 0."
+        },
+        // Fallback Beschränktes Wachstum
+        {
+            category: "Beschränktes Wachstum (Basis)", categoryId: "beschraenkt", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Was bedeutet 'Sättigungsgrenze S' beim beschränkten Wachstum?",
+            options: ["Der Maximalwert, dem f(t) sich annähert, den es aber nie überschreitet", "Der Anfangswert f(0)", "Die Wachstumsrate des Modells", "Der Zeitpunkt, ab dem die Funktion fällt"],
+            correct: 0,
+            hint: "Sättigung = voll. f wächst immer langsamer und kann S nie überschreiten."
+        },
+        // Challenge Beschränktes Wachstum (Feature 10)
+        {
+            category: "Beschränktes Wachstum (Herausforderung)", categoryId: "beschraenkt", type: "mc",
+            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
+            text: "f(t) = 800 − 800·e^(−0,5t). Was ist der Anfangswert f(0) und die Sättigungsgrenze S?",
+            options: ["f(0) = 800, S = 0", "f(0) = 0, S = 800", "f(0) = 400, S = 800", "f(0) = 800, S = 800"],
+            correct: 1,
+            hint: "f(0) = 800 − 800·e⁰ = 800 − 800 = 0. Für t → ∞: e^(−0,5t) → 0, also f → 800.",
+            explanation: "f(0) = 800 − 800·1 = 0. Für t → ∞: f(t) → 800 − 0 = 800. Also: Startwert 0, Sättigungsgrenze S = 800."
+        },
+
+        // ─── LEVEL 2 ─────────────────────────────────────
+        {
+            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Kombiniere Produkt- und Kettenregel! <br>Leite ab: <span class='math-text'>f(x) = x · e^(2x)</span> <br>(Schreibweise: <i>(2x+1)*e^(2x)</i>)",
+            correct: ["(2x+1)*e^(2x)", "e^(2x)*(2x+1)", "(1+2x)*e^(2x)"],
+            hint: "u = x, v = e^(2x). Denk dran: die innere Ableitung von v bringt eine 2 nach vorne!",
+            explanation: "Produktregel: u=x (u'=1), v=e^(2x) (v'=2e^(2x)). → 1·e^(2x) + x·2e^(2x) = e^(2x)·(1+2x)."
+        },
+        {
+            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Gegeben ist <span class='math-text'>f(x) = e^x − 2</span>. Welche Aussage zum Flächeninhalt im Intervall [0; 2] ist korrekt?",
+            options: ["Der Graph liegt komplett oberhalb der x-Achse.", "Das Integral liefert direkt den exakten Flächeninhalt.", "Das Integral muss mit Betragsstrichen an der Nullstelle berechnet werden.", "Die e-Funktion kann keine negativ orientierten Flächen haben."],
+            correct: 2,
+            hint: "Setze f(x) = 0: e^x = 2 → x = ln(2) ≈ 0,69. Da ln(2) zwischen 0 und 2 liegt, schneidet der Graph die Achse!",
+            explanation: "f(x) = 0 → e^x = 2 → x = ln(2) ≈ 0,69 ∈ [0;2]. Der Graph schneidet also die x-Achse im Intervall. Der Flächeninhalt erfordert daher Betragsstriche: A = |∫₀^ln2| + |∫_ln2^2|."
+        }
+    ];
+
+    // ══════════════════════════════════════════════════════
+    // KONFIGURATION & KONSTANTEN
+    // ══════════════════════════════════════════════════════
+    const FLOW_URL = "https://hook.eu1.make.com/qb4k33zyuudodz7kptwy44qrem8naepl";
+
+    const ALL_CATEGORY_IDS = ["ableitung", "stamm", "integral", "sach", "graph", "beschraenkt"];
+    const CATEGORY_NAMES = {
+        ableitung: "Ableitungsregeln",
+        stamm: "Stammfunktionen",
+        integral: "Bestimmte Integrale",
+        sach: "Sachzusammenhänge",
+        graph: "Graphenanalyse",
+        beschraenkt: "Beschränktes Wachstum"
+    };
+
+    // ══════════════════════════════════════════════════════
+    // ZUSTAND (State)
+    // ══════════════════════════════════════════════════════
+    let currentQueue    = [];
+    let currentIndex    = 0;
+    let xp              = 0;
+    let level           = 1;
+    let streak          = 0;
+    let selectedOption  = null;
+    let questionStartTime = 0;
+    let jokerUsedForCurrent = false;
+    let fiftyUsedForCurrent = false;
+    let studentName     = "Schüler/in";
+    let level2Started   = false;
+    let baseQueueLength = 0;
+
+    // Fallback-Tracking (Feature 6 – bestehend)
+    let consecutiveMistakesCategory = 0;
+    let lastErrorCategory = "";
+
+    // Feature 9: Fehleranalyse
+    let wrongChoices = {};
+
+    // Feature 10: Challenge-Tracking
+    let lastCorrectCategory = "";
+    let consecutiveCorrectSameCat = 0;
+
+    // Feature 2: Selbsteinschätzung
+    let selfRatings = {};
+
+    // Feature 3: Review-Modus
+    let isReviewMode = false;
+
+    // Feature 5: Kategorienauswahl
+    let selectedCategories = [...ALL_CATEGORY_IDS];
+
+    // Scores-Objekt (dynamisch befüllt)
+    let scores = {};
+
+    // ══════════════════════════════════════════════════════
+    // POWER AUTOMATE
+    // ══════════════════════════════════════════════════════
+    function reportToFlow(name, xpVal, lvl, scoresObj) {
+        if (!FLOW_URL) return;
+        const today = new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+        const payload = {
+            Datum: today,
+            Name: name,
+            XP: xpVal,
+            Level: lvl
+        };
+        // Kategorien-Scores (nur ausgewählte)
+        if (scoresObj.ableitung)    payload.Ableitungsregeln      = `${scoresObj.ableitung.correct}/${scoresObj.ableitung.total}`;
+        if (scoresObj.stamm)        payload.Stammfunktionen        = `${scoresObj.stamm.correct}/${scoresObj.stamm.total}`;
+        if (scoresObj.integral)     payload.Integrale              = `${scoresObj.integral.correct}/${scoresObj.integral.total}`;
+        if (scoresObj.sach)         payload.Sachaufgaben           = `${scoresObj.sach.correct}/${scoresObj.sach.total}`;
+        if (scoresObj.graph)        payload.Graphenanalyse         = `${scoresObj.graph.correct}/${scoresObj.graph.total}`;
+        if (scoresObj.beschraenkt)  payload.BeschraenktesWachstum  = `${scoresObj.beschraenkt.correct}/${scoresObj.beschraenkt.total}`;
+
+        // Feature 9: Fehleranalyse
+        for (const catId of selectedCategories) {
+            const key = catId.charAt(0).toUpperCase() + catId.slice(1) + "_Fehler";
+            payload[key] = (wrongChoices[catId] || []).join(" | ").substring(0, 400) || "";
+        }
+
+        fetch(FLOW_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).catch(() => {});
+    }
+
+    // ══════════════════════════════════════════════════════
+    // INITIALISIERUNG & SETUP
+    // ══════════════════════════════════════════════════════
+    window.addEventListener('load', () => {
+        // Name aus localStorage wiederherstellen
+        const savedName = localStorage.getItem('diagnose-name');
+        if (savedName) document.getElementById('student-name').value = savedName;
+
+        // Best-Score anzeigen
+        const bestXP = localStorage.getItem('diagnose-best-xp');
+        if (bestXP) document.getElementById('best-score-display').innerText = `🏆 Bestes Ergebnis: ${bestXP} XP`;
+
+        // Feature 5: Kategorie-Checkboxen rendern
+        renderCategoryCheckboxes();
+
+        // Feature 3: Review-Button anzeigen (wenn Daten vorhanden)
+        renderReviewButton();
+    });
+
+    function renderCategoryCheckboxes() {
+        const grid = document.getElementById('category-checkboxes');
+        grid.innerHTML = "";
+        ALL_CATEGORY_IDS.forEach(catId => {
+            const label = document.createElement('label');
+            label.className = 'cat-select-item';
+            label.innerHTML = `<input type="checkbox" class="cat-checkbox" value="${catId}" checked> ${CATEGORY_NAMES[catId]}`;
+            grid.appendChild(label);
+        });
+    }
+
+    function renderReviewButton() {
+        const reviewData = localStorage.getItem('diagnose-review-queue');
+        const area = document.getElementById('review-btn-area');
+        if (reviewData) {
+            const indices = JSON.parse(reviewData);
+            const valid = indices.filter(i => i >= 0 && i < allQuestions.length);
+            if (valid.length > 0) {
+                area.innerHTML = `<button class="review-btn" onclick="startReview()">🔁 ${valid.length} Fragen wiederholen</button>`;
+                return;
             }
-        ];
+        }
+        area.innerHTML = "";
+    }
 
-        // Adaptive Logic Tracking
-        let currentQueue = [];
-        let currentIndex = 0;
-        let xp = 0;
-        let level = 1;
-        let streak = 0;
-        let consecutiveMistakesCategory = 0;
-        let lastErrorCategory = "";
-        let selectedOption = null;
-        let questionStartTime = 0;
-        let jokerUsedForCurrent = false;
+    function initScores() {
+        scores = {};
+        wrongChoices = {};
+        for (const catId of selectedCategories) {
+            const total = allQuestions.filter(q => !q.isFallback && !q.isLevel2 && !q.isChallengeOnly && q.categoryId === catId).length;
+            scores[catId] = { correct: 0, total: total, name: CATEGORY_NAMES[catId] };
+            wrongChoices[catId] = [];
+        }
+    }
 
-        const scores = {
-            "ableitung": { correct: 0, total: 4, name: "Ableitungsregeln" },
-            "stamm": { correct: 0, total: 4, name: "Stammfunktionen" },
-            "integral": { correct: 0, total: 3, name: "Bestimmte Integrale" },
-            "sach": { correct: 0, total: 3, name: "Sachzusammenhänge" }
+    // ══════════════════════════════════════════════════════
+    // SCREEN-NAVIGATION
+    // ══════════════════════════════════════════════════════
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // ══════════════════════════════════════════════════════
+    // FEATURE 2: SELBSTEINSCHÄTZUNG
+    // ══════════════════════════════════════════════════════
+    function showSelfCheck() {
+        // Name validieren
+        const nameInput = document.getElementById('student-name').value.trim();
+        studentName = nameInput || "Schüler/in";
+        localStorage.setItem('diagnose-name', studentName);
+
+        // Kategorien auslesen
+        selectedCategories = [];
+        document.querySelectorAll('.cat-checkbox:checked').forEach(cb => {
+            selectedCategories.push(cb.value);
+        });
+        if (selectedCategories.length === 0) {
+            alert("Bitte wähle mindestens eine Kategorie aus!");
+            return;
+        }
+
+        // Selfcheck-Screen aufbauen
+        selfRatings = {};
+        const content = document.getElementById('selfcheck-content');
+        content.innerHTML = "";
+        selectedCategories.forEach(catId => {
+            const div = document.createElement('div');
+            div.className = 'selfcheck-category';
+            div.innerHTML = `
+                <div class="selfcheck-cat-name">${CATEGORY_NAMES[catId]}</div>
+                <div class="selfcheck-buttons">
+                    <button class="selfcheck-btn" onclick="rateCategory('${catId}','sicher',this)">✅ Sicher</button>
+                    <button class="selfcheck-btn" onclick="rateCategory('${catId}','unsicher',this)">🤔 Unsicher</button>
+                    <button class="selfcheck-btn" onclick="rateCategory('${catId}','garnicht',this)">❌ Gar nicht</button>
+                </div>`;
+            content.appendChild(div);
+        });
+
+        showScreen('selfcheck-screen');
+    }
+
+    function rateCategory(catId, rating, btnEl) {
+        selfRatings[catId] = rating;
+        // Buttons in derselben Kategorie zurücksetzen
+        const row = btnEl.closest('.selfcheck-category');
+        row.querySelectorAll('.selfcheck-btn').forEach(b => b.className = 'selfcheck-btn');
+        btnEl.classList.add('sel-' + rating);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // QUIZ STARTEN
+    // ══════════════════════════════════════════════════════
+    function startQuiz() {
+        isReviewMode = false;
+        initScores();
+        resetQuizState();
+        buildQueue();
+        showScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function startReview() {
+        isReviewMode = true;
+        const reviewData = localStorage.getItem('diagnose-review-queue');
+        if (!reviewData) return;
+        const indices = JSON.parse(reviewData);
+
+        // Alle Kategorien werden für Review freigeschaltet
+        selectedCategories = [...ALL_CATEGORY_IDS];
+        initScores();
+        resetQuizState();
+
+        currentQueue = indices
+            .filter(i => i >= 0 && i < allQuestions.length)
+            .map(i => allQuestions[i]);
+        baseQueueLength = currentQueue.length;
+
+        showScreen('quiz-screen');
+        loadQuestion();
+    }
+
+    function resetQuizState() {
+        currentQueue = [];
+        currentIndex = 0;
+        xp = 0; level = 1; streak = 0;
+        selectedOption = null;
+        jokerUsedForCurrent = false;
+        fiftyUsedForCurrent = false;
+        level2Started = false;
+        baseQueueLength = 0;
+        consecutiveMistakesCategory = 0;
+        lastErrorCategory = "";
+        lastCorrectCategory = "";
+        consecutiveCorrectSameCat = 0;
+
+        // Challenge-Flags zurücksetzen
+        allQuestions.forEach(q => { q._challenged = false; });
+
+        document.getElementById('xp-display').querySelector('span').innerText = '0';
+        document.getElementById('level-display').querySelector('span').innerText = '1';
+        document.getElementById('streak-display').querySelector('span').innerText = '0';
+        document.getElementById('streak-display').querySelector('span').classList.remove('streak-fire');
+    }
+
+    function buildQueue() {
+        currentQueue = [];
+        allQuestions.forEach(q => {
+            if (!q.isFallback && !q.isLevel2 && !q.isChallengeOnly) {
+                if (selectedCategories.includes(q.categoryId)) {
+                    currentQueue.push(q);
+                }
+            }
+        });
+        baseQueueLength = currentQueue.length;
+    }
+
+    function buildLevel2Queue() {
+        level2Started = true;
+        allQuestions.forEach(q => {
+            if (q.isLevel2 && selectedCategories.includes(q.categoryId)) {
+                currentQueue.push(q);
+            }
+        });
+        const inputArea = document.getElementById('input-area');
+        inputArea.innerHTML = `<div class="feedback-message msg-success" style="animation:none;">🔥 LEVEL 2 ERREICHT! Neue, schwierigere Aufgaben freigeschaltet! 🔥</div>`;
+        setTimeout(loadQuestion, 3000);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // FRAGE LADEN
+    // ══════════════════════════════════════════════════════
+    function loadQuestion() {
+        questionStartTime = Date.now();
+        jokerUsedForCurrent = false;
+        fiftyUsedForCurrent = false;
+        selectedOption = null;
+
+        if (currentIndex >= currentQueue.length) {
+            if (!isReviewMode && level >= 2 && !level2Started) {
+                buildLevel2Queue();
+                return;
+            }
+            showResults();
+            return;
+        }
+
+        const q = currentQueue[currentIndex];
+        document.getElementById('question-category').innerText = q.category + (q._isChallenge ? " 🔥" : "");
+        document.getElementById('question-text').innerHTML = q.text;
+
+        const inputArea = document.getElementById('input-area');
+        inputArea.innerHTML = "";
+
+        // Joker-Bereich zurücksetzen
+        const jokerArea = document.getElementById('joker-area');
+        const jokerHint = document.getElementById('joker-hint');
+        const jokerBtn  = document.getElementById('btn-joker');
+        const fiftyBtn  = document.getElementById('btn-fifty');
+        jokerHint.style.display = "none";
+        jokerHint.innerText = "";
+
+        const canUseJokers = !isReviewMode;
+        if (q.hint && canUseJokers) {
+            jokerArea.style.display = "block";
+            const hasXP = xp >= 50;
+            jokerBtn.disabled  = !hasXP;
+            jokerBtn.style.opacity = hasXP ? "1" : "0.4";
+            jokerBtn.title = hasXP ? "" : "Nicht genug XP (50 XP nötig)";
+            // 50:50 nur für mc/VisualGraph
+            const isMC = (q.type === 'mc' || q.type === 'VisualGraph') && q.options && q.options.length >= 3;
+            fiftyBtn.style.display = isMC ? "inline-block" : "none";
+            fiftyBtn.disabled  = !hasXP;
+            fiftyBtn.style.opacity = hasXP ? "1" : "0.4";
+            fiftyBtn.title = hasXP ? "" : "Nicht genug XP (50 XP nötig)";
+        } else {
+            jokerArea.style.display = "none";
+        }
+
+        // Antwortbereich rendern
+        if (q.type === 'VisualGraph') {
+            const graphDiv = document.createElement('div');
+            graphDiv.className = 'graph-container';
+            graphDiv.innerHTML = q.graphSVG;
+            inputArea.appendChild(graphDiv);
+            renderMCOptions(q, inputArea);
+        } else if (q.type === 'mc') {
+            renderMCOptions(q, inputArea);
+        } else if (q.type === 'text') {
+            const input = document.createElement('input');
+            input.type = q.numericInput ? 'number' : 'text';
+            input.id = 'text-answer';
+            input.placeholder = q.numericInput ? "Zahl eingeben..." : "Hier Term / Wort tippen...";
+            input.onkeyup = function(e) { if (e.key === 'Enter') submitAnswer(); };
+            inputArea.appendChild(input);
+            setTimeout(function() { input.focus(); }, 100);
+        }
+
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'block';
+        nextBtn.textContent = 'Antwort Einloggen';
+        nextBtn.onclick = submitAnswer;
+        updateProgress();
+    }
+
+    function renderMCOptions(q, container) {
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mc-options';
+        q.options.forEach(function(opt, index) {
+            const btn = document.createElement('div');
+            btn.className = 'mc-option';
+            btn.dataset.index = index;
+            btn.innerHTML = opt.replace(/e\^\((.*?)\)/g, 'e<sup>$1</sup>');
+            btn.onclick = function() {
+                document.querySelectorAll('.mc-option').forEach(function(el) { el.classList.remove('selected'); });
+                btn.classList.add('selected');
+                selectedOption = index;
+            };
+            optionsDiv.appendChild(btn);
+        });
+        container.appendChild(optionsDiv);
+    }
+
+    // ══════════════════════════════════════════════════════
+    // JOKER
+    // ══════════════════════════════════════════════════════
+    function useJoker() {
+        if (xp < 50) return;
+        xp -= 50;
+        jokerUsedForCurrent = true;
+        document.getElementById('xp-display').querySelector('span').innerText = xp;
+        const hintDiv = document.getElementById('joker-hint');
+        hintDiv.innerText = currentQueue[currentIndex].hint;
+        hintDiv.style.display = "block";
+        const btn = document.getElementById('btn-joker');
+        btn.disabled = true;
+        btn.style.opacity = "0.2";
+        // 50:50 nun ggf. auch nicht mehr leistbar
+        if (xp < 50) {
+            const fb = document.getElementById('btn-fifty');
+            fb.disabled = true;
+            fb.style.opacity = "0.4";
+        }
+    }
+
+    // Feature 4: 50:50-Joker
+    function useFifty() {
+        if (xp < 50 || fiftyUsedForCurrent) return;
+        const q = currentQueue[currentIndex];
+        if (q.type !== 'mc' && q.type !== 'VisualGraph') return;
+
+        xp -= 50;
+        fiftyUsedForCurrent = true;
+        document.getElementById('xp-display').querySelector('span').innerText = xp;
+
+        // Zwei zufällige falsche Optionen ermitteln und ausblenden
+        const wrongIndices = [];
+        q.options.forEach(function(_, i) { if (i !== q.correct) wrongIndices.push(i); });
+        // Shuffeln
+        for (let i = wrongIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [wrongIndices[i], wrongIndices[j]] = [wrongIndices[j], wrongIndices[i]];
+        }
+        const toEliminate = wrongIndices.slice(0, 2);
+        document.querySelectorAll('.mc-option').forEach(function(btn) {
+            if (toEliminate.includes(parseInt(btn.dataset.index))) {
+                btn.classList.add('eliminated');
+                if (btn.classList.contains('selected')) {
+                    btn.classList.remove('selected');
+                    selectedOption = null;
+                }
+            }
+        });
+
+        const fiftyBtn = document.getElementById('btn-fifty');
+        fiftyBtn.disabled = true;
+        fiftyBtn.style.opacity = "0.2";
+
+        if (xp < 50) {
+            const jBtn = document.getElementById('btn-joker');
+            jBtn.disabled = true;
+            jBtn.style.opacity = "0.4";
+        }
+    }
+
+    // ══════════════════════════════════════════════════════
+    // ANTWORT ABGEBEN
+    // ══════════════════════════════════════════════════════
+    function submitAnswer() {
+        const q = currentQueue[currentIndex];
+        let isCorrect = false;
+        let chosenText = "";
+
+        if (q.type === 'mc' || q.type === 'VisualGraph') {
+            if (selectedOption === null) return;
+            isCorrect = (selectedOption === q.correct);
+            chosenText = q.options[selectedOption];
+        } else if (q.type === 'text') {
+            const userInput = document.getElementById('text-answer').value.trim().toLowerCase().replace(/\s+/g, '');
+            if (userInput === "") return;
+            const corrects = q.correct.map(function(c) { return c.toLowerCase().replace(/\s+/g, ''); });
+            isCorrect = corrects.includes(userInput);
+            chosenText = document.getElementById('text-answer').value.trim();
+        }
+
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('joker-area').style.display = 'none';
+        const inputArea = document.getElementById('input-area');
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = "feedback-message " + (isCorrect ? "msg-success" : "msg-error");
+
+        if (isCorrect) {
+            streak++;
+
+            // Speed-Bonus
+            const timeTaken = (Date.now() - questionStartTime) / 1000;
+            let speedBonus = 0;
+            let bonusMsg = "";
+            if (timeTaken <= 10.0 && !jokerUsedForCurrent && !fiftyUsedForCurrent && !q.isFallback && !isReviewMode) {
+                speedBonus = 50;
+                bonusMsg = `<br><span style="color:var(--joker-color); font-size:0.88rem;">⚡ QUICK-BRAIN BONUS (+50 XP) – ${timeTaken.toFixed(1)}s</span>`;
+            }
+
+            let xpGain = 100 + (streak * 20) + speedBonus;
+            xp += xpGain;
+
+            if (!q.isFallback && !q._isChallenge) {
+                if (scores[q.categoryId]) scores[q.categoryId].correct++;
+            }
+
+            feedbackDiv.innerHTML = `Richtig! (+${xpGain} XP)` + bonusMsg;
+            consecutiveMistakesCategory = 0;
+
+            // Feature 10: Challenge-Tracking
+            if (!q.isFallback && !q.isChallengeOnly && !isReviewMode) {
+                if (q.categoryId === lastCorrectCategory) {
+                    consecutiveCorrectSameCat++;
+                } else {
+                    consecutiveCorrectSameCat = 1;
+                    lastCorrectCategory = q.categoryId;
+                }
+                if (consecutiveCorrectSameCat >= 3) {
+                    consecutiveCorrectSameCat = 0;
+                    const injected = injectChallenge(q.categoryId);
+                    if (injected) {
+                        feedbackDiv.innerHTML += `<div class="challenge-badge">🔥 Herausforderung freigeschaltet – du bist auf einem Top-Level!</div>`;
+                    }
+                }
+            }
+
+        } else {
+            streak = 0;
+            lastCorrectCategory = "";
+            consecutiveCorrectSameCat = 0;
+
+            let correctDisplay = q.type === 'text' ? q.correct[0] : q.options[q.correct];
+            feedbackDiv.innerHTML = `Falsch. Richtig wäre: <b>${correctDisplay}</b>`;
+
+            // Feature 9: Fehler tracken
+            if (!q.isFallback && scores[q.categoryId] !== undefined) {
+                const shortQ = q.text.replace(/<[^>]+>/g, '').substring(0, 40).trim();
+                wrongChoices[q.categoryId].push(`"${shortQ}…" → ${chosenText}`);
+            }
+
+            // Feature 1: Erklärung einblenden
+            if (q.explanation) {
+                const expDiv = document.createElement('div');
+                expDiv.className = 'explanation-box';
+                expDiv.innerHTML = '💡 ' + q.explanation;
+                inputArea.appendChild(expDiv);
+            }
+
+            // Adaptive Difficulty (rückwärts – Fallback)
+            if (!q.isFallback) {
+                if (lastErrorCategory === q.categoryId) {
+                    consecutiveMistakesCategory++;
+                } else {
+                    consecutiveMistakesCategory = 1;
+                    lastErrorCategory = q.categoryId;
+                }
+                if (consecutiveMistakesCategory === 2) {
+                    const fallbackQ = allQuestions.find(function(fb) { return fb.isFallback && fb.categoryId === q.categoryId; });
+                    if (fallbackQ) {
+                        currentQueue.splice(currentIndex + 1, 0, fallbackQ);
+                        feedbackDiv.innerHTML += `<br><br><span style="color:var(--joker-color);">⚠️ Sicherheitsnetz aktiviert. Nächste Aufgabe prüft Basics!</span>`;
+                    }
+                    consecutiveMistakesCategory = 0;
+                }
+            }
+
+            // Feature 3: Für Spaced Repetition merken
+            if (!q.isFallback && !isReviewMode) {
+                const qIndex = allQuestions.indexOf(q);
+                if (qIndex >= 0) {
+                    let reviewQueue = [];
+                    const stored = localStorage.getItem('diagnose-review-queue');
+                    if (stored) reviewQueue = JSON.parse(stored);
+                    if (!reviewQueue.includes(qIndex)) reviewQueue.push(qIndex);
+                    // Max 20 Fragen speichern
+                    if (reviewQueue.length > 20) reviewQueue = reviewQueue.slice(-20);
+                    localStorage.setItem('diagnose-review-queue', JSON.stringify(reviewQueue));
+                }
+            }
+        }
+
+        inputArea.appendChild(feedbackDiv);
+
+        // Level-Up
+        const newLevel = Math.floor(xp / 250) + 1;
+        if (newLevel > level) {
+            level = newLevel;
+            feedbackDiv.innerHTML += `<div style="color:var(--primary-glow); margin-top:8px;">⬆️ LEVEL UP: STUFE ${level}!</div>`;
+        }
+
+        document.getElementById('xp-display').querySelector('span').innerText = xp;
+        document.getElementById('level-display').querySelector('span').innerText = level;
+        const streakSpan = document.getElementById('streak-display').querySelector('span');
+        streakSpan.innerText = streak;
+        if (streak >= 3) streakSpan.classList.add('streak-fire');
+        else streakSpan.classList.remove('streak-fire');
+
+        currentIndex++;
+        setTimeout(loadQuestion, 3000);
+    }
+
+    // Feature 10: Challenge injizieren
+    function injectChallenge(catId) {
+        const challengeQ = allQuestions.find(function(q) {
+            return q.isChallengeOnly === true &&
+                   q.categoryId === catId &&
+                   !q._challenged;
+        });
+        if (!challengeQ) return false;
+        challengeQ._challenged = true;
+        currentQueue.splice(currentIndex + 1, 0, Object.assign({}, challengeQ, { _isChallenge: true }));
+        return true;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // FEATURE 7: FORMELBLATT
+    // ══════════════════════════════════════════════════════
+    function toggleFormulaSheet() {
+        const overlay = document.getElementById('formula-overlay');
+        overlay.classList.toggle('open');
+    }
+
+    function closeFormulaSheet(event) {
+        // Nur schließen wenn auf den Hintergrund geklickt wird
+        if (event && event.target === document.getElementById('formula-overlay')) {
+            document.getElementById('formula-overlay').classList.remove('open');
+        }
+    }
+
+    // ══════════════════════════════════════════════════════
+    // FORTSCHRITTSBALKEN
+    // ══════════════════════════════════════════════════════
+    function updateProgress() {
+        const percent = currentQueue.length > 0 ? (currentIndex / currentQueue.length) * 100 : 0;
+        document.getElementById('progress-bar').style.width = `${percent}%`;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // AUSWERTUNG
+    // ══════════════════════════════════════════════════════
+    const categoryResources = {
+        ableitung: [
+            { type: 'video', label: '▶ Kettenregel bei e-Funktionen', url: 'https://www.youtube.com/results?search_query=kettenregel+e-funktion+ableiten+einfach+erklärt' },
+            { type: 'video', label: '▶ Produktregel – Schritt für Schritt', url: 'https://www.youtube.com/results?search_query=produktregel+e-funktion+ausklammern+mathe' },
+            { type: 'web',   label: '🔗 Ableitungsregeln (mathebibel.de)', url: 'https://www.mathebibel.de/ableitungsregeln' },
+            { type: 'web',   label: '🔗 e-Funktion ableiten (mathe-im-abi.de)', url: 'https://www.mathe-im-abi.de/analysis/ableitungsfunktion' },
+        ],
+        stamm: [
+            { type: 'video', label: '▶ Stammfunktion von e-Funktionen', url: 'https://www.youtube.com/results?search_query=stammfunktion+e-funktion+aufleiten+schritt+für+schritt' },
+            { type: 'video', label: '▶ Aufleiten – Grundregeln & Übungen', url: 'https://www.youtube.com/results?search_query=aufleiten+grundregeln+stammfunktion+übungen+gymnasium' },
+            { type: 'web',   label: '🔗 Stammfunktionen (mathebibel.de)', url: 'https://www.mathebibel.de/stammfunktion' },
+        ],
+        integral: [
+            { type: 'video', label: '▶ Bestimmtes Integral berechnen', url: 'https://www.youtube.com/results?search_query=bestimmtes+integral+berechnen+e-funktion+NRW' },
+            { type: 'video', label: '▶ Fläche mit Integral berechnen', url: 'https://www.youtube.com/results?search_query=flächeninhalt+integral+x-achse+nullstelle+betragsstriche' },
+            { type: 'web',   label: '🔗 Bestimmtes Integral (mathebibel.de)', url: 'https://www.mathebibel.de/bestimmtes-integral' },
+            { type: 'web',   label: '🔗 Interaktiv: GeoGebra Integral', url: 'https://www.geogebra.org/m/e-funktionen' },
+        ],
+        sach: [
+            { type: 'video', label: '▶ Wachstum & Zerfall mit e-Funktion', url: 'https://www.youtube.com/results?search_query=exponentielles+wachstum+zerfall+e-funktion+sachaufgabe+NRW' },
+            { type: 'video', label: '▶ c und k interpretieren', url: 'https://www.youtube.com/results?search_query=e-funktion+anfangsbestand+wachstumsrate+k+c+sachaufgabe' },
+            { type: 'web',   label: '🔗 Exponentielles Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/exponentielles-wachstum' },
+        ],
+        graph: [
+            { type: 'video', label: '▶ Kurvendiskussion mit e-Funktion', url: 'https://www.youtube.com/results?search_query=kurvendiskussion+e-funktion+maximum+minimum+gymnasium+NRW' },
+            { type: 'video', label: '▶ Grenzverhalten von e-Funktionen', url: 'https://www.youtube.com/results?search_query=grenzwert+e-funktion+gegen+unendlich+minus+unendlich+mathe' },
+            { type: 'web',   label: '🔗 Kurvendiskussion (mathebibel.de)', url: 'https://www.mathebibel.de/kurvendiskussion' },
+        ],
+        beschraenkt: [
+            { type: 'video', label: '▶ Beschränktes Wachstum erklärt', url: 'https://www.youtube.com/results?search_query=beschränktes+wachstum+sättigungsgrenze+e-funktion+gymnasium' },
+            { type: 'video', label: '▶ Sättigungsgrenze S bestimmen', url: 'https://www.youtube.com/results?search_query=sättigungsgrenze+beschränktes+wachstum+NRW+aufgabe' },
+            { type: 'web',   label: '🔗 Beschränktes Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/beschraenktes-wachstum' },
+            { type: 'web',   label: '🔗 Wachstumsmodelle (mathe-im-abi.de)', url: 'https://www.mathe-im-abi.de' },
+        ],
+    };
+
+    function showResults() {
+        reportToFlow(studentName, xp, level, scores);
+        showScreen('result-screen');
+
+        const today = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        document.getElementById('cert-title').innerText = `Zertifikat: ${studentName}`;
+        document.getElementById('final-stats').innerText = `Lernerfolg: ${xp} XP | Level ${level} | ${today}`;
+
+        // Best-XP speichern
+        const bestXP = parseInt(localStorage.getItem('diagnose-best-xp') || '0');
+        if (xp > bestXP) localStorage.setItem('diagnose-best-xp', xp);
+
+        // Feature 3: Review-Queue: nur falsch beantwortete behalten (bereits beim Quiz gespeichert)
+        // Korrekt beantwortete Fragen aus der Review-Queue entfernen
+        if (isReviewMode) {
+            localStorage.removeItem('diagnose-review-queue');
+        }
+
+        // Feature 2: Selbsteinschätzungs-Vergleich
+        const selfcheckArea = document.getElementById('selfcheck-result-area');
+        selfcheckArea.innerHTML = "";
+        if (Object.keys(selfRatings).length > 0) {
+            const compareDiv = document.createElement('div');
+            compareDiv.className = 'selfcheck-compare';
+            compareDiv.innerHTML = '<h3>Selbsteinschätzung vs. Ergebnis</h3>';
+            const table = document.createElement('table');
+            table.innerHTML = `<tr>
+                <th>Kategorie</th>
+                <th>Einschätzung</th>
+                <th>Ergebnis</th>
+                <th>Übereinstimmung</th>
+            </tr>`;
+
+            const ratingLabels = { sicher: "✅ Sicher", unsicher: "🤔 Unsicher", garnicht: "❌ Gar nicht" };
+            for (const catId of selectedCategories) {
+                const s = scores[catId];
+                if (!s) continue;
+                const rating = selfRatings[catId] || "unsicher";
+                const ratio = Math.min(s.correct / s.total, 1);
+                const resultEmoji = ratio === 1 ? "✅" : ratio >= 0.5 ? "🟡" : "🔴";
+                const resultText = `${s.correct}/${s.total} ${resultEmoji}`;
+
+                // Übereinstimmungs-Logik
+                let match = "";
+                if (rating === "sicher" && ratio >= 0.75)       match = "✓ Richtig eingeschätzt";
+                else if (rating === "sicher" && ratio < 0.75)   match = "⚠️ Überschätzt";
+                else if (rating === "unsicher" && ratio >= 0.75) match = "🎉 Unterschätzt (positiv!)";
+                else if (rating === "garnicht" && ratio >= 0.5)  match = "🎉 Unterschätzt (positiv!)";
+                else                                              match = "✓ Richtig eingeschätzt";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${CATEGORY_NAMES[catId]}</td><td>${ratingLabels[rating]}</td><td>${resultText}</td><td style="font-size:0.85rem;">${match}</td>`;
+                table.appendChild(tr);
+            }
+            compareDiv.appendChild(table);
+            selfcheckArea.appendChild(compareDiv);
+        }
+
+        // Kategorie-Feedback
+        const feedbackArea = document.getElementById('feedback-area');
+        feedbackArea.innerHTML = "";
+
+        const specificHints = {
+            ableitung:   "Wiederhole die Kettenregel (Innere mal Äußere) und die Produktregel. Schau dir das Ausklammern von e^x an.",
+            stamm:       "Beim Aufleiten von e^(kx) durch k teilen. Konstante Faktoren bleiben stehen!",
+            integral:    "Achte auf Vorzeichenwechsel am Nullpunkt – Fläche ggf. in Teilbereiche aufteilen (Betragsstriche).",
+            sach:        "f(t) = c·e^(kt): c = Startwert, k > 0 = Wachstum, k < 0 = Zerfall. Integral der Rate = Gesamtmenge.",
+            graph:       "f'(x) > 0 → f steigt; Vorzeichenwechsel + → − bei f' = Hochpunkt. e^x dominiert Polynome.",
+            beschraenkt: "S = Grenzwert für t → ∞ (e-Term verschwindet). f(0) = Anfangswert. Form: f(t) = S − (S−f₀)·e^(−kt)."
         };
 
-        function buildQueue() {
-            allQuestions.forEach(q => {
-                if (!q.isFallback && !q.isLevel2) {
-                    currentQueue.push(q);
-                    // Dynamically calculate totals based on queue, but for now we manually bumped it
-                }
-            });
-        }
+        for (const key of selectedCategories) {
+            const s = scores[key];
+            if (!s) continue;
+            const catDiv = document.createElement('div');
+            catDiv.className = 'result-category';
 
-        function buildLevel2Queue() {
-            allQuestions.forEach(q => {
-                if (q.isLevel2) currentQueue.push(q);
-            });
-            const inputArea = document.getElementById('input-area');
-            inputArea.innerHTML = `<div class="feedback-message msg-success" style="animation: none;">🔥 LEVEL 2 ERREICHT! Neue, schwierigere Aufgaben freigeschaltet! 🔥</div>`;
-            setTimeout(() => {
-                loadQuestion();
-            }, 3000);
-        }
+            const ratio = Math.min(s.correct / s.total, 1);
+            const color = ratio === 1 ? 'var(--success)' : (ratio >= 0.5 ? '#f59e0b' : 'var(--error)');
+            catDiv.style.borderLeftColor = color;
 
-        function startTest() {
-            buildQueue();
-            document.getElementById('start-screen').classList.remove('active');
-            document.getElementById('quiz-screen').classList.add('active');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            // Start the timer and reset joker status
-            questionStartTime = Date.now();
-            jokerUsedForCurrent = false;
-
-            if (currentIndex >= currentQueue.length) {
-                // If Level 2 is reached, unlocked harder questions
-                if (level >= 2 && currentQueue.length === allQuestions.filter(q => !q.isFallback && !q.isLevel2).length) {
-                    buildLevel2Queue();
-                } else {
-                    showResults();
-                    return;
-                }
-            }
-
-            const q = currentQueue[currentIndex];
-            document.getElementById('question-category').innerText = q.category;
-            document.getElementById('question-text').innerHTML = q.text;
-
-            const inputArea = document.getElementById('input-area');
-            inputArea.innerHTML = "";
-
-            // JOKER reset
-            const jokerArea = document.getElementById('joker-area');
-            const jokerText = document.getElementById('joker-hint');
-            const jokerBtn = document.getElementById('btn-joker');
-            jokerText.style.display = "none";
-            jokerText.innerText = "";
-
-            if (q.hint && xp >= 50) {
-                jokerArea.style.display = "block";
-                jokerBtn.disabled = false;
-                jokerBtn.style.opacity = "1";
-            } else if (q.hint) {
-                jokerArea.style.display = "block";
-                jokerBtn.disabled = false;
-                jokerBtn.style.opacity = "0.5";
+            const hint = specificHints[key] || "";
+            let fbText = "";
+            if (ratio === 1) {
+                fbText = `Exzellent (${s.correct}/${s.total}). Du bist in diesem Bereich bestens für die Klausur vorbereitet!`;
+            } else if (ratio >= 0.5) {
+                fbText = `Solide (${s.correct}/${s.total}). Du hast die Basics verstanden, machst aber noch kleine Fehler.<br><strong style="color:var(--joker-color); font-size:0.93rem; display:inline-block; margin-top:8px;">💡 Tipp für die Klausur: ${hint}</strong>`;
             } else {
-                jokerArea.style.display = "none";
+                fbText = `Förderbedarf (${s.correct}/${s.total}). Dieser Bereich kostet dich Punkte in der Klausur.<br><strong style="color:var(--error); font-size:0.93rem; display:inline-block; margin-top:8px;">🎯 Dein Lernplan:</strong><br><span style="font-size:0.93rem; color:#cbd5e1; display:inline-block; margin-top:4px;">${hint}</span>`;
             }
 
-            selectedOption = null;
+            catDiv.innerHTML = `<h3 style="margin:0; font-size:1.05rem; color:${color};">${s.name}</h3><div class="feedback-text">${fbText}</div>`;
 
-            // Visual Graphic Check
-            if (q.type === 'VisualGraph') {
-                const graphDiv = document.createElement('div');
-                graphDiv.className = 'graph-container';
-                graphDiv.innerHTML = q.graphSVG;
-                inputArea.appendChild(graphDiv);
-
-                // MC Render für Visual
-                renderMCOptions(q, inputArea);
-            } else if (q.type === 'mc') {
-                renderMCOptions(q, inputArea);
-            } else if (q.type === 'text') {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.id = 'text-answer';
-                input.placeholder = "Hier Term / Wort tippen...";
-                input.onkeyup = (e) => { if (e.key === 'Enter') submitAnswer(); };
-                inputArea.appendChild(input);
-                setTimeout(() => input.focus(), 100);
+            if (ratio < 1 && categoryResources[key]) {
+                const resSection = document.createElement('div');
+                resSection.className = 'resources-section';
+                const resTitle = document.createElement('div');
+                resTitle.className = 'resources-title';
+                resTitle.innerText = '📚 Lernmaterial für diesen Bereich';
+                const resLinks = document.createElement('div');
+                resLinks.className = 'resource-links';
+                categoryResources[key].forEach(function(r) {
+                    const a = document.createElement('a');
+                    a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                    a.className = `resource-link ${r.type}`;
+                    a.innerText = r.label;
+                    resLinks.appendChild(a);
+                });
+                resSection.appendChild(resTitle);
+                resSection.appendChild(resLinks);
+                catDiv.appendChild(resSection);
             }
 
-            document.getElementById('next-btn').style.display = 'block';
-            updateProgress();
+            feedbackArea.appendChild(catDiv);
         }
-
-        function renderMCOptions(q, container) {
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'mc-options';
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('div');
-                btn.className = 'mc-option';
-                btn.innerHTML = opt.replace(/e\^\((.*?)\)/g, 'e<sup>$1</sup>');
-                btn.onclick = () => {
-                    document.querySelectorAll('.mc-option').forEach(el => el.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOption = index;
-                };
-                optionsDiv.appendChild(btn);
-            });
-            container.appendChild(optionsDiv);
-        }
-
-        function useJoker() {
-            if (xp >= 50) {
-                xp -= 50;
-                jokerUsedForCurrent = true;
-                document.getElementById('xp-display').querySelector('span').innerText = xp;
-
-                const hintDiv = document.getElementById('joker-hint');
-                hintDiv.innerText = currentQueue[currentIndex].hint;
-                hintDiv.style.display = "block";
-
-                document.getElementById('btn-joker').disabled = true;
-                document.getElementById('btn-joker').style.opacity = "0.2";
-            } else {
-                const hintDiv = document.getElementById('joker-hint');
-                hintDiv.innerText = "Nicht genug XP! Du brauchst 50 XP für einen Tipp.";
-                hintDiv.style.color = "var(--error)";
-                hintDiv.style.display = "block";
-                setTimeout(() => {
-                    hintDiv.style.display = "none";
-                    hintDiv.style.color = "var(--joker-color)";
-                }, 2000);
-            }
-        }
-
-        function submitAnswer() {
-            const q = currentQueue[currentIndex];
-            let isCorrect = false;
-
-            if (q.type === 'mc' || q.type === 'VisualGraph') {
-                if (selectedOption === null) return;
-                isCorrect = (selectedOption === q.correct);
-            } else if (q.type === 'text') {
-                const userInput = document.getElementById('text-answer').value.trim().toLowerCase().replace(/\s+/g, '');
-                if (userInput === "") return;
-                const corrects = q.correct.map(c => c.toLowerCase().replace(/\s+/g, ''));
-                isCorrect = corrects.includes(userInput);
-            }
-
-            document.getElementById('next-btn').style.display = 'none';
-            document.getElementById('joker-area').style.display = 'none'; // Hide joker on submit
-            const inputArea = document.getElementById('input-area');
-            const feedbackDiv = document.createElement('div');
-            feedbackDiv.className = "feedback-message " + (isCorrect ? "msg-success" : "msg-error");
-
-            if (isCorrect) {
-                streak++;
-
-                // Speedrun Bonus Logic
-                const timeTakenStr = ((Date.now() - questionStartTime) / 1000);
-                let speedBonus = 0;
-                let bonusMsg = "";
-
-                if (timeTakenStr <= 10.0 && !jokerUsedForCurrent && !q.isFallback) {
-                    speedBonus = 50;
-                    bonusMsg = `<br><span style="color:var(--joker-color); font-size: 0.9rem;">⚡ QUICK-BRAIN BONUS (+50 XP) - ${timeTakenStr.toFixed(1)}s</span>`;
-                }
-
-                let xpGain = 100 + (streak * 20) + speedBonus;
-                xp += xpGain;
-
-                // Nur normale Fragen fließen in die Score-Rückmeldung ein
-                if (!q.isFallback) scores[q.categoryId].correct++;
-
-                feedbackDiv.innerHTML = `Richtig! (+${xpGain} XP)` + bonusMsg;
-
-                // Adaptive Reset
-                consecutiveMistakesCategory = 0;
-            } else {
-                streak = 0;
-                let correctDisplay;
-                if (q.type === 'text') {
-                    correctDisplay = q.correct[0];
-                } else {
-                    correctDisplay = q.options[q.correct];
-                }
-
-                feedbackDiv.innerHTML = `Falsch. Richtig wäre: <b>${correctDisplay}</b>`;
-
-                // ADAPTIVE DIFFICULTY TRIGGER
-                if (!q.isFallback) {
-                    if (lastErrorCategory === q.categoryId) {
-                        consecutiveMistakesCategory++;
-                    } else {
-                        consecutiveMistakesCategory = 1;
-                        lastErrorCategory = q.categoryId;
-                    }
-
-                    // 2 FEHLER = Fallback injecten
-                    if (consecutiveMistakesCategory === 2) {
-                        const fallbackQ = allQuestions.find(fb => fb.isFallback && fb.categoryId === q.categoryId);
-                        if (fallbackQ) {
-                            // Inject directly after current
-                            currentQueue.splice(currentIndex + 1, 0, fallbackQ);
-                            feedbackDiv.innerHTML += `<br><br><span style="color:var(--joker-color);">⚠️ Sicherheitsnetz aktiviert. Nächste Aufgabe prüft Basics!</span>`;
-                        }
-                        consecutiveMistakesCategory = 0; // reset after trigger
-                    }
-                }
-            }
-
-            inputArea.appendChild(feedbackDiv);
-            const newLevel = Math.floor(xp / 250) + 1; // Level Up every 250 XP
-            if (newLevel > level) {
-                level = newLevel;
-                feedbackDiv.innerHTML += `<div style="color:var(--primary-glow); margin-top:10px;">LEVEL UP: STUFE ${level}!</div>`;
-            }
-
-            document.getElementById('xp-display').querySelector('span').innerText = xp;
-            document.getElementById('level-display').querySelector('span').innerText = level;
-
-            const streakSpan = document.getElementById('streak-display').querySelector('span');
-            streakSpan.innerText = streak;
-            if (streak >= 3) streakSpan.classList.add('streak-fire');
-            else streakSpan.classList.remove('streak-fire');
-
-            currentIndex++;
-            setTimeout(loadQuestion, 3000);
-        }
-
-        function updateProgress() {
-            // Adaptive Queue kann ihre Länge ändern (durch injections), daher relativ berechnen
-            const percent = (currentIndex / currentQueue.length) * 100;
-            document.getElementById('progress-bar').style.width = `${percent}%`;
-        }
-
-        function showResults() {
-            document.getElementById('quiz-screen').classList.remove('active');
-            document.getElementById('result-screen').classList.add('active');
-
-            document.getElementById('final-stats').innerText = `Lernerfolg: ${xp} XP | Level ${level}`;
-
-            const feedbackArea = document.getElementById('feedback-area');
-            feedbackArea.innerHTML = "";
-
-            for (const key in scores) {
-                const s = scores[key];
-                const catDiv = document.createElement('div');
-                catDiv.className = 'result-category';
-
-                let ratio = (s.correct / s.total);
-                let color = ratio === 1 ? 'var(--success)' : (ratio >= 0.5 ? '#f59e0b' : 'var(--error)');
-                catDiv.style.borderLeftColor = color;
-
-                let fbText = "";
-                let specificHint = "";
-
-                if (key === "ableitung") {
-                    specificHint = "Wiederhole die Kettenregel (Innere mal Äußere Ableitung) und die Produktregel. Schau dir speziell das Ausklammern von e^x an.";
-                } else if (key === "stamm") {
-                    specificHint = "Beim Aufleiten von e^(kx) musst du durch 'k' teilen. Erinnere dich: Die Konstante bleibt beim Ableiten und Aufleiten stehen!";
-                } else if (key === "integral") {
-                    specificHint = "Integrale messen Flächenbilanzen. Achte darauf, wo der Graph die x-Achse schneidet, und teile die Fläche ggf. am Nullpunkt auf (Betragsstriche).";
-                } else if (key === "sach") {
-                    specificHint = "Erinnere dich: f(t) = c*e^(kt). 'c' ist der Startwert. Bei k>0 haben wir Wachstum, bei k<0 Zerfall. Das Integral einer Änderungsrate liefert die hinzukommende Menge.";
-                }
-
-                if (ratio === 1) {
-                    fbText = `Exzellent (${s.correct}/${s.total}). Du bist in diesem Bereich bestens für die Klausur vorbereitet!`;
-                } else if (ratio >= 0.5) {
-                    fbText = `Solide (${s.correct}/${s.total}). Du hast die Basics verstanden, baust aber noch kleine Fehler ein.<br><strong style="color:var(--joker-color); font-size:0.95rem; display:inline-block; margin-top:8px;">💡 Tipp für die Klausur: ${specificHint}</strong>`;
-                } else {
-                    fbText = `Förderbedarf (${s.correct}/${s.total}). Dieser Bereich kostet dich in der Klausur noch viele Punkte.<br><strong style="color:var(--error); font-size:0.95rem; display:inline-block; margin-top:8px;">🎯 Dein Lernplan:</strong><br><span style="font-size:0.95rem; color:#cbd5e1; display:inline-block; margin-top:4px;">${specificHint}</span>`;
-                }
-
-                catDiv.innerHTML = `
-                    <h3 style="margin:0; font-size:1.1rem; color: ${color};">${s.name}</h3>
-                    <div class="feedback-text">${fbText}</div>
-                `;
-                feedbackArea.appendChild(catDiv);
-            }
-        }
-    </script>
+    }
+</script>
 </body>
-
 </html>
