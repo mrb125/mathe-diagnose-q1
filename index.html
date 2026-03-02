@@ -792,6 +792,197 @@
             correct: 2,
             hint: "Setze f(x) = 0: e^x = 2 → x = ln(2) ≈ 0,69. Da ln(2) zwischen 0 und 2 liegt, schneidet der Graph die Achse!",
             explanation: "f(x) = 0 → e^x = 2 → x = ln(2) ≈ 0,69 ∈ [0;2]. Der Graph schneidet also die x-Achse im Intervall. Der Flächeninhalt erfordert daher Betragsstriche: A = |∫₀^ln2| + |∫_ln2^2|."
+        },
+
+        // ─── ABLEITUNGSREGELN Level 2 (weitere 3) ────────────────
+        {
+            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Leite ab (Kettenregel): <span class='math-text'>f(x) = (3x + 1)⁴</span>",
+            options: ["f'(x) = 12·(3x+1)³", "f'(x) = 4·(3x+1)³", "f'(x) = 4·(3x+1)³·x", "f'(x) = (3x+1)⁴·3"],
+            correct: 0,
+            hint: "Äußere Ableitung: 4·(…)³, innere Ableitung von (3x+1): 3. Beide multiplizieren!",
+            explanation: "Kettenregel: f'(x) = 4·(3x+1)³ · 3 = 12·(3x+1)³. Die innere Ableitung von (3x+1) ist 3."
+        },
+        {
+            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Leite ab (Produkt- und Kettenregel): <span class='math-text'>f(x) = x² · e^(3x)</span><br>(Schreibweise: z.B. <i>(2x+3x^2)*e^(3x)</i>)",
+            correct: ["(2x+3x^2)*e^(3x)", "e^(3x)*(2x+3x^2)", "(2x+3x²)*e^(3x)", "e^(3x)*(2x+3x²)", "x*(2+3x)*e^(3x)"],
+            hint: "u = x², u' = 2x. v = e^(3x), v' = 3e^(3x). Produktregel: u'v + uv'.",
+            explanation: "u=x², u'=2x; v=e^(3x), v'=3e^(3x). f'(x) = 2x·e^(3x) + x²·3e^(3x) = e^(3x)·(2x+3x²)."
+        },
+        {
+            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Leite ab (Kettenregel): <span class='math-text'>f(x) = e^(−x²)</span>",
+            options: ["f'(x) = −2x · e^(−x²)", "f'(x) = −x² · e^(−x²−1)", "f'(x) = e^(−x²−1)", "f'(x) = −2 · e^(−x²)"],
+            correct: 0,
+            hint: "Innere Funktion: g(x) = −x². Innere Ableitung: g'(x) = −2x.",
+            explanation: "Kettenregel: f'(x) = e^(−x²) · (−2x) = −2x·e^(−x²). Die innere Ableitung von −x² ist −2x."
+        },
+
+        // ─── STAMMFUNKTIONEN Level 2 (4 neue) ────────────────────
+        {
+            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Bestimme eine Stammfunktion von <span class='math-text'>f(x) = (4x + 2)³</span>.",
+            options: ["F(x) = (4x+2)⁴ / 16 + C", "F(x) = (4x+2)⁴ / 4 + C", "F(x) = 3·(4x+2)² + C", "F(x) = (4x+2)⁴ + C"],
+            correct: 0,
+            hint: "Stammfunktion von u^3 ist u^4/4. Aber die innere Ableitung von (4x+2) ist 4 – die muss geteilt werden!",
+            explanation: "∫(4x+2)³ dx: Stammfunktion der äußeren Funktion ist (4x+2)⁴/4, geteilt durch die innere Ableitung 4: F(x) = (4x+2)⁴/16 + C."
+        },
+        {
+            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Bestimme eine Stammfunktion von <span class='math-text'>f(x) = 3·e^(2x) − 4x</span>.",
+            options: ["F(x) = (3/2)·e^(2x) − 2x² + C", "F(x) = 6·e^(2x) − 4 + C", "F(x) = 3·e^(2x) − 2x² + C", "F(x) = (3/2)·e^(2x) − 4x² + C"],
+            correct: 0,
+            hint: "∫3·e^(2x) dx: Stammfunktion von e^(2x) ist e^(2x)/2 (wegen innerer Ableitung 2). ∫4x dx = 2x².",
+            explanation: "∫3·e^(2x) dx = 3·e^(2x)/2 = (3/2)e^(2x). ∫4x dx = 2x². Zusammen: F(x) = (3/2)·e^(2x) − 2x² + C."
+        },
+        {
+            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Gegeben: <span class='math-text'>F'(x) = 2x − 6</span> und <span class='math-text'>F(3) = 1</span>.<br>Bestimme F(x). (Schreibweise: z.B. <i>x^2-6x+10</i>)",
+            correct: ["x^2-6x+10", "x²-6x+10", "x^2 - 6x + 10"],
+            hint: "Erst integrieren → F(x) = x² − 6x + C. Dann F(3) = 1 einsetzen, um C zu bestimmen.",
+            explanation: "F(x) = x² − 6x + C. Einsetzen: F(3) = 9 − 18 + C = 1 → C = 10. Also: F(x) = x² − 6x + 10."
+        },
+        {
+            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Ist <span class='math-text'>F(x) = (2x+1)³ / 6</span> eine Stammfunktion von <span class='math-text'>f(x) = (2x+1)²</span>?",
+            options: ["Ja, denn F'(x) = (2x+1)² nach Kettenregel.", "Nein, F(x) müsste (2x+1)³/3 sein.", "Nein, die innere Ableitung fehlt im Nenner.", "Ja, aber nur für x > −0,5."],
+            correct: 0,
+            hint: "Leite F(x) ab: Kettenregel! Äußere Ableitung · innere Ableitung. Innere Ableitung von (2x+1) ist 2.",
+            explanation: "F'(x) = 3·(2x+1)²/6 · 2 = (2x+1)². ✓ Das 6 im Nenner und die innere Ableitung 2 heben sich richtig auf."
+        },
+
+        // ─── BESTIMMTE INTEGRALE Level 2 (weitere 3) ─────────────
+        {
+            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Berechne: <span class='math-text'>∫₀¹ (3x² + e^x) dx</span>",
+            options: ["e (≈ 2,72)", "e + 2 (≈ 4,72)", "2e − 1 (≈ 4,44)", "1"],
+            correct: 0,
+            hint: "Stammfunktion: x³ + e^x. Einsetzen: (1 + e¹) − (0 + e⁰) = 1 + e − 0 − 1 = e.",
+            explanation: "[x³ + e^x]₀¹ = (1 + e¹) − (0 + e⁰) = (1 + e) − (0 + 1) = e. Das Integral ergibt genau die Eulersche Zahl e ≈ 2,72."
+        },
+        {
+            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Berechne den Flächeninhalt, den <span class='math-text'>f(x) = 4 − x²</span> mit der x-Achse einschließt.",
+            options: ["32/3 (≈ 10,67)", "16", "8", "16/3 (≈ 5,33)"],
+            correct: 0,
+            hint: "Nullstellen: x = ±2. Flächeninhalt = ∫₋₂² (4−x²) dx. Stammfunktion: 4x − x³/3.",
+            explanation: "f(x) = 0: x = ±2. A = ∫₋₂²(4−x²)dx = [4x − x³/3]₋₂² = (8 − 8/3) − (−8 + 8/3) = 16 − 16/3 = 32/3 ≈ 10,67."
+        },
+        {
+            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Berechne: <span class='math-text'>∫₀² e^(2x) dx</span>",
+            options: ["½·(e⁴ − 1) ≈ 26,8", "e⁴ − 1 ≈ 53,6", "½·e⁴ ≈ 27,3", "2·e⁴ ≈ 109,2"],
+            correct: 0,
+            hint: "Stammfunktion von e^(2x) ist e^(2x)/2 (wegen innerer Ableitung 2).",
+            explanation: "[e^(2x)/2]₀² = e^4/2 − e^0/2 = ½·e⁴ − ½ = ½·(e⁴ − 1) ≈ 26,8."
+        },
+
+        // ─── SACHAUFGABEN Level 2 (4 neue) ───────────────────────
+        {
+            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Eine Wasserleitung hat den Durchfluss <span class='math-text'>f(t) = 3t² + 2</span> (Liter/Minute). Wie viel Wasser fließt von t = 1 bis t = 3 Minuten durch?",
+            options: ["30 Liter", "27 Liter", "36 Liter", "24 Liter"],
+            correct: 0,
+            hint: "Berechne ∫₁³ (3t²+2) dt. Stammfunktion: t³ + 2t.",
+            explanation: "∫₁³(3t²+2)dt = [t³+2t]₁³ = (27+6)−(1+2) = 33−3 = 30 Liter."
+        },
+        {
+            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Die Gewinnfunktion lautet <span class='math-text'>G(x) = −x² + 40x − 300</span> (in €, x = Stückzahl in Zehnern). Bei welcher Stückzahl wird der maximale Gewinn erzielt?",
+            options: ["x = 20 (→ 200 Stück), G_max = 100 €", "x = 40, G_max = 300 €", "x = 10, G_max = 0 €", "x = 20, G_max = 400 €"],
+            correct: 0,
+            hint: "G'(x) = −2x + 40 = 0 → x = 20. Dann G(20) ausrechnen.",
+            explanation: "G'(x) = −2x+40 = 0 → x = 20. G(20) = −400+800−300 = 100 €. Da x in Zehnern: 20·10 = 200 Stück."
+        },
+        {
+            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Der Mittelwert einer Funktion über [a;b] ist <span class='math-text'>(1/(b−a))·∫ₐᵇ f(x) dx</span>. Berechne den Mittelwert von <span class='math-text'>f(x) = 2x + 1</span> über [0; 4].",
+            options: ["5", "4", "9", "20"],
+            correct: 0,
+            hint: "Berechne ∫₀⁴ (2x+1) dx = [x²+x]₀⁴, dann durch (4−0) = 4 teilen.",
+            explanation: "∫₀⁴(2x+1)dx = [x²+x]₀⁴ = 16+4 = 20. Mittelwert: 20/4 = 5."
+        },
+        {
+            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Eine Bakterienkolonie startet mit 500 Bakterien. Wachstumsrate: <span class='math-text'>f'(t) = 100·e^(0,2t)</span>. Wie viele Bakterien gibt es nach 5 Stunden?",
+            options: ["ca. 1359 Bakterien", "ca. 860 Bakterien", "ca. 500 Bakterien", "ca. 2000 Bakterien"],
+            correct: 0,
+            hint: "N(5) = 500 + ∫₀⁵ 100·e^(0,2t) dt. Stammfunktion von e^(0,2t) ist e^(0,2t)/0,2 = 5·e^(0,2t).",
+            explanation: "N(5) = 500 + [100/0,2·e^(0,2t)]₀⁵ = 500 + 500·(e¹−1) ≈ 500 + 500·1,718 ≈ 500 + 859 ≈ 1359 Bakterien."
+        },
+
+        // ─── GRAPHENANALYSE Level 2 (4 neue) ─────────────────────
+        {
+            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Die Ableitung einer Funktion f ist <span class='math-text'>f'(x) = x² − 4</span>. In welchen Intervallen ist f streng monoton steigend?",
+            options: ["(−∞; −2) und (2; ∞)", "(−2; 2)", "Nur für x > 0", "Für alle x ≠ 0"],
+            correct: 0,
+            hint: "f steigt, wo f'(x) > 0. Löse x²−4 > 0 → x² > 4 → |x| > 2.",
+            explanation: "f'(x) = x²−4 > 0 ⟺ x² > 4 ⟺ x < −2 oder x > 2. Also monoton steigend auf (−∞;−2) und (2;∞)."
+        },
+        {
+            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Bestimme den Wendepunkt von <span class='math-text'>f(x) = x³ − 3x² + 2</span>.",
+            options: ["W(1 | 0)", "W(0 | 2)", "W(2 | −2)", "W(−1 | 0)"],
+            correct: 0,
+            hint: "Wendepunkt: f''(x) = 0. Berechne f''(x) = 6x − 6. Setze gleich 0.",
+            explanation: "f'(x) = 3x²−6x, f''(x) = 6x−6 = 0 → x = 1. f(1) = 1−3+2 = 0. VZW von f'' prüfen: Wendepunkt bei W(1|0)."
+        },
+        {
+            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Bestimme das globale Maximum von <span class='math-text'>f(x) = −x² + 6x − 5</span> im Intervall [0; 5].",
+            options: ["Globales Maximum: f(3) = 4", "Globales Maximum: f(0) = −5", "Globales Maximum: f(5) = 0", "Globales Maximum: f(6) = 7"],
+            correct: 0,
+            hint: "Kandidaten: Randwerte f(0), f(5) und lokale Extremstellen (f'(x) = 0). Vergleiche alle!",
+            explanation: "f'(x) = −2x+6 = 0 → x = 3. Kandidaten: f(0)=−5, f(3)=−9+18−5=4, f(5)=−25+30−5=0. Globales Maximum: f(3)=4."
+        },
+        {
+            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Eine quadratische Funktion f hat einen Tiefpunkt bei T(1|0) und verläuft durch den Punkt (0|2). Welche Funktionsgleichung hat f?",
+            options: ["f(x) = 2·(x−1)²", "f(x) = (x−1)² + 2", "f(x) = −2·(x−1)²", "f(x) = 2x² + 1"],
+            correct: 0,
+            hint: "Scheitelpunktform: f(x) = a·(x−1)². Einsetzen von (0|2): 2 = a·1² → a = 2.",
+            explanation: "Tiefpunkt T(1|0) → f(x) = a·(x−1)². Punkt (0|2): 2 = a·(0−1)² = a. Also f(x) = 2·(x−1)²."
+        },
+
+        // ─── BESCHRÄNKTES WACHSTUM Level 2 (4 neue) ──────────────
+        {
+            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Gegeben: <span class='math-text'>f(t) = 600 − 600·e^(−kt)</span>. Nach 5 Stunden gilt f(5) = 300. Welchen Wert hat k?",
+            options: ["k = ln(2)/5 ≈ 0,139", "k = 0,5", "k = ln(0,5)/5 ≈ −0,139", "k = 5/ln(2) ≈ 7,21"],
+            correct: 0,
+            hint: "Setze f(5) = 300 ein: 600·e^(−5k) = 300 → e^(−5k) = 0,5 → ln beider Seiten.",
+            explanation: "300 = 600−600·e^(−5k) → 600·e^(−5k) = 300 → e^(−5k) = ½ → −5k = ln(½) = −ln(2) → k = ln(2)/5 ≈ 0,139."
+        },
+        {
+            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Ein Lernprozess: <span class='math-text'>f(t) = 1000·(1 − e^(−0,5t))</span> (Sättigung S = 1000 Vokabeln). Ab wann wurden 90 % gelernt?",
+            options: ["t ≈ 4,6 Tage", "t ≈ 2,0 Tage", "t ≈ 9,0 Tage", "t ≈ 0,9 Tage"],
+            correct: 0,
+            hint: "Setze f(t) = 900: 1 − e^(−0,5t) = 0,9 → e^(−0,5t) = 0,1 → ln beider Seiten.",
+            explanation: "900 = 1000·(1−e^(−0,5t)) → e^(−0,5t) = 0,1 → −0,5t = ln(0,1) → t = −ln(0,1)/0,5 = 2·ln(10) ≈ 4,6."
+        },
+        {
+            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Fischbestand: Anfang 200 Fische, Kapazitätsgrenze 800. Nach 2 Jahren: 350 Fische. Welchen Wert hat k in <span class='math-text'>f(t) = 800 − 600·e^(−kt)</span>?",
+            options: ["k = −ln(0,75)/2 ≈ 0,14", "k = 0,25", "k = ln(0,75)/2 ≈ −0,14", "k = ln(2)/2 ≈ 0,35"],
+            correct: 0,
+            hint: "f(2) = 350 einsetzen: 800−600·e^(−2k) = 350 → e^(−2k) = 450/600 = 0,75.",
+            explanation: "350 = 800−600·e^(−2k) → 600·e^(−2k) = 450 → e^(−2k) = 0,75 → −2k = ln(0,75) → k = −ln(0,75)/2 ≈ 0,144."
+        },
+        {
+            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
+            text: "Zwei Modelle: f₁(t) = 500·(1−e^(−0,3t)) und f₂(t) = 500·(1−e^(−0,1t)), beide mit S = 500 und f(0) = 0. Welche Aussage stimmt?",
+            options: [
+                "f₁ nähert sich S schneller an, da k₁ = 0,3 > k₂ = 0,1.",
+                "f₂ nähert sich S schneller an, da k₂ kleiner ist.",
+                "Beide nähern sich S gleich schnell an.",
+                "Der Wert von k hat keinen Einfluss auf die Geschwindigkeit."
+            ],
+            correct: 0,
+            hint: "Je größer k, desto schneller fällt e^(−kt) gegen 0 – und desto schneller nähert sich f an S.",
+            explanation: "Größeres k → e^(−kt) fällt schneller gegen 0 → f nähert sich schneller der Sättigungsgrenze S. f₁ mit k=0,3 ist schneller als f₂ mit k=0,1."
         }
     ];
 
