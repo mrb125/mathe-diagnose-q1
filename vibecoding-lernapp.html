@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vibecoding Lernen</title>
+  <style>
+    :root {
+      --bg:      #0b1120;
+      --surface: #111827;
+      --card:    #1a2236;
+      --border:  rgba(255,255,255,0.09);
+      --text:    #f1f5f9;
+      --muted:   #64748b;
+      --prim:    #38bdf8;
+      --sec:     #818cf8;
+      --green:   #34d399;
+      --warn:    #fbbf24;
+      --red:     #f87171;
+      /* Kategoriefarben */
+      --cat-mindset:  #8b5cf6;
+      --cat-prompt:   #0ea5e9;
+      --cat-tools:    #10b981;
+      --cat-workflow: #6366f1;
+      --cat-security: #ef4444;
+      --cat-debug:    #f97316;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+    }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 40px 20px 24px;
+      background: radial-gradient(ellipse at top, #1e293b 0%, var(--bg) 70%);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: var(--prim);
+      background: rgba(56,189,248,.12);
+      border: 1px solid rgba(56,189,248,.25);
+      border-radius: 20px; padding: 3px 12px;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 5vw, 3rem);
+      font-weight: 900; letter-spacing: -.02em;
+      background: linear-gradient(135deg, var(--prim) 0%, var(--sec) 60%, #c084fc 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    .hero p {
+      font-size: clamp(0.88rem, 2vw, 1.05rem);
+      color: var(--muted); max-width: 580px; margin: 0 auto 24px;
+    }
+
+    /* Karpathy Quote */
+    .karpathy-quote {
+      display: inline-block;
+      max-width: 520px;
+      background: rgba(56,189,248,.07);
+      border-left: 3px solid var(--prim);
+      border-radius: 0 8px 8px 0;
+      padding: 10px 16px;
+      font-size: 0.88rem; font-style: italic;
+      color: #cbd5e1; margin-bottom: 28px; text-align: left;
+    }
+    .karpathy-quote cite {
+      display: block; font-style: normal;
+      font-size: 0.72rem; color: var(--muted); margin-top: 5px;
+    }
+
+    /* ── LEVEL-TABS ─────────────────────────────────────────── */
+    .level-tabs {
+      display: flex; justify-content: center; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .level-tab {
+      padding: 9px 22px; border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: transparent; color: var(--muted);
+      cursor: pointer; font-size: 0.88rem; font-weight: 700;
+      transition: all .18s;
+    }
+    .level-tab .tab-emoji { margin-right: 6px; }
+    .level-tab:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .level-tab.active[data-level="einsteiger"] {
+      background: rgba(52,211,153,.15); border-color: var(--green); color: var(--green);
+    }
+    .level-tab.active[data-level="fortgeschritten"] {
+      background: rgba(56,189,248,.15); border-color: var(--prim); color: var(--prim);
+    }
+    .level-tab.active[data-level="profi"] {
+      background: rgba(129,140,248,.15); border-color: var(--sec); color: var(--sec);
+    }
+
+    /* ── STATS BAR ──────────────────────────────────────────── */
+    .stats-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 20px;
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      font-size: 0.78rem; color: var(--muted);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .stats-left { display: flex; align-items: center; gap: 14px; }
+    .progress-bar-wrap {
+      flex: 1; max-width: 200px; min-width: 80px;
+      height: 5px; background: rgba(255,255,255,.08);
+      border-radius: 3px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, var(--green), var(--prim));
+      transition: width .4s;
+    }
+    .stats-right { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Kategorie-Filter */
+    .cat-filter {
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 0.68rem; font-weight: 700; cursor: pointer;
+      border: 1px solid transparent;
+      transition: all .15s;
+    }
+    .cat-filter.active, .cat-filter:hover { opacity: 1; }
+    .cat-filter:not(.active) { opacity: .45; }
+
+    /* ── RANDOM TIP BUTTON ──────────────────────────────────── */
+    .btn-random {
+      padding: 4px 12px; border-radius: 6px;
+      background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3);
+      color: var(--warn); font-size: 0.74rem; font-weight: 700;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-random:hover { background: rgba(251,191,36,.2); }
+
+    /* ── KARTEN-GRID ────────────────────────────────────────── */
+    #cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+      padding: 20px;
+      max-width: 1400px; margin: 0 auto;
+    }
+
+    .tip-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+      display: flex; flex-direction: column;
+    }
+    .tip-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+      border-color: rgba(255,255,255,.18);
+    }
+    .tip-card.done {
+      opacity: .55;
+      border-style: dashed;
+    }
+    .tip-card.hidden { display: none; }
+
+    /* Karten-Header */
+    .tc-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tc-num {
+      font-size: 0.65rem; font-weight: 800;
+      color: var(--muted); min-width: 22px;
+    }
+    .tc-badge {
+      font-size: 0.58rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .tc-title {
+      font-weight: 700; font-size: 0.9rem;
+      flex: 1; line-height: 1.25;
+    }
+    .tc-done-icon { font-size: 1rem; }
+
+    /* Karten-Body */
+    .tc-body { padding: 12px 14px 14px; flex: 1; }
+    .tc-preview {
+      font-size: 0.8rem; color: #94a3b8; line-height: 1.5;
+      margin-bottom: 0;
+    }
+    .tc-detail {
+      display: none;
+      font-size: 0.82rem; color: #cbd5e1; line-height: 1.6;
+      margin-top: 10px;
+    }
+    .tc-detail.open { display: block; }
+
+    /* Detail-Abschnitte */
+    .detail-section { margin-bottom: 10px; }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-label {
+      font-size: 0.62rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .09em;
+      color: var(--muted); margin-bottom: 3px;
+    }
+    .detail-text { font-size: 0.8rem; line-height: 1.55; color: #cbd5e1; }
+
+    /* Code-Snippet innerhalb Karte */
+    .tip-code {
+      background: #0b1120; border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; padding: 8px 12px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.76rem; color: #7dd3fc;
+      white-space: pre-wrap; word-break: break-all;
+      margin-top: 6px;
+    }
+
+    /* Quellen-Link */
+    .tc-source {
+      font-size: 0.67rem; color: var(--muted);
+      margin-top: 10px; padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .tc-source a { color: var(--prim); text-decoration: none; }
+    .tc-source a:hover { text-decoration: underline; }
+
+    /* Karten-Footer */
+    .tc-footer {
+      padding: 8px 14px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .btn-mark {
+      font-size: 0.7rem; font-weight: 700; padding: 3px 10px;
+      border-radius: 5px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-mark:hover { background: rgba(52,211,153,.1); color: var(--green); border-color: var(--green); }
+    .tip-card.done .btn-mark {
+      background: rgba(52,211,153,.12); color: var(--green); border-color: rgba(52,211,153,.3);
+    }
+
+    /* ── KATEGORIE-FARBEN ───────────────────────────────────── */
+    [data-cat="mindset"]  .tc-badge { background: rgba(139,92,246,.2); color: #c4b5fd; }
+    [data-cat="prompt"]   .tc-badge { background: rgba(14,165,233,.2); color: #7dd3fc; }
+    [data-cat="tools"]    .tc-badge { background: rgba(16,185,129,.2); color: #6ee7b7; }
+    [data-cat="workflow"] .tc-badge { background: rgba(99,102,241,.2); color: #a5b4fc; }
+    [data-cat="security"] .tc-badge { background: rgba(239,68,68,.2);  color: #fca5a5; }
+    [data-cat="debug"]    .tc-badge { background: rgba(249,115,22,.2); color: #fdba74; }
+
+    [data-cat="mindset"]  { border-top: 2px solid var(--cat-mindset); }
+    [data-cat="prompt"]   { border-top: 2px solid var(--cat-prompt); }
+    [data-cat="tools"]    { border-top: 2px solid var(--cat-tools); }
+    [data-cat="workflow"] { border-top: 2px solid var(--cat-workflow); }
+    [data-cat="security"] { border-top: 2px solid var(--cat-security); }
+    [data-cat="debug"]    { border-top: 2px solid var(--cat-debug); }
+
+    .cat-filter[data-cat="mindset"]  { background: rgba(139,92,246,.15); color:#c4b5fd; border-color:rgba(139,92,246,.3); }
+    .cat-filter[data-cat="prompt"]   { background: rgba(14,165,233,.15); color:#7dd3fc; border-color:rgba(14,165,233,.3); }
+    .cat-filter[data-cat="tools"]    { background: rgba(16,185,129,.15); color:#6ee7b7; border-color:rgba(16,185,129,.3); }
+    .cat-filter[data-cat="workflow"] { background: rgba(99,102,241,.15); color:#a5b4fc; border-color:rgba(99,102,241,.3); }
+    .cat-filter[data-cat="security"] { background: rgba(239,68,68,.15);  color:#fca5a5; border-color:rgba(239,68,68,.3); }
+    .cat-filter[data-cat="debug"]    { background: rgba(249,115,22,.15); color:#fdba74; border-color:rgba(249,115,22,.3); }
+
+    /* ── QUELLEN-ABSCHNITT ──────────────────────────────────── */
+    #sources {
+      max-width: 1400px; margin: 0 auto;
+      padding: 20px;
+      border-top: 1px solid var(--border);
+    }
+    #sources h2 {
+      font-size: 0.8rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px;
+    }
+    #sources ul {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      list-style: none;
+    }
+    #sources li a {
+      font-size: 0.72rem; color: var(--prim);
+      background: rgba(56,189,248,.07);
+      border: 1px solid rgba(56,189,248,.2);
+      border-radius: 6px; padding: 3px 10px;
+      text-decoration: none; display: block;
+      transition: background .15s;
+    }
+    #sources li a:hover { background: rgba(56,189,248,.15); }
+
+    @media (max-width: 600px) {
+      #cards-container { grid-template-columns: 1fr; padding: 12px; }
+      .stats-bar { font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ Lern-App 2026</div>
+  <h1>Vibecoding lernen</h1>
+  <p>Von Null zum KI-gestützten Developer — mit Tipps aus echten Workflows und aktueller Forschung.</p>
+  <blockquote class="karpathy-quote">
+    „I just see stuff, say stuff, run stuff, and copy-paste stuff, and it mostly works."
+    <cite>— Andrej Karpathy (Erfinder des Begriffs „Vibecoding", Feb. 2025)</cite>
+  </blockquote>
+  <div class="level-tabs">
+    <button class="level-tab active" data-level="einsteiger" onclick="setLevel('einsteiger')">
+      <span class="tab-emoji">🌱</span>Einsteiger
+    </button>
+    <button class="level-tab" data-level="fortgeschritten" onclick="setLevel('fortgeschritten')">
+      <span class="tab-emoji">🔧</span>Fortgeschritten
+    </button>
+    <button class="level-tab" data-level="profi" onclick="setLevel('profi')">
+      <span class="tab-emoji">🚀</span>Profi
+    </button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-left">
+    <span id="stats-text">0 / 0 Tipps gelesen</span>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+  <div class="stats-right" id="cat-filters">
+    <button class="cat-filter active" data-cat="all" onclick="filterCat('all')">Alle</button>
+    <button class="cat-filter active" data-cat="mindset"  onclick="filterCat('mindset')">🧠 Mindset</button>
+    <button class="cat-filter active" data-cat="prompt"   onclick="filterCat('prompt')">✍️ Prompt</button>
+    <button class="cat-filter active" data-cat="tools"    onclick="filterCat('tools')">🛠 Tools</button>
+    <button class="cat-filter active" data-cat="workflow" onclick="filterCat('workflow')">⚡ Workflow</button>
+    <button class="cat-filter active" data-cat="security" onclick="filterCat('security')">🔒 Security</button>
+    <button class="cat-filter active" data-cat="debug"    onclick="filterCat('debug')">🐛 Debug</button>
+    <button class="btn-random" onclick="openRandom()">🎲 Zufalls-Tipp</button>
+  </div>
+</div>
+
+<!-- KARTEN -->
+<div id="cards-container"></div>
+
+<!-- QUELLEN -->
+<section id="sources">
+  <h2>Quellen</h2>
+  <ul>
+    <li><a href="https://aitoolsclub.com/the-ultimate-vibe-coding-guide-for-beginners-pros/" target="_blank">The Ultimate Vibe Coding Guide (aitoolsclub)</a></li>
+    <li><a href="https://zapier.com/blog/how-to-vibe-code/" target="_blank">11 Vibe Coding Best Practices (Zapier)</a></li>
+    <li><a href="https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l" target="_blank">Structured Workflow for Vibe Coding (DEV.to)</a></li>
+    <li><a href="https://cc.deeptoai.com/docs/en/best-practices/karpathy-llm-coding-evolution" target="_blank">Karpathy on LLM-Assisted Coding Evolution</a></li>
+    <li><a href="https://vibecoding.app/blog/vibe-coding-complete-guide" target="_blank">Vibe Coding Complete Guide 2026 (vibecoding.app)</a></li>
+    <li><a href="https://www.kaspersky.com/blog/vibe-coding-2025-risks/54584/" target="_blank">Security Risks of Vibe Coding (Kaspersky)</a></li>
+    <li><a href="https://github.com/analyticalrohit/awesome-vibe-coding-guide" target="_blank">Awesome Vibe Coding Guide (GitHub)</a></li>
+    <li><a href="https://www.sitepoint.com/vibe-coding-complete-developers-guide/" target="_blank">Complete Developer's Guide to Vibe Coding (SitePoint)</a></li>
+    <li><a href="https://medium.com/@cem.karaca/the-complete-guide-to-vibe-coding-best-practices-for-ai-powered-development-5529dedfd2a7" target="_blank">Best Practices for AI-Powered Development (Medium)</a></li>
+    <li><a href="https://cgstrategylab.com/advanced-claude-code-vibe-coding-guide/" target="_blank">Advanced Vibe Coding with Claude Code</a></li>
+  </ul>
+</section>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   TIPPS-DATEN
+   ══════════════════════════════════════════════════════════════ */
+const TIPS = {
+
+  einsteiger: [
+    {
+      cat: 'mindset',
+      title: 'Was ist Vibecoding?',
+      preview: 'Ein neuer Ansatz: Du beschreibst — die KI schreibt den Code.',
+      was: 'Vibecoding wurde im Februar 2025 von KI-Forscher Andrej Karpathy geprägt. Statt jede Zeile Code selbst zu schreiben, führst du ein Gespräch mit einer KI und beschreibst, was deine App tun soll.',
+      tipp: 'Denke an dich als Architekt und die KI als sehr schnellen, aber manchmal unaufmerksamen Bauarbeiter — du gibst die Pläne vor, die KI baut.',
+      beispiel: null,
+      quelle: { text: 'Karpathy — LLM Coding Evolution', url: 'https://cc.deeptoai.com/docs/en/best-practices/karpathy-llm-coding-evolution' }
+    },
+    {
+      cat: 'mindset',
+      title: 'Du bist der Chef, die KI ist dein Assistent',
+      preview: 'Die KI macht keine Entscheidungen für dich — sie setzt deine Ideen um.',
+      was: 'Die häufigste Anfänger-Falle ist, die KI entscheiden zu lassen, was gebaut werden soll. Du musst eine klare Vorstellung mitbringen.',
+      tipp: 'Formuliere immer: Was soll die App können? Für wen? Welchen Look soll sie haben? Dann erst prompten.',
+      beispiel: null,
+      quelle: { text: 'Ultimate Vibe Coding Guide', url: 'https://aitoolsclub.com/the-ultimate-vibe-coding-guide-for-beginners-pros/' }
+    },
+    {
+      cat: 'tools',
+      title: 'Das richtige Tool für dein Level',
+      preview: 'Cursor, Lovable, Replit, Claude Code — welches ist für dich das richtige?',
+      was: 'Vier Kategorien: (1) Browser-basiert ohne Installation: Replit. (2) Kein Code-Wissen: Lovable. (3) Mit Code-Editor: Cursor. (4) Für Terminal-Nutzer: Claude Code.',
+      tipp: 'Als Einsteiger ohne Coding-Erfahrung: fang mit Replit oder Lovable an. Mit etwas Erfahrung: Cursor ist der Standard-Tipp der meisten Profis.',
+      beispiel: null,
+      quelle: { text: 'Tools-Vergleich (SitePoint)', url: 'https://www.sitepoint.com/vibe-coding-complete-developers-guide/' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Klar und spezifisch prompten',
+      preview: '„Erstelle eine App" ist keine gute Anfrage. Kontext ist alles.',
+      was: 'Die Qualität des generierten Codes hängt direkt von der Qualität deiner Anfrage ab. Vage Prompts liefern vage Ergebnisse.',
+      tipp: 'Schlecht: „Erstelle eine App." Gut: „Erstelle einen Habit-Tracker in React. Er soll tägliche Streaks tracken, eine farbige Fortschrittsanzeige haben und lokal im Browser speichern."',
+      beispiel: 'Erstelle eine einfache To-Do-Liste als Single-Page-App mit HTML, CSS und JavaScript. Die App soll Aufgaben hinzufügen, als erledigt markieren und löschen können. Verwende keine externen Libraries.',
+      quelle: { text: '11 Vibe Coding Best Practices (Zapier)', url: 'https://zapier.com/blog/how-to-vibe-code/' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Kontext immer mitgeben',
+      preview: 'Technologie-Stack, Zielgruppe, Einschränkungen — die KI weiß sonst nichts.',
+      was: 'Ohne Kontext macht die KI Annahmen — und die treffen oft nicht zu. Sag immer: welche Sprache/Framework, welche Browser/Plattform, welche Einschränkungen.',
+      tipp: 'Starte einen neuen Chat immer mit: „Ich baue [was]. Ich verwende [Stack]. Wichtig: [Einschränkungen]."',
+      beispiel: 'Ich baue eine Schul-Web-App. Stack: reines HTML/CSS/JS, keine Server-Anbindung. Muss auf Tablets funktionieren. Keine externen CDNs nötig.',
+      quelle: { text: 'Getting Started with Vibe Coding (index.dev)', url: 'https://www.index.dev/blog/how-to-start-vibe-coding' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Klein anfangen — Ein Feature nach dem anderen',
+      preview: 'Nicht die ganze App auf einmal. Immer inkrementell vorgehen.',
+      was: 'Es ist verlockend, die KI nach einer riesigen App auf einmal zu fragen. Das liefert schlechte Ergebnisse. Besser: Feature für Feature aufbauen.',
+      tipp: 'Bauplan: 1. Grundstruktur. 2. Erstes Feature. 3. Testen. 4. Zweites Feature. Niemals mehr als eine Sache gleichzeitig.',
+      beispiel: null,
+      quelle: { text: 'Structured Workflow (DEV.to)', url: 'https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Git von Anfang an nutzen',
+      preview: 'Versionskontrolle rettet dich, wenn die KI etwas kaputt macht.',
+      was: 'Nach jeder funktionierenden Version: Git-Commit. So kannst du jederzeit auf einen funktionierenden Stand zurückgehen, egal was die KI als nächstes macht.',
+      tipp: 'Kein GitHub-Wissen nötig: Mit VS Code oder GitHub Desktop reicht ein Klick für „Commit". Commit-Nachricht: kurz beschreiben was gerade funktioniert.',
+      beispiel: 'git init\ngit add .\ngit commit -m "Login-Formular funktioniert"',
+      quelle: { text: 'Best Practices (Zapier)', url: 'https://zapier.com/blog/how-to-vibe-code/' }
+    },
+    {
+      cat: 'mindset',
+      title: 'Code verstehen — nicht blind vertrauen',
+      preview: 'Lass dir erklären, was der Code macht. Immer.',
+      was: 'Der größte Fehler: Code kopieren und einfügen, ohne zu verstehen was er macht. Das führt zu unkontrollierbaren, unsicheren Anwendungen.',
+      tipp: 'Nach jedem Code-Block: „Erkläre mir in einfachen Worten, was dieser Code macht und warum." Du musst es nicht tief verstehen — aber grob wissen, was passiert.',
+      beispiel: null,
+      quelle: { text: 'Beginners Guide (index.dev)', url: 'https://www.index.dev/blog/how-to-start-vibe-coding' }
+    },
+    {
+      cat: 'security',
+      title: 'Niemals API Keys direkt im Code',
+      preview: 'Passwörter, Tokens, Keys — niemals in den Code schreiben lassen.',
+      was: 'KI-Tools tendieren dazu, API Keys direkt in den Code zu schreiben. Das ist ein Sicherheitsrisiko, besonders wenn Code auf GitHub landet.',
+      tipp: 'Sag explizit: „Schreibe keine API Keys in den Code. Verwende stattdessen Environment-Variablen (.env Datei)."',
+      beispiel: '// ❌ Schlecht:\nconst key = "sk-abc123...";\n\n// ✅ Gut:\nconst key = process.env.API_KEY;',
+      quelle: { text: 'Security Risks (Kaspersky)', url: 'https://www.kaspersky.com/blog/vibe-coding-2025-risks/54584/' }
+    },
+    {
+      cat: 'debug',
+      title: 'Fehlermeldungen direkt einfügen',
+      preview: 'Fehlermeldung kopieren, einfügen, KI fragen. So simpel ist Debugging.',
+      was: 'Beim Debuggen ist der wichtigste Schritt: die exakte Fehlermeldung aus dem Browser (F12 → Konsole) oder Terminal in den Chat kopieren.',
+      tipp: 'Nicht beschreiben was falsch ist — zeigen. Füge immer die vollständige Fehlermeldung + den relevanten Code-Ausschnitt ein.',
+      beispiel: 'Ich bekomme diesen Fehler:\n[Fehlermeldung hier einfügen]\n\nHier ist der relevante Code:\n[Code hier]',
+      quelle: { text: 'Vibe Coding Hacks (nucamp)', url: 'https://www.nucamp.co/blog/vibe-coding-vibe-coding-hacks-top-10-tips-youll-wish-you-knew-sooner' }
+    },
+  ],
+
+  fortgeschritten: [
+    {
+      cat: 'workflow',
+      title: 'PRD schreiben vor dem ersten Prompt',
+      preview: 'Fünf Minuten planen spart Stunden an Iteration.',
+      was: 'Ein Product Requirements Document (PRD) ist eine klare Beschreibung dessen, was gebaut werden soll: Features, Nutzer, technische Anforderungen. Die KI produziert damit deutlich besseren Code.',
+      tipp: 'Bitte die KI, dir ein PRD zu schreiben: „Ich will [App]. Hilf mir, ein PRD zu erstellen, bevor wir mit dem Code anfangen."',
+      beispiel: '## App: Stundenplan-Manager\n- Nutzer: Schüler, Lehrer\n- Features: Stunden anlegen, Fächer mit Farben, Export als PDF\n- Stack: React, localStorage\n- Mobil-first Design',
+      quelle: { text: 'Structured Workflow (DEV.to)', url: 'https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l' }
+    },
+    {
+      cat: 'tools',
+      title: 'Karpathys Drei-Schichten-Workflow',
+      preview: 'Cursor für Kleinkram, Claude Code für Features, GPT-5 für echte Probleme.',
+      was: 'Andrej Karpathy beschreibt einen dreistufigen Workflow: ~75% Tab-Completion in Cursor für kleinere Änderungen. Claude Code / Codex für größere Funktionsblöcke. GPT-5 Pro für die härtesten Bugs und Abstraktionen.',
+      tipp: 'Fange nicht gleich mit dem schwersten Tool an. Viele Änderungen löst Cursor-Autocomplete eleganter als ein langer Chat.',
+      beispiel: null,
+      quelle: { text: 'Karpathy 3-Tier Workflow (36kr)', url: 'https://eu.36kr.com/en/p/3438963016404608' }
+    },
+    {
+      cat: 'tools',
+      title: 'CLAUDE.md / .cursorrules nutzen',
+      preview: 'Persistente Anweisungen — kein ständiges Wiederholen von Kontext.',
+      was: 'Eine CLAUDE.md-Datei (oder .cursorrules für Cursor) enthält dauerhafte Anweisungen: Code-Stil, Projektstruktur, Verbote. Die KI liest sie bei jeder Anfrage.',
+      tipp: 'Packe rein: bevorzugter Stack, Naming Conventions, was die KI NICHT tun soll (z.B. „Füge keine unnötigen Libraries hinzu"), Projektstruktur.',
+      beispiel: '# CLAUDE.md\n## Stack\nPures HTML/CSS/JS — keine Build-Tools\n\n## Stil\nDeutsche Kommentare, Klassen auf Englisch\n\n## Verbote\n- Keine npm-Packages\n- Keine inline Styles\n- API Keys nur über .env',
+      quelle: { text: 'Advanced Claude Code Guide', url: 'https://cgstrategylab.com/advanced-claude-code-vibe-coding-guide/' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Atomare Aufgaben — Ein Prompt, eine Sache',
+      preview: 'Komplexe Aufgaben in kleine, prüfbare Schritte aufteilen.',
+      was: 'Je kleiner und präziser eine Aufgabe, desto zuverlässiger die KI. Megaprompts liefern Megaprobleme.',
+      tipp: 'Statt: „Baue das komplette Login-System." Besser: Schritt 1: HTML-Formular. Schritt 2: Validierung. Schritt 3: API-Anbindung. Schritt 4: Error Handling.',
+      beispiel: 'Schritt 1: Erstelle nur das HTML-Gerüst für ein Login-Formular. Noch keine JavaScript-Logik — nur die Struktur und das CSS.',
+      quelle: { text: 'Best Practices (aitoolsclub)', url: 'https://aitoolsclub.com/the-ultimate-vibe-coding-guide-for-beginners-pros/' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Rollen zuweisen für bessere Ausgaben',
+      preview: '„Agiere als Senior Developer mit 10 Jahren React-Erfahrung."',
+      was: 'Das Zuweisen einer Rolle beeinflusst Stil und Qualität der Antwort deutlich. Senior-Rolle → saubererer Code, mehr Kommentare, besseres Error Handling.',
+      tipp: 'Kombiniere Rolle + Aufgabe + Einschränkung: „Als erfahrener TypeScript-Developer ohne externe Libraries: [Aufgabe]"',
+      beispiel: 'Du bist ein erfahrener Full-Stack-Developer der Wert auf sauberen, wartbaren Code legt. Reviewe folgenden Code und liste konkrete Verbesserungen auf: [Code]',
+      quelle: { text: 'Vibe Coding Hacks (nucamp)', url: 'https://www.nucamp.co/blog/vibe-coding-vibe-coding-hacks-top-10-tips-youll-wish-you-knew-sooner' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Tests generieren lassen',
+      preview: 'Erst Code generieren, dann Tests — oder umgekehrt für TDD.',
+      was: 'KI kann nicht nur Code, sondern auch Tests schreiben. Das lohnt sich besonders bei Kernlogik. TDD mit KI: erst Testfälle beschreiben, dann implementieren lassen.',
+      tipp: 'Prompt-Vorlage: „Schreibe Unit-Tests für folgende Funktion. Teste Normalfall, Edge Cases (leer, null, negativ) und Fehlerfälle: [Funktion]"',
+      beispiel: null,
+      quelle: { text: 'Awesome Vibe Coding Guide (GitHub)', url: 'https://github.com/analyticalrohit/awesome-vibe-coding-guide' }
+    },
+    {
+      cat: 'security',
+      title: 'Iterative Verschlechterung beachten',
+      preview: 'Nach 5 Iterationen hat Code 37 % mehr kritische Sicherheitslücken.',
+      was: 'Forschung zeigt: Wenn KI-generierter Code wiederholt durch Follow-up-Prompts verändert wird, steigt die Zahl kritischer Sicherheitslücken massiv an. Nach nur 5 Iterationen: +37% kritische Vulnerabilities.',
+      tipp: 'Wenn eine Funktion nach 3 Versuchen noch nicht funktioniert: Neu starten, neuer Chat, sauberere Anfrage. Nicht weiter auf fehlendem Code herumflicken.',
+      beispiel: null,
+      quelle: { text: 'Security Risks (Kaspersky)', url: 'https://www.kaspersky.com/blog/vibe-coding-2025-risks/54584/' }
+    },
+    {
+      cat: 'debug',
+      title: 'Erst diagnostizieren, dann fixen',
+      preview: 'Nie sofort „fix this" — erst verstehen was falsch ist.',
+      was: 'Viele verschlimmbessern Bugs durch blindes Fixen. Besser: KI zuerst das Problem analysieren lassen, dann erst den Fix besprechen.',
+      tipp: 'Zwei-Schritt-Debugging: „Analysiere diesen Code und erkläre, welches Problem den Fehler [X] verursacht." → Danach erst: „Schlage einen Fix vor."',
+      beispiel: 'Schritt 1: „Was könnte in folgendem Code den Fehler verursachen? Erkläre erst, fix noch nicht."\nSchritt 2: „Gut. Jetzt implementiere den Fix für Ursache 2."',
+      quelle: { text: 'Structured Workflow (DEV.to)', url: 'https://dev.to/wasp/a-structured-workflow-for-vibe-coding-full-stack-apps-352l' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Plan Mode nutzen (Claude Code)',
+      preview: 'Erst planen, dann coden — Alignment vor dem ersten Commit.',
+      was: 'Claude Code hat einen Plan Mode: Die KI erstellt erst einen detaillierten Implementierungsplan, den du reviewen und freigeben kannst, bevor Code geschrieben wird.',
+      tipp: 'Besonders wertvoll bei: neue Features, Refactoring, unbekannte Codebasis. Verhindert, dass die KI in die falsche Richtung arbeitet.',
+      beispiel: null,
+      quelle: { text: 'Claude Code Complete Guide', url: 'https://natesnewsletter.substack.com/p/the-claude-code-complete-guide-learn' }
+    },
+    {
+      cat: 'tools',
+      title: 'Context Window frisch halten',
+      preview: 'Langer Chat = verworrene KI. Neuen Chat starten, wenn es driftet.',
+      was: 'Je länger ein Gespräch, desto mehr verliert die KI den Faden. Sie beginnt, frühere Anweisungen zu „vergessen" oder zu vermischen. Das Context Window hat Grenzen.',
+      tipp: 'Faustregel: Wenn eine Aufgabe abgeschlossen ist → neuer Chat. CLAUDE.md sorgt dafür, dass wichtige Infos immer verfügbar sind.',
+      beispiel: null,
+      quelle: { text: 'Karpathy Coding Evolution', url: 'https://cc.deeptoai.com/docs/en/best-practices/karpathy-llm-coding-evolution' }
+    },
+  ],
+
+  profi: [
+    {
+      cat: 'mindset',
+      title: 'Wann NICHT mit KI coden',
+      preview: 'Einige Bereiche sind zu kritisch für AI-Generated Code.',
+      was: 'Nicht alles profitiert von KI-Generierung. Laut Karpathy und anderen: Komplexe Algorithmen mit tiefem Domain-Wissen, sicherheitskritische Pfade (Auth, Krypto), performance-sensitive Inner Loops.',
+      tipp: 'Faustregel: Wenn du den generierten Code nicht schnell reviewen und verstehen kannst, solltest du ihn manuell schreiben. KI für Boilerplate, Mensch für Kernlogik.',
+      beispiel: null,
+      quelle: { text: 'Karpathy Coding Evolution', url: 'https://cc.deeptoai.com/docs/en/best-practices/karpathy-llm-coding-evolution' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Agentic Workflows mit Claude Code',
+      preview: 'Multi-Step Tasks, Hintergrundprozesse, parallele Agenten.',
+      was: 'Claude Code kann als vollständiger Agent fungieren: Dateien lesen/schreiben, Tests ausführen, Shell-Commands nutzen, mehrere Aufgaben parallel bearbeiten.',
+      tipp: 'Nutze Background Processes für lang laufende Aufgaben. Nutze den Explore Agent für schnelle Codebase-Erkundung. Plan Mode für architektonische Entscheidungen.',
+      beispiel: '# Agentic Task Prompt\nAnalysiere die gesamte Codebase in /src, finde alle ungesicherten API-Endpoints und erstelle einen Report mit Risikobewertung. Dann schlage konkrete Fixes für die kritischsten 3 vor.',
+      quelle: { text: 'Advanced Claude Code Guide', url: 'https://cgstrategylab.com/advanced-claude-code-vibe-coding-guide/' }
+    },
+    {
+      cat: 'security',
+      title: 'Prompt Injection — die versteckte Gefahr',
+      preview: 'Bösartiger Code in analysierten Dateien kann die KI manipulieren.',
+      was: 'CVE-2025-55284: Eine Lücke in Claude Code erlaubte Daten-Exfiltration via DNS durch Prompt Injection in analysiertem Code. Wenn die KI externen Content liest, kann darin eingebetteter Text die KI umleiten.',
+      tipp: 'Niemals unbekannten Code mit vollen Berechtigungen analysieren lassen. Sandbox verwenden. Bei CI/CD: KI-Tools auf Read-Only beschränken wo möglich.',
+      beispiel: null,
+      quelle: { text: 'Security Risks (Kaspersky)', url: 'https://www.kaspersky.com/blog/vibe-coding-2025-risks/54584/' }
+    },
+    {
+      cat: 'tools',
+      title: 'CLAUDE.md optimal gestalten',
+      preview: 'Mehr als 100 öffentliche CLAUDE.md-Dateien auf GitHub — Best Practices.',
+      was: 'CLAUDE.md ist deine persistente Systembeschreibung für Claude Code. Über 100 öffentliche Repos nutzen es, darunter Metabase und LangChain. Was reingehört: Projektstruktur, Conventions, Verbote, Security-Regeln.',
+      tipp: 'Sections: (1) Projektbeschreibung, (2) Tech-Stack, (3) Dateistruktur, (4) Code-Conventions, (5) Verbotene Muster, (6) Security-Regeln, (7) Häufige Aufgaben.',
+      beispiel: '# CLAUDE.md\n\n## Projekt\nLern-App für Gymnasium, pure HTML/JS\n\n## Architektur\n/src/components/ — UI-Komponenten\n/src/data/ — JSON-Daten\n\n## Pflicht bei jedem PR\n- Kein eval()\n- Kein innerHTML ohne Sanitizing\n- Accessibility: alt-Tags, ARIA-Labels',
+      quelle: { text: 'Personalization in Vibe Coding (Snyk)', url: 'https://snyk.io/articles/personalization-vibe-coding/' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Prompt Contracts statt Vibe Prompts',
+      preview: 'Präzise, verifizierbare Verträge mit der KI — kein Glücksspiel mehr.',
+      was: 'Statt vager Beschreibungen: Prompt Contracts definieren exakt Input, Output, Constraints und Akzeptanzkriterien. Die KI kann nur noch richtigen Code liefern.',
+      tipp: 'Format: Input (was gegeben ist) → Transformation (was passieren soll) → Output (wie das Ergebnis aussehen muss) → Constraints (was verboten ist) → Tests (wie man prüft ob es stimmt).',
+      beispiel: '## Prompt Contract: Datums-Formatierer\n**Input:** ISO-8601 String ("2025-03-05")\n**Output:** Deutsches Format ("05.03.2025")\n**Constraints:** Kein Moment.js, kein Date-fns\n**Error-Case:** Ungültige Eingabe → throw TypeError\n**Test:** formatDate("2025-01-01") === "01.01.2025"',
+      quelle: { text: 'Prompt Contracts (Medium)', url: 'https://medium.com/@rentierdigital/i-stopped-vibe-coding-and-started-prompt-contracts-claude-code-went-from-gambling-to-shipping-4080ef23efac' }
+    },
+    {
+      cat: 'workflow',
+      title: 'MCP-Integration für custom Tools',
+      preview: 'Model Context Protocol — der KI eigene Werkzeuge geben.',
+      was: 'MCP (Model Context Protocol) erlaubt es, der KI eigene Tools bereitzustellen: Datenbank-Queries, API-Calls, File-System-Operationen. Das macht agentic Workflows deutlich mächtiger.',
+      tipp: 'Einstieg: Nutze bestehende MCP-Server (Filesystem, Browser, GitHub). Erst dann eigene schreiben. Immer Berechtigungen minimal halten (Principle of Least Privilege).',
+      beispiel: null,
+      quelle: { text: 'Practical Guide MCP Tools', url: 'https://www.geigertron.com/blog/2025/4/4/a-practical-guide-to-vibe-coding-with-claude-and-mcp-tools' }
+    },
+    {
+      cat: 'prompt',
+      title: 'Chain-of-Thought für komplexe Probleme',
+      preview: 'Die KI laut denken lassen — bessere Ergebnisse bei schweren Aufgaben.',
+      was: 'Bei komplexen Algorithmen oder schwierigen Bugs: Bitte die KI, schrittweise zu denken, bevor sie Code schreibt. Das verbessert die Lösungsqualität nachweislich.',
+      tipp: 'Füge an den Prompt-Anfang: „Denke Schritt für Schritt nach, bevor du Code schreibst. Erkläre dein Vorgehen, dann implementiere." oder nutze Claude\'s "Think" feature.',
+      beispiel: 'Ich habe einen Bug in einem Sortier-Algorithmus. Denke erst laut nach was das Problem sein könnte (Step-by-Step), bevor du einen Fix vorschlägst. Dann erkläre warum dein Fix korrekt ist.',
+      quelle: { text: 'Karpathy Workflow Evolution', url: 'https://cc.deeptoai.com/docs/en/best-practices/karpathy-llm-coding-evolution' }
+    },
+    {
+      cat: 'security',
+      title: 'Security-Checklist automatisch generieren',
+      preview: 'OWASP-Checks, Dependency-Scans, Auth-Reviews — mit KI systematisch.',
+      was: 'KI kann systematische Security-Reviews durchführen, wenn man sie richtig prompted. Besonders nützlich: OWASP Top 10 Review, Dependency-Vulnerabilities, Auth-Flows.',
+      tipp: 'Security-Review Prompt: „Analysiere folgenden Code auf die OWASP Top 10. Bewerte jede Kategorie (✅ ok / ⚠️ Risiko / ❌ kritisch) und begründe kurz."',
+      beispiel: 'Security Review Prompt:\n"Du bist ein Security-Auditor. Prüfe diesen Code auf:\n1. Injection-Angriffe\n2. Broken Authentication\n3. Sensitive Data Exposure\n4. XSS\nBewerte jede Kategorie und nenne konkrete Schwachstellen."',
+      quelle: { text: 'Secure Vibe Coding (The Hacker News)', url: 'https://thehackernews.com/2025/06/secure-vibe-coding-complete-new-guide.html' }
+    },
+    {
+      cat: 'workflow',
+      title: 'Karpathys 75/25-Regel',
+      preview: '75 % Tab-Completion, 25 % Chat-Prompts — nicht alles im Chat lösen.',
+      was: 'Karpathy beschreibt, dass ~75% seiner KI-Unterstützung aus Tab-Completion in Cursor besteht. „Konkreten Code schreiben und an der richtigen Stelle im File sein ist ein hochbandbreitiger Weg, der KI die Aufgabe zu spezifizieren."',
+      tipp: 'Nicht alles in den Chat werfen. Wenn du in der Nähe des zu ändernden Codes bist und Kontext gibst, ist Tab-Completion oft präziser als ein Chat-Prompt.',
+      beispiel: null,
+      quelle: { text: 'Karpathy 3-Tier Workflow', url: 'https://eu.36kr.com/en/p/3438963016404608' }
+    },
+    {
+      cat: 'debug',
+      title: 'Root Cause Analysis Prompt',
+      preview: 'Systematische Fehleranalyse statt Symptom-Behandlung.',
+      was: 'Profis debuggen mit der KI anders als Einsteiger: Nicht „fix this bug", sondern „finde die Wurzel des Problems, zeige alle betroffenen Code-Pfade, schlage dann Lösungen mit Trade-Offs vor".',
+      tipp: 'RCA-Prompt: (1) Was genau ist das beobachtete Verhalten? (2) Was ist das erwartete Verhalten? (3) Welche Hypothesen gibt es? (4) Wie teste ich jede? (5) Implementiere die beste.',
+      beispiel: 'RCA für Bug:\n"Beobachtet: [X]. Erwartet: [Y].\n1. Erstelle 3 Hypothesen was die Ursache sein könnte\n2. Für jede Hypothese: welcher Code-Pfad ist betroffen?\n3. Empfehle den besten Fix und erkläre warum"',
+      quelle: { text: 'Getting Better at Coding Agents (sankalp blog)', url: 'https://sankalp.bearblog.dev/my-experience-with-claude-code-20-and-how-to-get-better-at-using-coding-agents/' }
+    },
+  ]
+};
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+   ══════════════════════════════════════════════════════════════ */
+let currentLevel = 'einsteiger';
+let currentCatFilter = 'all';
+let done = JSON.parse(localStorage.getItem('vc-done') || '{}');
+
+/* ══════════════════════════════════════════════════════════════
+   RENDER
+   ══════════════════════════════════════════════════════════════ */
+function render() {
+  const container = document.getElementById('cards-container');
+  container.innerHTML = '';
+  const tips = TIPS[currentLevel];
+
+  tips.forEach((tip, i) => {
+    const key = `${currentLevel}-${i}`;
+    const isDone = !!done[key];
+    const hidden = currentCatFilter !== 'all' && tip.cat !== currentCatFilter;
+
+    const card = document.createElement('div');
+    card.className = `tip-card${isDone ? ' done' : ''}${hidden ? ' hidden' : ''}`;
+    card.dataset.cat = tip.cat;
+    card.dataset.key = key;
+
+    const catLabels = {
+      mindset:'🧠 Mindset', prompt:'✍️ Prompt',
+      tools:'🛠 Tools', workflow:'⚡ Workflow',
+      security:'🔒 Security', debug:'🐛 Debug'
+    };
+
+    const codeHtml = tip.beispiel
+      ? `<div class="detail-section">
+           <div class="detail-label">Beispiel / Vorlage</div>
+           <div class="tip-code">${tip.beispiel.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+         </div>` : '';
+
+    const sourceHtml = tip.quelle
+      ? `<div class="tc-source">Quelle: <a href="${tip.quelle.url}" target="_blank">${tip.quelle.text}</a></div>` : '';
+
+    card.innerHTML = `
+      <div class="tc-header">
+        <span class="tc-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="tc-badge">${catLabels[tip.cat]}</span>
+        <span class="tc-title">${tip.title}</span>
+        ${isDone ? '<span class="tc-done-icon">✓</span>' : ''}
+      </div>
+      <div class="tc-body">
+        <div class="tc-preview">${tip.preview}</div>
+        <div class="tc-detail">
+          <div class="detail-section">
+            <div class="detail-label">Was bedeutet das?</div>
+            <div class="detail-text">${tip.was}</div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-label">Tipp</div>
+            <div class="detail-text">${tip.tipp}</div>
+          </div>
+          ${codeHtml}
+          ${sourceHtml}
+        </div>
+      </div>
+      <div class="tc-footer">
+        <button class="btn-mark" onclick="toggleDone('${key}', event)">
+          ${isDone ? '↩ Als ungelesen markieren' : '✓ Als gelesen markieren'}
+        </button>
+      </div>
+    `;
+
+    // Klick auf Card-Body → expand
+    card.querySelector('.tc-body').addEventListener('click', () => {
+      card.querySelector('.tc-detail').classList.toggle('open');
+    });
+
+    container.appendChild(card);
+  });
+
+  updateStats();
+}
+
+function updateStats() {
+  const tips = TIPS[currentLevel];
+  const total = tips.length;
+  const doneCount = tips.filter((_, i) => done[`${currentLevel}-${i}`]).length;
+  document.getElementById('stats-text').textContent = `${doneCount} / ${total} Tipps gelesen`;
+  document.getElementById('progress-fill').style.width = total ? `${(doneCount/total)*100}%` : '0%';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   AKTIONEN
+   ══════════════════════════════════════════════════════════════ */
+function setLevel(level) {
+  currentLevel = level;
+  currentCatFilter = 'all';
+  document.querySelectorAll('.level-tab').forEach(t => t.classList.toggle('active', t.dataset.level === level));
+  document.querySelectorAll('.cat-filter').forEach(f => f.classList.add('active'));
+  render();
+  document.getElementById('cards-container').scrollIntoView({ behavior: 'smooth' });
+}
+
+function filterCat(cat) {
+  currentCatFilter = cat;
+  const cards = document.querySelectorAll('.tip-card');
+  cards.forEach(c => {
+    const match = cat === 'all' || c.dataset.cat === cat;
+    c.classList.toggle('hidden', !match);
+  });
+  document.querySelectorAll('.cat-filter').forEach(f => {
+    if (cat === 'all') f.classList.add('active');
+    else f.classList.toggle('active', f.dataset.cat === cat || f.dataset.cat === 'all');
+  });
+}
+
+function toggleDone(key, e) {
+  e.stopPropagation();
+  done[key] = !done[key];
+  localStorage.setItem('vc-done', JSON.stringify(done));
+  render();
+}
+
+function openRandom() {
+  const tips = TIPS[currentLevel];
+  const idx = Math.floor(Math.random() * tips.length);
+  // Scroll to and open card
+  const cards = document.querySelectorAll('.tip-card:not(.hidden)');
+  if (!cards.length) return;
+  const target = cards[idx % cards.length];
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setTimeout(() => {
+    const detail = target.querySelector('.tc-detail');
+    if (!detail.classList.contains('open')) detail.classList.add('open');
+    target.style.outline = '2px solid var(--warn)';
+    setTimeout(() => target.style.outline = '', 2000);
+  }, 400);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   START
+   ══════════════════════════════════════════════════════════════ */
+render();
+</script>
+</body>
+</html>

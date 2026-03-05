@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physik Diagnose DGL">
+  <title>Physik Diagnose – Differentialgleichungen</title>
+  <style>
+    :root {
+      --primary-glow: #38bdf8;
+      --secondary-glow: #fb923c;
+      --joker-color:   #fbbf24;
+      --success:       #22c55e;
+      --error:         #ef4444;
+      --bg:            #020d1a;
+      --card-bg:       rgba(8, 28, 52, 0.85);
+      --text-main:     #e2e8f0;
+      --text-muted:    #94a3b8;
+      --border:        rgba(56, 189, 248, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(56, 189, 248, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(251, 146, 60, 0.05) 0%, transparent 60%);
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 700px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 40px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.08);
+    }
+    .screen.active { display: block; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, var(--primary-glow), #7dd3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    h2 { font-size: 1.1rem; color: var(--text-muted); font-weight: 400; margin-bottom: 20px; }
+
+    button {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 14px 38px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--primary-glow), #7dd3fc);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    button:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .hud-item {
+      flex: 1;
+      padding: 8px 4px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--primary-glow);
+    }
+
+    /* ── Optionen ── */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .option-btn {
+      width: 100%;
+      padding: 13px 18px;
+      margin: 0;
+      background: rgba(56, 189, 248, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.97rem;
+      font-family: inherit;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      line-height: 1.4;
+    }
+    .option-btn:hover { background: rgba(56, 189, 248, 0.12); border-color: var(--primary-glow); transform: translateX(4px); }
+    .option-btn.selected { border-color: var(--primary-glow); background: rgba(56, 189, 248, 0.18); }
+    .option-btn.correct  { border-color: var(--success); background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .option-btn.wrong    { border-color: var(--error);   background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .option-btn:disabled { cursor: default; transform: none; }
+
+    /* ── Fortschrittsbalken ── */
+    .progress-bar-container {
+      height: 4px;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 4px;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow));
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── Joker ── */
+    .joker-btn {
+      margin-top: 14px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      background: transparent;
+      border: 1px solid var(--joker-color);
+      color: var(--joker-color);
+      border-radius: 50px;
+    }
+    .joker-btn:hover { background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 12px rgba(251, 191, 36, 0.25); transform: none; }
+    .joker-text {
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--joker-color);
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    /* ── Feedback-Meldung ── */
+    .feedback-msg {
+      margin-top: 14px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .feedback-msg.correct { background: rgba(34, 197, 94, 0.1);  border: 1px solid rgba(34, 197, 94, 0.3);  color: var(--success); }
+    .feedback-msg.wrong   { background: rgba(239, 68, 68, 0.1);  border: 1px solid rgba(239, 68, 68, 0.3);  color: var(--error); }
+
+    /* ── Auswertung ── */
+    .result-category {
+      background: rgba(56, 189, 248, 0.04);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary-glow);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .feedback-text { color: var(--text-muted); font-size: 0.9rem; margin-top: 6px; line-height: 1.5; }
+    .resources-section { margin-top: 10px; }
+    .resources-title { font-size: 0.82rem; font-weight: 600; color: var(--primary-glow); margin-bottom: 6px; }
+    .resource-link {
+      display: inline-block;
+      margin: 3px 4px 3px 0;
+      padding: 5px 12px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--primary-glow);
+      text-decoration: none;
+    }
+    .resource-link:hover { background: rgba(56, 189, 248, 0.16); }
+
+    /* ── Print ── */
+    .print-btn {
+      background: transparent;
+      border: 1px solid var(--primary-glow);
+      color: var(--primary-glow);
+      font-size: 0.9rem;
+      padding: 10px 24px;
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+    .print-btn:hover { background: rgba(56, 189, 248, 0.1); box-shadow: none; transform: none; }
+
+    @media (max-width: 600px) {
+      .screen { padding: 24px 18px; }
+      h1 { font-size: 1.4rem; }
+    }
+
+    @media print {
+      body { background: white; color: black; }
+      .screen { display: block !important; box-shadow: none; border: none; }
+      #quiz-screen, #start-screen { display: none !important; }
+      button { display: none; }
+      .result-category { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ PHASE 1: START ═══ -->
+  <div id="start-screen" class="screen active">
+    <h1>⚛️ Physik Diagnose</h1>
+    <h2>Differentialgleichungen · Physik LK NRW</h2>
+    <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin-top: 14px;">
+  Teste dein Wissen zu <strong style="color:var(--primary-glow)">DGL-Grundlagen, Exponentialprozessen und Schwingungen</strong>
+  sowie <strong style="color:var(--secondary-glow)">Bewegung mit Reibung</strong>.
+  Verdiene XP und schalte Tipps mit dem Joker-System frei.
+</p>
+    <input type="text" id="student-name" maxlength="40"
+      placeholder="Dein Name (für Zertifikat)..."
+      style="width:80%; padding:13px; font-size:1rem; margin-top:22px;
+             background:rgba(56,189,248,0.06); border:1.5px solid var(--border);
+             color:var(--text-main); border-radius:12px; text-align:center;
+             font-family:inherit; display:block; margin-left:auto; margin-right:auto;">
+    <div id="best-score-display" style="font-size:0.88rem; color:var(--text-muted); margin-top:10px;"></div>
+    <button onclick="startTest()">Diagnose starten →</button>
+  </div>
+
+  <!-- ═══ PHASE 2: QUIZ ═══ -->
+  <div id="quiz-screen" class="screen">
+    <div class="hud">
+      <div class="hud-item" id="level-display">LVL <span>1</span></div>
+      <div class="hud-item" id="xp-display">XP: <span>0</span></div>
+      <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
+    </div>
+
+    <div id="question-category"
+      style="color:var(--secondary-glow); font-weight:700; font-size:0.8rem;
+             letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;">
+      KATEGORIE
+    </div>
+
+    <div id="question-text"
+      style="font-size:1.15rem; font-weight:500; line-height:1.55; min-height:60px;">
+      Lade…
+    </div>
+
+    <div id="input-area"></div>
+
+    <div id="joker-area" style="display:none; text-align:center; margin-top:4px;">
+      <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp freischalten (−50 XP)</button>
+      <div id="joker-hint" class="joker-text" style="display:none;"></div>
+    </div>
+
+    <div id="feedback-area"></div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <button id="next-btn" onclick="submitAnswer()" style="display:none; margin-top:24px;">
+      Antwort abgeben
+    </button>
+  </div>
+
+  <!-- ═══ PHASE 3: AUSWERTUNG ═══ -->
+  <div id="result-screen" class="screen">
+    <h1 id="cert-title">Zertifikat</h1>
+    <h2 id="final-stats" style="color:var(--text-main); text-transform:none; margin-bottom:32px;">
+      Gesamt: 0 XP
+    </h2>
+    <div id="feedback-area-result"></div>
+    <div style="margin-top:20px;">
+      <button onclick="restartTest()">Nochmal versuchen</button>
+      <button class="print-btn" onclick="window.print()">🖨️ Zertifikat drucken</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Power Automate – URL nach Flow-Setup hier eintragen ──────────────
+    // make.powerautomate.com → HTTP-Trigger → Excel-Zeile hinzufügen
+    const FLOW_URL = "";
+
+    function reportToFlow(name, xp, level, scores) {
+      if (!FLOW_URL) return;
+      const today = new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+                  const payload = {
+        Datum:   today,
+        Name:    name,
+        XP:      xp,
+        Level:   level,
+        Grundlagen:        `${scores.grundlagen.correct}/${scores.grundlagen.total}`,
+        Exponentialprozesse: `${scores.exponential.correct}/${scores.exponential.total}`,
+        Oszillator:        `${scores.oszillator.correct}/${scores.oszillator.total}`,
+        Reibung:           `${scores.reibung.correct}/${scores.reibung.total}`
+      };
+      fetch(FLOW_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .catch(() => {});
+    }
+
+    // ── Lernressourcen pro Kategorie ─────────────────────────────────────
+        const categoryResources = {
+      grundlagen: [
+        { title: "YouTube: DGL Grundlagen Physik", url: "https://www.youtube.com/results?search_query=differentialgleichung+physik+grundlagen" },
+        { title: "YouTube: DGL in der Physik LK", url: "https://www.youtube.com/results?search_query=dgl+physik+lk" }
+      ],
+      exponential: [
+        { title: "YouTube: Exponentialzerfall DGL", url: "https://www.youtube.com/results?search_query=exponentialzerfall+differentialgleichung" },
+        { title: "YouTube: Abkuehlungsgesetz DGL", url: "https://www.youtube.com/results?search_query=abkuehlungsgesetz+differentialgleichung" }
+      ],
+      oszillator: [
+        { title: "YouTube: Harmonischer Oszillator", url: "https://www.youtube.com/results?search_query=harmonischer+oszillator+dgl" },
+        { title: "YouTube: Schwingung Differentialgleichung", url: "https://www.youtube.com/results?search_query=schwingung+differentialgleichung" }
+      ],
+      reibung: [
+        { title: "YouTube: Bewegung mit Reibung DGL", url: "https://www.youtube.com/results?search_query=bewegung+mit+reibung+differentialgleichung" },
+        { title: "YouTube: Grenzgeschwindigkeit DGL", url: "https://www.youtube.com/results?search_query=grenzgeschwindigkeit+differentialgleichung" }
+      ]
+    };
+
+    // ── Fragen ────────────────────────────────────────────────────────────
+        const allQuestions = [
+
+      // ══ GRUNDLAGEN DGL ══
+      {
+        category: "grundlagen",
+        text: "Was bedeutet die Ordnung einer Differentialgleichung?",
+        options: ["Anzahl der Unbekannten", "Hoechste vorkommende Ableitung", "Anzahl der Anfangsbedingungen", "Grad des Polynoms"],
+        correct: 1, xpValue: 80, difficulty: "easy",
+        hint: "Die Ordnung ist die groesste Ableitung, die in der DGL vorkommt."
+      },
+      {
+        category: "grundlagen",
+        text: "Was beschreibt eine Anfangsbedingung bei einer DGL?",
+        options: ["Den Wert der Loesung (und ggf. Ableitung) zu einem Zeitpunkt", "Den Koeffizienten vor der hoechsten Ableitung", "Die Einheit der Variablen", "Ob die DGL linear ist"],
+        correct: 0, xpValue: 100, difficulty: "medium",
+        hint: "Anfangsbedingungen legen den Startwert (und ggf. Ableitung) fest."
+      },
+      {
+        category: "grundlagen",
+        text: "Welche DGL ist linear und homogen erster Ordnung?",
+        options: ["y' = a*y", "y' = y^2", "y' = sin(y)", "y' = y^2 + t"],
+        correct: 0, xpValue: 110, difficulty: "medium",
+        hint: "Linear bedeutet: y und y' kommen nur in erster Potenz vor und nicht multipliziert."
+      },
+      {
+        category: "grundlagen",
+        text: "Welche Methode nutzt man typisch bei separablen DGL?",
+        options: ["Variablen trennen und integrieren", "Quadratische Ergaenzung", "Partialbruchzerlegung", "Laplace-Transformation (immer)"],
+        correct: 0, xpValue: 100, difficulty: "medium",
+        hint: "Separable DGL: alle y-Terme auf die eine, alle t-Terme auf die andere Seite."
+      },
+      {
+        category: "grundlagen",
+        text: "Was bedeutet dy/dt in einer physikalischen DGL?",
+        options: ["Aenderungsrate nach der Zeit", "Produkt zweier Groessen", "Ortskoordinate", "Integral der Groesse"],
+        correct: 0, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "dy/dt beschreibt, wie schnell sich y mit der Zeit aendert."
+      },
+
+      // ══ EXPONENTIALPROZESSE ══
+      {
+        category: "exponential",
+        text: "Welche DGL beschreibt radioaktiven Zerfall?",
+        options: ["dN/dt = -lambda * N", "dN/dt = lambda * N^2", "dN/dt = -lambda", "dN/dt = -lambda * t"],
+        correct: 0, xpValue: 100, difficulty: "medium",
+        hint: "Die Aenderungsrate ist proportional zur aktuellen Menge."
+      },
+      {
+        category: "exponential",
+        text: "Welche Loesung passt zu y' = k*y?",
+        options: ["y = y0 * e^(k t)", "y = y0 + k t", "y = y0 * e^(k/t)", "y = k * t^2"],
+        correct: 0, xpValue: 100, difficulty: "medium",
+        hint: "Exponentielle Loesung mit Startwert y0."
+      },
+      {
+        category: "exponential",
+        text: "Welche DGL beschreibt Newtonsches Abkuehlungsgesetz?",
+        options: ["dT/dt = -k*(T - T_U)", "dT/dt = -k*T^2", "dT/dt = k*(T - T_U)", "dT/dt = -k"],
+        correct: 0, xpValue: 110, difficulty: "medium",
+        hint: "Die Temperatur aendert sich proportional zum Abstand zur Umgebungstemperatur."
+      },
+      {
+        category: "exponential",
+        text: "Welche DGL beschreibt die Entladung eines Kondensators (RC)?",
+        options: ["dQ/dt = -Q/(R*C)", "dQ/dt = -R*C*Q", "dQ/dt = -Q^2", "dQ/dt = -R/C"],
+        correct: 0, xpValue: 110, difficulty: "medium",
+        hint: "Ladung nimmt exponentiell ab mit Zeitkonstante tau = R*C."
+      },
+      {
+        category: "exponential",
+        text: "Was bedeutet k < 0 in y' = k*y?",
+        options: ["Exponentieller Zerfall", "Lineares Wachstum", "Periodische Schwingung", "Konstante Loesung"],
+        correct: 0, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "Negatives k fuehrt zu Abnahme (Zerfall) der Loesung."
+      },
+
+      // ══ HARMONISCHER OSZILLATOR ══
+      {
+        category: "oszillator",
+        text: "Welche DGL beschreibt den ungedaempften harmonischen Oszillator?",
+        options: ["x'' + omega^2 * x = 0", "x'' + gamma * x' + omega^2 * x = 0", "x' + omega^2 * x = 0", "x'' = omega^2"],
+        correct: 0, xpValue: 120, difficulty: "medium",
+        hint: "Ohne Daempfung gilt die zweite Ableitung plus omega^2 * x gleich null."
+      },
+      {
+        category: "oszillator",
+        text: "Welche Funktionsform ist eine Loesung der harmonischen Schwingung?",
+        options: ["x(t) = A * cos(omega t + phi)", "x(t) = A * e^(omega t)", "x(t) = A * t", "x(t) = A / t"],
+        correct: 0, xpValue: 110, difficulty: "medium",
+        hint: "Sinus- oder Cosinusfunktion mit Kreisfrequenz."
+      },
+      {
+        category: "oszillator",
+        text: "Wie haengen Kreisfrequenz omega und Periodendauer T zusammen?",
+        options: ["omega = 2*pi / T", "omega = T / (2*pi)", "omega = 2*pi * T", "omega = 1/T^2"],
+        correct: 0, xpValue: 100, difficulty: "easy",
+        hint: "Frequenz f = 1/T und omega = 2*pi*f."
+      },
+      {
+        category: "oszillator",
+        text: "Welche Beziehung gilt beim harmonischen Oszillator zwischen Beschleunigung und Auslenkung?",
+        options: ["a = -omega^2 * x", "a = +omega^2 * x", "a = -x/omega", "a = konst."],
+        correct: 0, xpValue: 120, difficulty: "medium",
+        hint: "Richtkraft zeigt zur Ruhelage: Minuszeichen."
+      },
+      {
+        category: "oszillator",
+        text: "Welche Groesse ist proportional zur Auslenkung mit Minuszeichen?",
+        options: ["Beschleunigung", "Geschwindigkeit", "Energie", "Masse"],
+        correct: 0, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "Hooke: a ~ -x."
+      },
+
+      // ══ BEWEGUNG MIT REIBUNG ══
+      {
+        category: "reibung",
+        text: "Welche DGL beschreibt die Bewegung mit linearer Reibung (Fall nach unten)?",
+        options: ["m*v' = m*g - b*v", "m*v' = m*g - b*v^2", "m*v' = b*v", "m*v' = -m*g"],
+        correct: 0, xpValue: 110, difficulty: "medium",
+        hint: "Lineare Reibung: Kraft proportional zu v mit Minuszeichen."
+      },
+      {
+        category: "reibung",
+        text: "Wie lautet die Grenzgeschwindigkeit v_T bei linearer Reibung?",
+        options: ["v_T = m*g / b", "v_T = b / (m*g)", "v_T = m / b", "v_T = g / (m*b)"],
+        correct: 0, xpValue: 100, difficulty: "easy",
+        hint: "Im Grenzfall: m*g = b*v_T."
+      },
+      {
+        category: "reibung",
+        text: "Welche Geschwindigkeitsfunktion passt (Start v=0)?",
+        options: ["v(t) = v_T * (1 - e^(-t/tau))", "v(t) = v_T * e^(t/tau)", "v(t) = v_T / t", "v(t) = v_T * sin(t)"],
+        correct: 0, xpValue: 120, difficulty: "medium",
+        hint: "Exponentielle Annaeherung an v_T."
+      },
+      {
+        category: "reibung",
+        text: "Wie lautet die Zeitkonstante tau bei linearer Reibung?",
+        options: ["tau = m / b", "tau = b / m", "tau = m * b", "tau = g / b"],
+        correct: 0, xpValue: 100, difficulty: "medium",
+        hint: "Aus m*v' + b*v = m*g folgt tau = m/b."
+      },
+      {
+        category: "reibung",
+        text: "Wie lautet die Kraft der linearen Reibung?",
+        options: ["F_R = -b*v", "F_R = -b*v^2", "F_R = -b*x", "F_R = b*t"],
+        correct: 0, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "Linear bedeutet proportional zu v, mit Minuszeichen."
+      }
+    ];
+
+    // ── Score-Tracking ────────────────────────────────────────────────────
+        const scores = {
+      grundlagen: { correct: 0, total: 4, name: "Grundlagen DGL" },
+      exponential: { correct: 0, total: 4, name: "Exponentialprozesse" },
+      oszillator: { correct: 0, total: 4, name: "Harmonischer Oszillator" },
+      reibung: { correct: 0, total: 4, name: "Bewegung mit Reibung" }
+    };
+
+    // ── Spielzustand ─────────────────────────────────────────────────────
+    let xp = 0, level = 1, streak = 0;
+    let consecutiveMistakes = 0, lastErrorCategory = "";
+    let currentQueue = [], currentIndex = 0;
+    let selectedOption = null;
+    let jokerUsedForCurrent = false;
+    let studentName = "";
+
+    // ── Queue aufbauen ────────────────────────────────────────────────────
+    function buildQueue() {
+      const regular = allQuestions.filter(q => !q.fallback);
+      // Fisher-Yates shuffle
+      for (let i = regular.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [regular[i], regular[j]] = [regular[j], regular[i]];
+      }
+      return regular;
+    }
+
+    function insertFallback(category) {
+      const fallbacks = allQuestions.filter(q => q.fallback && q.category === category);
+      if (!fallbacks.length) return;
+      const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      currentQueue.splice(currentIndex + 1, 0, { ...fb, _isFallback: true });
+    }
+
+    // ── Spielstart ────────────────────────────────────────────────────────
+    function startTest() {
+      const input = document.getElementById("student-name").value.trim();
+      studentName = input || "Schüler/in";
+      localStorage.setItem("physik-dgl-name", studentName);
+
+      // Scores zurücksetzen
+      Object.keys(scores).forEach(k => { scores[k].correct = 0; });
+      xp = 0; level = 1; streak = 0;
+      consecutiveMistakes = 0; lastErrorCategory = "";
+
+      currentQueue = buildQueue();
+      currentIndex = 0;
+
+      document.getElementById("start-screen").classList.remove("active");
+      document.getElementById("quiz-screen").classList.add("active");
+      loadQuestion();
+    }
+
+    // ── Frage laden ───────────────────────────────────────────────────────
+    function loadQuestion() {
+      if (currentIndex >= currentQueue.length) { showResults(); return; }
+      const q = currentQueue[currentIndex];
+      selectedOption = null;
+      jokerUsedForCurrent = false;
+
+      const regularTotal = allQuestions.filter(x => !x.fallback).length;
+      const progress = Math.min((currentIndex / regularTotal) * 100, 100);
+      document.getElementById("progress-bar").style.width = progress + "%";
+
+      document.getElementById("question-category").textContent = scores[q.category]?.name || q.category;
+      document.getElementById("question-text").textContent = q.text;
+      document.getElementById("feedback-area").innerHTML = "";
+
+      // Antwortoptionen aufbauen
+      const inputArea = document.getElementById("input-area");
+      inputArea.innerHTML = "";
+      const grid = document.createElement("div");
+      grid.className = "options-grid";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.onclick = () => selectOption(idx, btn);
+        grid.appendChild(btn);
+      });
+      inputArea.appendChild(grid);
+
+      // Joker
+      const jokerArea = document.getElementById("joker-area");
+      const jokerHint = document.getElementById("joker-hint");
+      if (q.hint && xp >= 50) {
+        // Joker verfügbar
+        jokerArea.style.display = "block";
+        document.getElementById("btn-joker").style.display = "inline-block";
+        jokerHint.style.display = "none";
+        jokerHint.textContent = "";
+      } else {
+        // Kein Hint vorhanden oder zu wenig XP – gesamten Joker-Bereich verstecken
+        jokerArea.style.display = "none";
+      }
+
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.style.display = "none";
+      nextBtn.textContent = "Antwort abgeben";
+      nextBtn.onclick = submitAnswer; // onclick nach jeder Frage zurücksetzen
+    }
+
+    function selectOption(idx, btnEl) {
+      selectedOption = idx;
+      document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+      btnEl.classList.add("selected");
+      document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    // ── Joker ─────────────────────────────────────────────────────────────
+    function useJoker() {
+      if (jokerUsedForCurrent || xp < 50) return;
+      const q = currentQueue[currentIndex];
+      xp -= 50;
+      jokerUsedForCurrent = true;
+      updateHUD();
+      const hint = document.getElementById("joker-hint");
+      hint.textContent = "💡 " + q.hint;
+      hint.style.display = "block";
+      document.getElementById("btn-joker").style.display = "none";
+    }
+
+    // ── Antwort auswerten ────────────────────────────────────────────────
+    function submitAnswer() {
+      if (selectedOption === null) return;
+      const q = currentQueue[currentIndex];
+      const isCorrect = selectedOption === q.correct;
+      const isFallback = !!q._isFallback;
+
+      // Optionen einfärben
+      const optBtns = document.querySelectorAll(".option-btn");
+      optBtns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === q.correct) b.classList.add("correct");
+        else if (i === selectedOption && !isCorrect) b.classList.add("wrong");
+      });
+
+      // Feedback
+      const feedbackArea = document.getElementById("feedback-area");
+      const msg = document.createElement("div");
+      msg.className = "feedback-msg " + (isCorrect ? "correct" : "wrong");
+
+      if (isCorrect) {
+        let gain = q.xpValue;
+        if (streak >= 3) gain = Math.round(gain * 1.5);
+        xp += gain;
+        streak++;
+        consecutiveMistakes = 0;
+        if (!isFallback) scores[q.category].correct++;
+        const levelUp = Math.floor(xp / 250) + 1;
+        if (levelUp > level) { level = levelUp; msg.innerHTML = `⬆️ Level Up! Jetzt Level ${level}! +${gain} XP`; }
+        else msg.innerHTML = streak >= 3 ? `✅ Richtig! STREAK x${streak} → +${gain} XP (Bonus!)` : `✅ Richtig! +${gain} XP`;
+      } else {
+        streak = 0;
+        consecutiveMistakes++;
+        if (consecutiveMistakes >= 2 && lastErrorCategory === q.category) {
+          insertFallback(q.category);
+          consecutiveMistakes = 0;
+        }
+        lastErrorCategory = q.category;
+        msg.innerHTML = `❌ Leider falsch. Richtig wäre: „${q.options[q.correct]}"`;
+        if (q.hint) {
+          const hintEl = document.createElement("div");
+          hintEl.style.cssText = "margin-top:8px; font-size:0.85rem; color:var(--joker-color); opacity:0.9;";
+          hintEl.textContent = "💡 " + q.hint;
+          msg.appendChild(hintEl);
+        }
+      }
+      feedbackArea.appendChild(msg);
+
+      updateHUD();
+      document.getElementById("btn-joker").style.display = "none";
+
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.textContent = currentIndex + 1 < currentQueue.length ? "Weiter →" : "Auswertung →";
+      nextBtn.onclick = () => { currentIndex++; loadQuestion(); };
+    }
+
+    function updateHUD() {
+      document.getElementById("xp-display").querySelector("span").textContent = xp;
+      document.getElementById("level-display").querySelector("span").textContent = level;
+      document.getElementById("streak-display").querySelector("span").textContent = streak;
+    }
+
+    // ── Auswertung ────────────────────────────────────────────────────────
+    function showResults() {
+      reportToFlow(studentName, xp, level, scores);
+
+      document.getElementById("quiz-screen").classList.remove("active");
+      document.getElementById("result-screen").classList.add("active");
+
+      const today = new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+      document.getElementById("cert-title").textContent = `Zertifikat: ${studentName}`;
+      document.getElementById("final-stats").textContent = `Ergebnis: ${xp} XP · Level ${level} · ${today}`;
+
+      const best = parseInt(localStorage.getItem("physik-dgl-best-xp") || "0");
+      if (xp > best) localStorage.setItem("physik-dgl-best-xp", xp);
+
+      const feedbackDiv = document.getElementById("feedback-area-result");
+      feedbackDiv.innerHTML = "";
+
+      const categoryHints = {
+        atomaufbau:    "Wiederhole die Atommodelle (Thomson/Rutherford) und den Streuversuch. Achte auf Größenverhältnisse im Atom (Kern 10⁻¹⁵ m, Hülle 10⁻¹⁰ m).",
+        isotope:       "Übe das Ablesen von Z, N und A aus der Isotopenschreibweise. A = Z + N ist die Grundformel. Lerne auch die Quark-Zusammensetzung von Proton und Neutron.",
+        strahlung:     "Lerne die drei Strahlenarten als Tabelle: Zusammensetzung, Ladung, Reichweite in Luft, Abschirmmaterial, Ionisierungsstärke.",
+        zerfall:       "Übe Zerfallsgleichungen: α-Zerfall (Z−2, A−4) · β⁻ (Z+1, A gleich) · β⁺ (Z−1, A gleich) · γ (Z und A unverändert).",
+        halbwertszeit: "Übe das Ablesen aus t-n-Diagrammen und die Formel n = n₀·(½)^(t/T½). Denke an die Nullrate und die C-14-Methode als Anwendungsbeispiel."
+      };
+
+      for (const key in scores) {
+        const s = scores[key];
+        const ratio = s.total > 0 ? s.correct / s.total : 0;
+        const color = ratio === 1 ? "var(--success)" : ratio >= 0.5 ? "var(--joker-color)" : "var(--error)";
+
+        const div = document.createElement("div");
+        div.className = "result-category";
+        div.style.borderLeftColor = color;
+
+        let fbText = "";
+        if (ratio === 1) {
+          fbText = `Exzellent (${s.correct}/${s.total}) – Bestens vorbereitet in diesem Bereich!`;
+        } else if (ratio >= 0.5) {
+          fbText = `Solide (${s.correct}/${s.total}) – Du hast die Grundlagen, baust aber noch Fehler ein.<br>
+            <strong style="color:var(--joker-color); font-size:0.9rem; display:inline-block; margin-top:6px;">
+              💡 Klausur-Tipp: ${categoryHints[key]}
+            </strong>`;
+        } else {
+          fbText = `Förderbedarf (${s.correct}/${s.total}) – Dieser Bereich kostet dich in der Klausur Punkte.<br>
+            <span style="color:var(--error); font-weight:600; font-size:0.9rem; display:inline-block; margin-top:6px;">
+              🎯 Lernplan:
+            </span><br>
+            <span style="font-size:0.9rem; color:var(--text-muted); display:inline-block; margin-top:4px;">
+              ${categoryHints[key]}
+            </span>`;
+        }
+
+        div.innerHTML = `<h3 style="margin:0; font-size:1rem; color:${color};">${s.name}</h3>
+          <div class="feedback-text">${fbText}</div>`;
+
+        if (ratio < 1 && categoryResources[key]) {
+          const resSection = document.createElement("div");
+          resSection.className = "resources-section";
+          resSection.innerHTML = `<div class="resources-title">📚 Lernmaterial</div>`;
+          categoryResources[key].forEach(r => {
+            const a = document.createElement("a");
+            a.className = "resource-link";
+            a.href = r.url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.textContent = r.title;
+            resSection.appendChild(a);
+          });
+          div.appendChild(resSection);
+        }
+
+        feedbackDiv.appendChild(div);
+      }
+    }
+
+    function restartTest() {
+      document.getElementById("result-screen").classList.remove("active");
+      document.getElementById("start-screen").classList.add("active");
+      const best = localStorage.getItem("physik-dgl-best-xp");
+      if (best) {
+        document.getElementById("best-score-display").textContent = `🏆 Bestes Ergebnis: ${best} XP`;
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────
+    (() => {
+      const savedName = localStorage.getItem("physik-dgl-name");
+      if (savedName) document.getElementById("student-name").value = savedName;
+      const bestXP = localStorage.getItem("physik-dgl-best-xp");
+      if (bestXP) document.getElementById("best-score-display").textContent = `🏆 Bestes Ergebnis: ${bestXP} XP`;
+    })();
+  </script>
+</body>
+</html>

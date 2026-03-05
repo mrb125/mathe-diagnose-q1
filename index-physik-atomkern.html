@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Physik Diagnose">
+  <title>Physik Diagnose – Struktur der Materie</title>
+  <style>
+    :root {
+      --primary-glow: #38bdf8;
+      --secondary-glow: #fb923c;
+      --joker-color:   #fbbf24;
+      --success:       #22c55e;
+      --error:         #ef4444;
+      --bg:            #020d1a;
+      --card-bg:       rgba(8, 28, 52, 0.85);
+      --text-main:     #e2e8f0;
+      --text-muted:    #94a3b8;
+      --border:        rgba(56, 189, 248, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(56, 189, 248, 0.07) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 90%, rgba(251, 146, 60, 0.05) 0%, transparent 60%);
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 700px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 40px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(56, 189, 248, 0.08);
+    }
+    .screen.active { display: block; }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, var(--primary-glow), #7dd3fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    h2 { font-size: 1.1rem; color: var(--text-muted); font-weight: 400; margin-bottom: 20px; }
+
+    button {
+      display: inline-block;
+      margin-top: 28px;
+      padding: 14px 38px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--bg);
+      background: linear-gradient(135deg, var(--primary-glow), #7dd3fc);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    button:hover { transform: scale(1.04); box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .hud-item {
+      flex: 1;
+      padding: 8px 4px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--primary-glow);
+    }
+
+    /* ── Optionen ── */
+    .options-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .option-btn {
+      width: 100%;
+      padding: 13px 18px;
+      margin: 0;
+      background: rgba(56, 189, 248, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.97rem;
+      font-family: inherit;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      line-height: 1.4;
+    }
+    .option-btn:hover { background: rgba(56, 189, 248, 0.12); border-color: var(--primary-glow); transform: translateX(4px); }
+    .option-btn.selected { border-color: var(--primary-glow); background: rgba(56, 189, 248, 0.18); }
+    .option-btn.correct  { border-color: var(--success); background: rgba(34, 197, 94, 0.15); color: var(--success); }
+    .option-btn.wrong    { border-color: var(--error);   background: rgba(239, 68, 68, 0.12); color: var(--error); }
+    .option-btn:disabled { cursor: default; transform: none; }
+
+    /* ── Fortschrittsbalken ── */
+    .progress-bar-container {
+      height: 4px;
+      background: rgba(56, 189, 248, 0.1);
+      border-radius: 4px;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-glow), var(--secondary-glow));
+      border-radius: 4px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── Joker ── */
+    .joker-btn {
+      margin-top: 14px;
+      padding: 10px 22px;
+      font-size: 0.9rem;
+      background: transparent;
+      border: 1px solid var(--joker-color);
+      color: var(--joker-color);
+      border-radius: 50px;
+    }
+    .joker-btn:hover { background: rgba(251, 191, 36, 0.1); box-shadow: 0 0 12px rgba(251, 191, 36, 0.25); transform: none; }
+    .joker-text {
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--joker-color);
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    /* ── Feedback-Meldung ── */
+    .feedback-msg {
+      margin-top: 14px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .feedback-msg.correct { background: rgba(34, 197, 94, 0.1);  border: 1px solid rgba(34, 197, 94, 0.3);  color: var(--success); }
+    .feedback-msg.wrong   { background: rgba(239, 68, 68, 0.1);  border: 1px solid rgba(239, 68, 68, 0.3);  color: var(--error); }
+
+    /* ── Auswertung ── */
+    .result-category {
+      background: rgba(56, 189, 248, 0.04);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary-glow);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      text-align: left;
+    }
+    .feedback-text { color: var(--text-muted); font-size: 0.9rem; margin-top: 6px; line-height: 1.5; }
+    .resources-section { margin-top: 10px; }
+    .resources-title { font-size: 0.82rem; font-weight: 600; color: var(--primary-glow); margin-bottom: 6px; }
+    .resource-link {
+      display: inline-block;
+      margin: 3px 4px 3px 0;
+      padding: 5px 12px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--primary-glow);
+      text-decoration: none;
+    }
+    .resource-link:hover { background: rgba(56, 189, 248, 0.16); }
+
+    /* ── Print ── */
+    .print-btn {
+      background: transparent;
+      border: 1px solid var(--primary-glow);
+      color: var(--primary-glow);
+      font-size: 0.9rem;
+      padding: 10px 24px;
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+    .print-btn:hover { background: rgba(56, 189, 248, 0.1); box-shadow: none; transform: none; }
+
+    @media (max-width: 600px) {
+      .screen { padding: 24px 18px; }
+      h1 { font-size: 1.4rem; }
+    }
+
+    @media print {
+      body { background: white; color: black; }
+      .screen { display: block !important; box-shadow: none; border: none; }
+      #quiz-screen, #start-screen { display: none !important; }
+      button { display: none; }
+      .result-category { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ PHASE 1: START ═══ -->
+  <div id="start-screen" class="screen active">
+    <h1>⚛️ Physik Diagnose</h1>
+    <h2>Struktur der Materie · Atomkerne & Radioaktivität</h2>
+    <p style="font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin-top: 14px;">
+      Teste dein Wissen zu <strong style="color:var(--primary-glow)">Atommodellen, Isotopen, radioaktiver Strahlung, Zerfallsprozessen</strong> und der <strong style="color:var(--secondary-glow)">Halbwertszeit</strong>.
+      Verdiene XP und schalte Tipps mit dem Joker-System frei.
+    </p>
+    <input type="text" id="student-name" maxlength="40"
+      placeholder="Dein Name (für Zertifikat)..."
+      style="width:80%; padding:13px; font-size:1rem; margin-top:22px;
+             background:rgba(56,189,248,0.06); border:1.5px solid var(--border);
+             color:var(--text-main); border-radius:12px; text-align:center;
+             font-family:inherit; display:block; margin-left:auto; margin-right:auto;">
+    <div id="best-score-display" style="font-size:0.88rem; color:var(--text-muted); margin-top:10px;"></div>
+    <button onclick="startTest()">Diagnose starten →</button>
+  </div>
+
+  <!-- ═══ PHASE 2: QUIZ ═══ -->
+  <div id="quiz-screen" class="screen">
+    <div class="hud">
+      <div class="hud-item" id="level-display">LVL <span>1</span></div>
+      <div class="hud-item" id="xp-display">XP: <span>0</span></div>
+      <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
+    </div>
+
+    <div id="question-category"
+      style="color:var(--secondary-glow); font-weight:700; font-size:0.8rem;
+             letter-spacing:2px; text-transform:uppercase; margin-bottom:10px;">
+      KATEGORIE
+    </div>
+
+    <div id="question-text"
+      style="font-size:1.15rem; font-weight:500; line-height:1.55; min-height:60px;">
+      Lade…
+    </div>
+
+    <div id="input-area"></div>
+
+    <div id="joker-area" style="display:none; text-align:center; margin-top:4px;">
+      <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp freischalten (−50 XP)</button>
+      <div id="joker-hint" class="joker-text" style="display:none;"></div>
+    </div>
+
+    <div id="feedback-area"></div>
+
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <button id="next-btn" onclick="submitAnswer()" style="display:none; margin-top:24px;">
+      Antwort abgeben
+    </button>
+  </div>
+
+  <!-- ═══ PHASE 3: AUSWERTUNG ═══ -->
+  <div id="result-screen" class="screen">
+    <h1 id="cert-title">Zertifikat</h1>
+    <h2 id="final-stats" style="color:var(--text-main); text-transform:none; margin-bottom:32px;">
+      Gesamt: 0 XP
+    </h2>
+    <div id="feedback-area-result"></div>
+    <div style="margin-top:20px;">
+      <button onclick="restartTest()">Nochmal versuchen</button>
+      <button class="print-btn" onclick="window.print()">🖨️ Zertifikat drucken</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Power Automate – URL nach Flow-Setup hier eintragen ──────────────
+    // make.powerautomate.com → HTTP-Trigger → Excel-Zeile hinzufügen
+    const FLOW_URL = "";
+
+    function reportToFlow(name, xp, level, scores) {
+      if (!FLOW_URL) return;
+      const today = new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+      const payload = {
+        Datum:           today,
+        Name:            name,
+        XP:              xp,
+        Level:           level,
+        Atomaufbau:      `${scores.atomaufbau.correct}/${scores.atomaufbau.total}`,
+        Isotope:         `${scores.isotope.correct}/${scores.isotope.total}`,
+        Strahlung:       `${scores.strahlung.correct}/${scores.strahlung.total}`,
+        Zerfallsprozesse:`${scores.zerfall.correct}/${scores.zerfall.total}`,
+        Halbwertszeit:   `${scores.halbwertszeit.correct}/${scores.halbwertszeit.total}`
+      };
+      fetch(FLOW_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+        .catch(() => {});
+    }
+
+    // ── Lernressourcen pro Kategorie ─────────────────────────────────────
+    const categoryResources = {
+      atomaufbau: [
+        { title: "Leifi: Atommodelle",            url: "https://www.leifiphysik.de/atom-kernphysik/atommodelle" },
+        { title: "Leifi: Rutherford-Streuversuch", url: "https://www.leifiphysik.de/atom-kernphysik/rutherfordscher-streuversuch" }
+      ],
+      isotope: [
+        { title: "Leifi: Isotope & Nuklidkarte",  url: "https://www.leifiphysik.de/atom-kernphysik/isotope" },
+        { title: "Leifi: Quarks",                  url: "https://www.leifiphysik.de/teilchenphysik/quarks" }
+      ],
+      strahlung: [
+        { title: "Leifi: Radioaktive Strahlung",  url: "https://www.leifiphysik.de/atom-kernphysik/radioaktivitaet-eigenschaften" },
+        { title: "Leifi: Nachweisgeräte",          url: "https://www.leifiphysik.de/atom-kernphysik/nachweisgeraete" }
+      ],
+      zerfall: [
+        { title: "Leifi: Alpha-Zerfall",           url: "https://www.leifiphysik.de/atom-kernphysik/alphastrahlung" },
+        { title: "Leifi: Beta-Zerfall",            url: "https://www.leifiphysik.de/atom-kernphysik/betastrahlung" },
+        { title: "Leifi: Gamma-Strahlung",         url: "https://www.leifiphysik.de/atom-kernphysik/gammastrahlung" }
+      ],
+      halbwertszeit: [
+        { title: "Leifi: Halbwertszeit",           url: "https://www.leifiphysik.de/atom-kernphysik/halbwertszeit" },
+        { title: "Leifi: Aktivität",               url: "https://www.leifiphysik.de/atom-kernphysik/aktivitaet" }
+      ]
+    };
+
+    // ── Fragen ────────────────────────────────────────────────────────────
+    const allQuestions = [
+
+      // ══ ATOMAUFBAU & MODELLE ══
+      {
+        category: "atomaufbau",
+        text: "Wer entdeckte 1897 das Elektron durch Experimente mit Kathodenstrahlröhren?",
+        options: ["Ernest Rutherford", "James Chadwick", "Joseph John Thomson", "Niels Bohr"],
+        correct: 2, xpValue: 80, difficulty: "easy",
+        hint: "Er stellte fest, dass Kathodenstrahlen negativ geladene Teilchen sind, die durch elektrische Felder abgelenkt werden. Er erhielt 1906 den Nobelpreis für Physik."
+      },
+      {
+        category: "atomaufbau",
+        text: "Wie beschreibt das Thomson-Modell den Aufbau eines Atoms?",
+        options: [
+          "Elektronen kreisen auf festen Bahnen um einen kleinen Kern",
+          "Elektronen sind in einer gleichmäßig positiv geladenen Kugel eingebettet wie Rosinen im Teig",
+          "Der Kern enthält alle Masse, die Elektronenhülle ist leer",
+          "Das Atom ist eine unteilbare, homogene Kugel"
+        ],
+        correct: 1, xpValue: 100, difficulty: "medium",
+        hint: "Thomson stellte sich vor: positive Ladung gleichmäßig über eine Kugel verteilt, darin die Elektronen auf konzentrischen Kreisen – wie Rosinen im Kuchenteig."
+      },
+      {
+        category: "atomaufbau",
+        text: "Was beobachteten Geiger und Marsden beim Rutherfordschen Streuversuch mit der Goldfolie?",
+        options: [
+          "Alle α-Teilchen wurden gleichmäßig um kleine Winkel abgelenkt",
+          "Die meisten α-Teilchen gingen durch die Folie, einige wurden stark – manchmal um 180° – abgelenkt",
+          "Alle α-Teilchen wurden von der Folie zurückgeworfen",
+          "α-Teilchen konnten die Folie gar nicht durchdringen"
+        ],
+        correct: 1, xpValue: 120, difficulty: "medium",
+        hint: "Die meisten Teilchen passierten die Folie fast ungehindert (viel leerer Raum). Aber wenige wurden stark abgelenkt → kleiner, schwerer, positiv geladener Atomkern."
+      },
+      {
+        category: "atomaufbau",
+        text: "Wie groß ist der Atomkern im Vergleich zum Atom (Atomhülle)?",
+        options: [
+          "Etwa ½ des Atomdurchmessers",
+          "Etwa 1/1.000 des Atomdurchmessers",
+          "Etwa 1/100.000 des Atomdurchmessers",
+          "Er hat denselben Durchmesser wie das Atom"
+        ],
+        correct: 2, xpValue: 100, difficulty: "medium",
+        hint: "Vergrößert man den Atomkern auf die Größe eines Reiskorns (1 mm), wäre das Atom 100 m groß – ein Fußballstadion! Der Kern ist winzig, enthält aber fast die gesamte Masse."
+      },
+      {
+        category: "atomaufbau",
+        text: "Ein Sauerstoffatom (8 Protonen) gibt 2 Elektronen ab. Welche Ladung trägt das entstandene Ion?",
+        options: ["2-fach negativ geladen", "einfach positiv geladen", "2-fach positiv geladen", "elektrisch neutral"],
+        correct: 2, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "Gibt das Atom 2 Elektronen (negative Ladung) ab, überwiegen die 8 positiven Protonen → das Ion ist 2-fach positiv geladen. Man schreibt O²⁺."
+      },
+
+      // ══ ISOTOPE & NUKLIDKARTE ══
+      {
+        category: "isotope",
+        text: "Was bezeichnet die Massenzahl A eines Isotops?",
+        options: [
+          "Ausschließlich die Anzahl der Protonen",
+          "Ausschließlich die Anzahl der Neutronen",
+          "Die Summe aus Protonen- und Neutronenzahl (Nukleonenzahl)",
+          "Die Masse des Atoms in Gramm"
+        ],
+        correct: 2, xpValue: 80, difficulty: "easy",
+        hint: "A = Z + N. Z ist die Kernladungszahl (Protonenzahl), N die Neutronenzahl. Die Massenzahl A zählt alle Nukleonen (Protonen + Neutronen) im Kern."
+      },
+      {
+        category: "isotope",
+        text: "Das Isotop ¹⁴₆C (Kohlenstoff-14) enthält wie viele Neutronen?",
+        options: ["6 Neutronen", "14 Neutronen", "8 Neutronen", "20 Neutronen"],
+        correct: 2, xpValue: 100, difficulty: "medium",
+        hint: "Neutronen = Massenzahl − Protonenzahl = 14 − 6 = 8. Die tief gestellte Zahl ist die Protonenzahl (Z=6), die hoch gestellte ist die Massenzahl (A=14)."
+      },
+      {
+        category: "isotope",
+        text: "Was sind Isotope eines Elements?",
+        options: [
+          "Atome verschiedener Elemente mit gleicher Massenzahl",
+          "Atome des gleichen Elements mit verschiedener Neutronenzahl",
+          "Nur radioaktive Atome eines Elements",
+          "Atome mit gleich vielen Elektronen und Protonen"
+        ],
+        correct: 1, xpValue: 100, difficulty: "medium",
+        hint: "Isotope haben immer die gleiche Protonenzahl Z (= gleiches Element!), aber unterschiedliche Neutronenzahlen N. Beispiel: H-1, H-2 (Deuterium), H-3 (Tritium)."
+      },
+      {
+        category: "isotope",
+        text: "Welche Ladung trägt ein up-Quark (u)?",
+        options: ["−e (negativ)", "+e (positiv)", "+⅔e", "−⅓e"],
+        correct: 2, xpValue: 140, difficulty: "hard",
+        hint: "Up-Quark: +²⁄₃e · Down-Quark: −¹⁄₃e. Proton (p = uud): ²⁄₃+²⁄₃−¹⁄₃ = +e ✓ · Neutron (n = udd): ²⁄₃−¹⁄₃−¹⁄₃ = 0 ✓"
+      },
+      {
+        category: "isotope",
+        text: "Was gibt die Ordnungszahl eines Elements im Periodensystem an?",
+        options: [
+          "Die Massenzahl des häufigsten Isotops",
+          "Die Anzahl der Neutronen im Kern",
+          "Die Kernladungszahl Z = Anzahl der Protonen im Kern",
+          "Die relative Atommasse"
+        ],
+        correct: 2, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "Ordnungszahl = Kernladungszahl Z = Protonenzahl. Alle Atome mit Z=6 sind Kohlenstoff, alle mit Z=26 sind Eisen – unabhängig von der Neutronenzahl."
+      },
+
+      // ══ STRAHLUNGSARTEN & NACHWEIS ══
+      {
+        category: "strahlung",
+        text: "Woraus besteht α-Strahlung?",
+        options: [
+          "Aus sehr schnellen Elektronen",
+          "Aus elektromagnetischen Wellen (Photonen)",
+          "Aus Heliumkernen (je 2 Protonen + 2 Neutronen)",
+          "Aus Neutronen"
+        ],
+        correct: 2, xpValue: 80, difficulty: "easy",
+        hint: "α-Teilchen = ⁴₂He²⁺ = Heliumkerne. Sie sind 2-fach positiv geladen, schwer und haben kurze Reichweite (max. 10 cm Luft). Schon ein Blatt Papier stoppt sie."
+      },
+      {
+        category: "strahlung",
+        text: "Welche Abschirmung ist für γ-Strahlung nötig, um sie nahezu vollständig zu stoppen?",
+        options: [
+          "Ein Blatt Papier",
+          "5 mm Aluminium",
+          "5–10 cm Blei",
+          "γ-Strahlung kann prinzipiell nicht abgeschirmt werden"
+        ],
+        correct: 2, xpValue: 120, difficulty: "medium",
+        hint: "Abschirmung: α = Papier | β = 5 mm Aluminium | γ = 5–10 cm Blei. γ-Strahlung ist elektromagnetische Strahlung (wie sehr energetisches Licht) und extrem durchdringend."
+      },
+      {
+        category: "strahlung",
+        text: "Warum entlädt radioaktive Strahlung ein geladenes Elektroskop in Luft, aber nicht im Vakuum?",
+        options: [
+          "Im Vakuum fehlen Luftmoleküle, die durch die Strahlung ionisiert werden könnten",
+          "Das Elektroskop schirmt die Strahlung im Vakuum ab",
+          "Im Vakuum ist die Strahlung stärker und lädt das Elektroskop auf",
+          "Radioaktive Strahlung hat im Vakuum keine Wirkung"
+        ],
+        correct: 0, xpValue: 130, difficulty: "hard",
+        hint: "Die Strahlung ionisiert Luftmoleküle (schlägt Elektronen heraus). Diese Ionen gleichen die Ladung des Elektroskops aus. Im Vakuum gibt es keine Luftmoleküle → kein Effekt."
+      },
+      {
+        category: "strahlung",
+        text: "Welche elektrische Ladung trägt β⁻-Strahlung?",
+        options: ["Positiv", "Neutral (keine Ladung)", "Negativ", "Je nach Energie positiv oder negativ"],
+        correct: 2, xpValue: 80, difficulty: "easy",
+        hint: "β⁻-Strahlung besteht aus sehr schnellen Elektronen (e⁻) – diese sind negativ geladen. β⁺-Strahlung besteht aus Positronen und ist positiv geladen."
+      },
+      {
+        category: "strahlung",
+        text: "Welche Maßnahme beschreibt das erste 'A' in der AAA-Regel beim Strahlenschutz?",
+        options: ["Abstand halten", "Abschirmung nutzen", "Aufenthaltsdauer minimieren", "Atemschutz tragen"],
+        correct: 2, xpValue: 60, difficulty: "easy", fallback: true,
+        hint: "AAA = Aufenthaltsdauer (kurz halten) · Abstand (groß halten) · Abschirmung (geeignetes Material nutzen). Alle drei Maßnahmen reduzieren die aufgenommene Strahlendosis."
+      },
+
+      // ══ ZERFALLSPROZESSE ══
+      {
+        category: "zerfall",
+        text: "Wie verändert sich die Kernladungszahl Z bei einem α-Zerfall?",
+        options: ["Z bleibt unverändert", "Z nimmt um 1 zu", "Z nimmt um 2 ab", "Z nimmt um 4 ab"],
+        correct: 2, xpValue: 100, difficulty: "medium",
+        hint: "Beim α-Zerfall verlässt ein Heliumkern (⁴₂He) den Atomkern: 2 Protonen weniger → Z nimmt um 2 ab. Die Massenzahl A nimmt um 4 ab (2p + 2n im α-Teilchen)."
+      },
+      {
+        category: "zerfall",
+        text: "Was passiert im Atomkern bei einem β⁻-Zerfall?",
+        options: [
+          "Ein Proton wandelt sich in ein Neutron um, ein Positron wird ausgesendet",
+          "Ein Neutron wandelt sich in ein Proton um, ein Elektron und ein Antineutrino werden ausgesendet",
+          "Zwei Protonen verschmelzen zu einem Heliumkern",
+          "Ein Elektron aus der Hülle dringt in den Kern ein"
+        ],
+        correct: 1, xpValue: 140, difficulty: "hard",
+        hint: "β⁻-Zerfall: n → p + e⁻ + Antineutrino (ν̄ₑ). Die Kernladungszahl Z steigt um 1 (mehr Protonen), die Massenzahl A bleibt gleich (Gesamtanzahl Nukleonen konstant)."
+      },
+      {
+        category: "zerfall",
+        text: "Was ändert sich an Z und A, wenn ein Atomkern γ-Strahlung aussendet?",
+        options: [
+          "Z nimmt um 2 ab, A nimmt um 4 ab",
+          "Z nimmt um 1 zu, A bleibt gleich",
+          "Z und A bleiben beide vollständig unverändert",
+          "A nimmt um 1 ab, Z bleibt gleich"
+        ],
+        correct: 2, xpValue: 100, difficulty: "medium",
+        hint: "γ-Strahlung ist reine Energieabgabe: Ein angeregter Kern (A*) gibt Energie als elektromagnetische Strahlung ab und geht in den Grundzustand über. Der Kern selbst bleibt identisch."
+      },
+      {
+        category: "zerfall",
+        text: "Ra-226 (Z=88, A=226) sendet α-Strahlung aus. Welches Tochterisotop entsteht?",
+        options: [
+          "Francium-222 (Z=87)",
+          "Radon-222 (Z=86)",
+          "Polonium-222 (Z=84)",
+          "Radium-222 (Z=88)"
+        ],
+        correct: 1, xpValue: 140, difficulty: "hard",
+        hint: "α-Zerfall: Z−2 und A−4. Ra: Z=88, A=226 → Z=86 (Radon), A=222. Gleichung: ²²⁶₈₈Ra → ²²²₈₆Rn²⁻ + ⁴₂He²⁺ · Schau im PSE: Z=86 = Radon (Rn)."
+      },
+      {
+        category: "zerfall",
+        text: "Bei einem β⁺-Zerfall verändert sich die Kernladungszahl Z wie?",
+        options: [
+          "Z nimmt um 2 ab",
+          "Z nimmt um 1 zu",
+          "Z nimmt um 1 ab",
+          "Z bleibt gleich"
+        ],
+        correct: 2, xpValue: 80, difficulty: "easy", fallback: true,
+        hint: "β⁺-Zerfall: Ein Proton → Neutron + Positron (e⁺) + Neutrino. Weniger Protonen → Z sinkt um 1. Massenzahl A bleibt gleich (Gesamtanzahl der Nukleonen konstant)."
+      },
+
+      // ══ HALBWERTSZEIT & AKTIVITÄT ══
+      {
+        category: "halbwertszeit",
+        text: "Was beschreibt die Halbwertszeit T½ eines radioaktiven Isotops?",
+        options: [
+          "Die Zeit, bis alle Atome einer Probe vollständig zerfallen sind",
+          "Die Zeitspanne, in der sich die Zählrate auf die Hälfte des Anfangswerts verringert",
+          "Die halbe Lebenserwartung eines einzelnen radioaktiven Atoms",
+          "Die Zeit, nach der die Strahlung für Menschen ungefährlich ist"
+        ],
+        correct: 1, xpValue: 100, difficulty: "medium",
+        hint: "Die Halbwertszeit ist die Zeitspanne, in der Zählrate und Aktivität jeweils auf die Hälfte sinken. Nach 2·T½ sind noch ¼ übrig, nach 3·T½ noch ⅛ usw."
+      },
+      {
+        category: "halbwertszeit",
+        text: "Ein Isotop hat T½ = 10 Jahre. Die Anfangszählrate beträgt 800/s. Welche Zählrate misst man nach 30 Jahren?",
+        options: ["400/s", "200/s", "100/s", "50/s"],
+        correct: 2, xpValue: 140, difficulty: "hard",
+        hint: "30 Jahre = 3 Halbwertszeiten: 800 → 400 → 200 → 100/s. Nach jeder Halbwertszeit halbiert sich die Zählrate. Formel: n = n₀ · (½)^(t/T½)"
+      },
+      {
+        category: "halbwertszeit",
+        text: "In welcher Einheit wird die Aktivität A eines radioaktiven Präparats angegeben?",
+        options: ["Joule (J)", "Becquerel (Bq = 1/s)", "Sievert (Sv)", "Watt (W)"],
+        correct: 1, xpValue: 80, difficulty: "easy",
+        hint: "1 Becquerel = 1 Zerfall pro Sekunde. Benannt nach Henri Becquerel (1896 Entdeckung der Radioaktivität). Nicht zu verwechseln mit Sievert (= biologische Strahlenwirkung)."
+      },
+      {
+        category: "halbwertszeit",
+        text: "Was versteht man unter der Nullrate bei Strahlungsmessungen?",
+        options: [
+          "Die Strahlung einer Probe, nachdem sie vollständig zerfallen ist",
+          "Die natürliche Hintergrundstrahlung, die ohne zusätzliche Strahlungsquelle gemessen wird",
+          "Eine gemessene Zählrate von exakt null Impulsen",
+          "Den maximalen Startwert zu Beginn des Zerfalls"
+        ],
+        correct: 1, xpValue: 100, difficulty: "medium",
+        hint: "Die Nullrate ist immer vorhanden – durch natürliche radioaktive Isotope in der Umgebung (z.B. K-40 in Gesteinen, Rn-222 in der Luft). Sie muss bei Messungen abgezogen werden."
+      },
+      {
+        category: "halbwertszeit",
+        text: "C-14 hat T½ = 5.730 Jahre. Ein toter Organismus enthält noch ¼ der ursprünglichen C-14-Menge. Wie alt ist er ungefähr?",
+        options: ["5.730 Jahre", "11.460 Jahre", "17.190 Jahre", "2.865 Jahre"],
+        correct: 1, xpValue: 80, difficulty: "easy", fallback: true,
+        hint: "Nach 1 Halbwertszeit (5.730 a): ½ übrig · Nach 2 Halbwertszeiten (11.460 a): ¼ übrig → Alter ≈ 11.460 Jahre. Dies ist die Grundlage der Radiokarbonmethode (C-14-Methode)."
+      }
+    ];
+
+    // ── Score-Tracking ────────────────────────────────────────────────────
+    const scores = {
+      atomaufbau:    { correct: 0, total: 4, name: "Atomaufbau & Modelle" },
+      isotope:       { correct: 0, total: 4, name: "Isotope & Nuklidkarte" },
+      strahlung:     { correct: 0, total: 4, name: "Strahlungsarten & Nachweis" },
+      zerfall:       { correct: 0, total: 4, name: "Zerfallsprozesse" },
+      halbwertszeit: { correct: 0, total: 4, name: "Halbwertszeit & Aktivität" }
+    };
+
+    // ── Spielzustand ─────────────────────────────────────────────────────
+    let xp = 0, level = 1, streak = 0;
+    let consecutiveMistakes = 0, lastErrorCategory = "";
+    let currentQueue = [], currentIndex = 0;
+    let selectedOption = null;
+    let jokerUsedForCurrent = false;
+    let studentName = "";
+
+    // ── Queue aufbauen ────────────────────────────────────────────────────
+    function buildQueue() {
+      const regular = allQuestions.filter(q => !q.fallback);
+      // Fisher-Yates shuffle
+      for (let i = regular.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [regular[i], regular[j]] = [regular[j], regular[i]];
+      }
+      return regular;
+    }
+
+    function insertFallback(category) {
+      const fallbacks = allQuestions.filter(q => q.fallback && q.category === category);
+      if (!fallbacks.length) return;
+      const fb = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      currentQueue.splice(currentIndex + 1, 0, { ...fb, _isFallback: true });
+    }
+
+    // ── Spielstart ────────────────────────────────────────────────────────
+    function startTest() {
+      const input = document.getElementById("student-name").value.trim();
+      studentName = input || "Schüler/in";
+      localStorage.setItem("physik-atomkern-name", studentName);
+
+      // Scores zurücksetzen
+      Object.keys(scores).forEach(k => { scores[k].correct = 0; });
+      xp = 0; level = 1; streak = 0;
+      consecutiveMistakes = 0; lastErrorCategory = "";
+
+      currentQueue = buildQueue();
+      currentIndex = 0;
+
+      document.getElementById("start-screen").classList.remove("active");
+      document.getElementById("quiz-screen").classList.add("active");
+      loadQuestion();
+    }
+
+    // ── Frage laden ───────────────────────────────────────────────────────
+    function loadQuestion() {
+      if (currentIndex >= currentQueue.length) { showResults(); return; }
+      const q = currentQueue[currentIndex];
+      selectedOption = null;
+      jokerUsedForCurrent = false;
+
+      const regularTotal = allQuestions.filter(x => !x.fallback).length;
+      const progress = Math.min((currentIndex / regularTotal) * 100, 100);
+      document.getElementById("progress-bar").style.width = progress + "%";
+
+      document.getElementById("question-category").textContent = scores[q.category]?.name || q.category;
+      document.getElementById("question-text").textContent = q.text;
+      document.getElementById("feedback-area").innerHTML = "";
+
+      // Antwortoptionen aufbauen
+      const inputArea = document.getElementById("input-area");
+      inputArea.innerHTML = "";
+      const grid = document.createElement("div");
+      grid.className = "options-grid";
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.onclick = () => selectOption(idx, btn);
+        grid.appendChild(btn);
+      });
+      inputArea.appendChild(grid);
+
+      // Joker
+      const jokerArea = document.getElementById("joker-area");
+      const jokerHint = document.getElementById("joker-hint");
+      if (q.hint && xp >= 50) {
+        // Joker verfügbar
+        jokerArea.style.display = "block";
+        document.getElementById("btn-joker").style.display = "inline-block";
+        jokerHint.style.display = "none";
+        jokerHint.textContent = "";
+      } else {
+        // Kein Hint vorhanden oder zu wenig XP – gesamten Joker-Bereich verstecken
+        jokerArea.style.display = "none";
+      }
+
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.style.display = "none";
+      nextBtn.textContent = "Antwort abgeben";
+      nextBtn.onclick = submitAnswer; // onclick nach jeder Frage zurücksetzen
+    }
+
+    function selectOption(idx, btnEl) {
+      selectedOption = idx;
+      document.querySelectorAll(".option-btn").forEach(b => b.classList.remove("selected"));
+      btnEl.classList.add("selected");
+      document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    // ── Joker ─────────────────────────────────────────────────────────────
+    function useJoker() {
+      if (jokerUsedForCurrent || xp < 50) return;
+      const q = currentQueue[currentIndex];
+      xp -= 50;
+      jokerUsedForCurrent = true;
+      updateHUD();
+      const hint = document.getElementById("joker-hint");
+      hint.textContent = "💡 " + q.hint;
+      hint.style.display = "block";
+      document.getElementById("btn-joker").style.display = "none";
+    }
+
+    // ── Antwort auswerten ────────────────────────────────────────────────
+    function submitAnswer() {
+      if (selectedOption === null) return;
+      const q = currentQueue[currentIndex];
+      const isCorrect = selectedOption === q.correct;
+      const isFallback = !!q._isFallback;
+
+      // Optionen einfärben
+      const optBtns = document.querySelectorAll(".option-btn");
+      optBtns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === q.correct) b.classList.add("correct");
+        else if (i === selectedOption && !isCorrect) b.classList.add("wrong");
+      });
+
+      // Feedback
+      const feedbackArea = document.getElementById("feedback-area");
+      const msg = document.createElement("div");
+      msg.className = "feedback-msg " + (isCorrect ? "correct" : "wrong");
+
+      if (isCorrect) {
+        let gain = q.xpValue;
+        if (streak >= 3) gain = Math.round(gain * 1.5);
+        xp += gain;
+        streak++;
+        consecutiveMistakes = 0;
+        if (!isFallback) scores[q.category].correct++;
+        const levelUp = Math.floor(xp / 250) + 1;
+        if (levelUp > level) { level = levelUp; msg.innerHTML = `⬆️ Level Up! Jetzt Level ${level}! +${gain} XP`; }
+        else msg.innerHTML = streak >= 3 ? `✅ Richtig! STREAK x${streak} → +${gain} XP (Bonus!)` : `✅ Richtig! +${gain} XP`;
+      } else {
+        streak = 0;
+        consecutiveMistakes++;
+        if (consecutiveMistakes >= 2 && lastErrorCategory === q.category) {
+          insertFallback(q.category);
+          consecutiveMistakes = 0;
+        }
+        lastErrorCategory = q.category;
+        msg.innerHTML = `❌ Leider falsch. Richtig wäre: „${q.options[q.correct]}"`;
+        if (q.hint) {
+          const hintEl = document.createElement("div");
+          hintEl.style.cssText = "margin-top:8px; font-size:0.85rem; color:var(--joker-color); opacity:0.9;";
+          hintEl.textContent = "💡 " + q.hint;
+          msg.appendChild(hintEl);
+        }
+      }
+      feedbackArea.appendChild(msg);
+
+      updateHUD();
+      document.getElementById("btn-joker").style.display = "none";
+
+      const nextBtn = document.getElementById("next-btn");
+      nextBtn.textContent = currentIndex + 1 < currentQueue.length ? "Weiter →" : "Auswertung →";
+      nextBtn.onclick = () => { currentIndex++; loadQuestion(); };
+    }
+
+    function updateHUD() {
+      document.getElementById("xp-display").querySelector("span").textContent = xp;
+      document.getElementById("level-display").querySelector("span").textContent = level;
+      document.getElementById("streak-display").querySelector("span").textContent = streak;
+    }
+
+    // ── Auswertung ────────────────────────────────────────────────────────
+    function showResults() {
+      reportToFlow(studentName, xp, level, scores);
+
+      document.getElementById("quiz-screen").classList.remove("active");
+      document.getElementById("result-screen").classList.add("active");
+
+      const today = new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+      document.getElementById("cert-title").textContent = `Zertifikat: ${studentName}`;
+      document.getElementById("final-stats").textContent = `Ergebnis: ${xp} XP · Level ${level} · ${today}`;
+
+      const best = parseInt(localStorage.getItem("physik-atomkern-best-xp") || "0");
+      if (xp > best) localStorage.setItem("physik-atomkern-best-xp", xp);
+
+      const feedbackDiv = document.getElementById("feedback-area-result");
+      feedbackDiv.innerHTML = "";
+
+      const categoryHints = {
+        atomaufbau:    "Wiederhole die Atommodelle (Thomson/Rutherford) und den Streuversuch. Achte auf Größenverhältnisse im Atom (Kern 10⁻¹⁵ m, Hülle 10⁻¹⁰ m).",
+        isotope:       "Übe das Ablesen von Z, N und A aus der Isotopenschreibweise. A = Z + N ist die Grundformel. Lerne auch die Quark-Zusammensetzung von Proton und Neutron.",
+        strahlung:     "Lerne die drei Strahlenarten als Tabelle: Zusammensetzung, Ladung, Reichweite in Luft, Abschirmmaterial, Ionisierungsstärke.",
+        zerfall:       "Übe Zerfallsgleichungen: α-Zerfall (Z−2, A−4) · β⁻ (Z+1, A gleich) · β⁺ (Z−1, A gleich) · γ (Z und A unverändert).",
+        halbwertszeit: "Übe das Ablesen aus t-n-Diagrammen und die Formel n = n₀·(½)^(t/T½). Denke an die Nullrate und die C-14-Methode als Anwendungsbeispiel."
+      };
+
+      for (const key in scores) {
+        const s = scores[key];
+        const ratio = s.total > 0 ? s.correct / s.total : 0;
+        const color = ratio === 1 ? "var(--success)" : ratio >= 0.5 ? "var(--joker-color)" : "var(--error)";
+
+        const div = document.createElement("div");
+        div.className = "result-category";
+        div.style.borderLeftColor = color;
+
+        let fbText = "";
+        if (ratio === 1) {
+          fbText = `Exzellent (${s.correct}/${s.total}) – Bestens vorbereitet in diesem Bereich!`;
+        } else if (ratio >= 0.5) {
+          fbText = `Solide (${s.correct}/${s.total}) – Du hast die Grundlagen, baust aber noch Fehler ein.<br>
+            <strong style="color:var(--joker-color); font-size:0.9rem; display:inline-block; margin-top:6px;">
+              💡 Klausur-Tipp: ${categoryHints[key]}
+            </strong>`;
+        } else {
+          fbText = `Förderbedarf (${s.correct}/${s.total}) – Dieser Bereich kostet dich in der Klausur Punkte.<br>
+            <span style="color:var(--error); font-weight:600; font-size:0.9rem; display:inline-block; margin-top:6px;">
+              🎯 Lernplan:
+            </span><br>
+            <span style="font-size:0.9rem; color:var(--text-muted); display:inline-block; margin-top:4px;">
+              ${categoryHints[key]}
+            </span>`;
+        }
+
+        div.innerHTML = `<h3 style="margin:0; font-size:1rem; color:${color};">${s.name}</h3>
+          <div class="feedback-text">${fbText}</div>`;
+
+        if (ratio < 1 && categoryResources[key]) {
+          const resSection = document.createElement("div");
+          resSection.className = "resources-section";
+          resSection.innerHTML = `<div class="resources-title">📚 Lernmaterial</div>`;
+          categoryResources[key].forEach(r => {
+            const a = document.createElement("a");
+            a.className = "resource-link";
+            a.href = r.url;
+            a.target = "_blank";
+            a.rel = "noopener";
+            a.textContent = r.title;
+            resSection.appendChild(a);
+          });
+          div.appendChild(resSection);
+        }
+
+        feedbackDiv.appendChild(div);
+      }
+    }
+
+    function restartTest() {
+      document.getElementById("result-screen").classList.remove("active");
+      document.getElementById("start-screen").classList.add("active");
+      const best = localStorage.getItem("physik-atomkern-best-xp");
+      if (best) {
+        document.getElementById("best-score-display").textContent = `🏆 Bestes Ergebnis: ${best} XP`;
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────
+    (() => {
+      const savedName = localStorage.getItem("physik-atomkern-name");
+      if (savedName) document.getElementById("student-name").value = savedName;
+      const bestXP = localStorage.getItem("physik-atomkern-best-xp");
+      if (bestXP) document.getElementById("best-score-display").textContent = `🏆 Bestes Ergebnis: ${bestXP} XP`;
+    })();
+  </script>
+</body>
+</html>

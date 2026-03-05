@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Q1 GK+ Expert">
+    <title>Q1 GK+ Diagnose – Experten-Modus</title>
+    <style>
+
+        :root {
+            --bg-dark: #0f172a;
+            --bg-gradient: radial-gradient(circle at top, #1a1040 0%, #0f172a 100%);
+            --primary-glow: #a78bfa;
+            --secondary-glow: #f472b6;
+            --joker-color: #fbbf24;
+            --text-main: #f8fafc;
+            --glass-bg: rgba(30, 20, 60, 0.75);
+            --glass-border: rgba(167, 139, 250, 0.15);
+            --success: #34d399;
+            --error: #f87171;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--bg-gradient);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 60px rgba(167, 139, 250, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        h1, h2, h3 { font-weight: 900; margin-top: 0; }
+
+        h1 {
+            color: #fff;
+            text-shadow: 0 0 20px var(--primary-glow);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--secondary-glow);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .screen { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s ease-out; }
+        .screen.active { display: block; opacity: 1; transform: translateY(0); }
+
+        /* HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 5, 30, 0.8);
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .hud-item { display: flex; align-items: center; gap: 8px; }
+        .hud-item span { color: var(--primary-glow); }
+
+        .progress-bar-container {
+            width: 100%; height: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px; margin-top: 30px; overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%; width: 0%;
+            background: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.5s ease;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(135deg, var(--primary-glow), #7c3aed);
+            color: #fff;
+            border: none;
+            padding: 18px 36px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        button:active { transform: scale(0.96); }
+        button:hover { box-shadow: 0 6px 20px rgba(167, 139, 250, 0.5); transform: translateY(-2px); }
+
+        .joker-btn {
+            background: linear-gradient(135deg, var(--joker-color), #d97706);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            font-size: 1rem;
+            padding: 12px 24px;
+            margin-top: 15px;
+            max-width: 280px;
+        }
+
+        .joker-text {
+            color: var(--joker-color);
+            font-weight: bold;
+            margin-top: 15px;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 15px;
+            border: 1px dashed var(--joker-color);
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .mc-options { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
+
+        .mc-option {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(167, 139, 250, 0.15);
+            padding: 18px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .mc-option.selected {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(167, 139, 250, 0.2);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 80%;
+            padding: 18px;
+            font-size: 1.4rem;
+            margin-top: 25px;
+            background: rgba(10, 5, 30, 0.8);
+            border: 2px solid rgba(167, 139, 250, 0.25);
+            color: var(--primary-glow);
+            border-radius: 12px;
+            text-align: center;
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+        }
+
+        /* Result Section */
+        .result-category {
+            background: rgba(10, 5, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            margin: 15px 0;
+            text-align: left;
+            border-radius: 16px;
+            border-left: 6px solid var(--primary-glow);
+        }
+
+        .math-text {
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
+            font-size: 1.15rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 5px 0;
+            color: var(--primary-glow);
+            border: 1px solid rgba(167, 139, 250, 0.2);
+        }
+
+        .graph-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+            border: 2px solid var(--primary-glow);
+        }
+
+        .feedback-message {
+            margin-top: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 12px;
+            animation: fadeIn 0.3s;
+        }
+
+        .msg-success { background: rgba(52, 211, 153, 0.1); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.3); }
+        .msg-error { background: rgba(248, 113, 113, 0.1); color: var(--error); border: 1px solid rgba(248, 113, 113, 0.3); }
+
+        .streak-fire {
+            color: var(--joker-color) !important;
+            text-shadow: 0 0 10px var(--joker-color);
+            animation: streakPulse 0.7s ease-in-out infinite alternate;
+        }
+
+        @keyframes streakPulse { from { transform: scale(1); } to { transform: scale(1.3); } }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Ressourcen-Links */
+        .resources-section { margin-top: 15px; padding-top: 12px; border-top: 1px dashed rgba(255, 255, 255, 0.1); }
+        .resources-title { font-size: 0.78rem; color: var(--secondary-glow); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .resource-links { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .resource-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 13px; border-radius: 8px; font-size: 0.88rem;
+            text-decoration: none; font-weight: 600; transition: all 0.2s;
+        }
+
+        .resource-link.video { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); }
+        .resource-link.video:hover { background: rgba(239, 68, 68, 0.25); }
+        .resource-link.web { background: rgba(167, 139, 250, 0.08); color: var(--primary-glow); border: 1px solid rgba(167, 139, 250, 0.2); }
+        .resource-link.web:hover { background: rgba(167, 139, 250, 0.18); }
+
+        /* Expert Badge */
+        .expert-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        /* Print */
+        @media print {
+            body { background: #fff !important; color: #000 !important; display: block; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; margin: 0; padding: 0; background: none; backdrop-filter: none; }
+            .hud, #start-screen, #quiz-screen, button, .resources-section { display: none !important; }
+            .screen.active { opacity: 1; transform: none; display: block; }
+            h1 { color: #000 !important; text-shadow: none !important; margin-bottom: 50px; text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 20px; }
+            h2 { color: #555 !important; }
+            .result-category { background: #fdfdfd !important; border: 1px solid #ddd !important; border-left: 6px solid #7c3aed !important; page-break-inside: avoid; }
+            .feedback-text { color: #333 !important; }
+            #result-screen::after {
+                content: "Q1 GK+ Experten-Diagnose – NRW Grundkurs Mathematik – Spitzenleistungen beginnen mit ehrlicher Selbsteinschätzung.";
+                display: block; margin-top: 50px; text-align: center; font-size: 0.9rem;
+                color: #888; border-top: 1px solid #ccc; padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- PHASE 1: START -->
+        <div id="start-screen" class="screen active">
+            <div class="expert-badge">★ Expert Mode</div>
+            <h1>GK⁺ Diagnose</h1>
+            <h2>Für Top-Schüler · Q1 NRW</h2>
+            <p style="font-size: 1.05rem; color: #94a3b8; margin-top: 20px; line-height: 1.7;">
+                Dieser Modus ist für <strong style="color: var(--primary-glow);">sehr gute GK-Schüler</strong> konzipiert.
+                Weniger Multiple-Choice – mehr echte Rechenschritte: Extremstellen, Rekonstruktion, Halbwertszeit und Flächenberechnung.
+                Tipps kosten <strong style="color: var(--joker-color);">80 XP</strong>.
+            </p>
+            <input type="text" id="student-name" maxlength="40" placeholder="Dein Name (für Zertifikat)..."
+                style="width:70%; padding:14px; font-size:1rem; margin-top:20px; background:rgba(10,5,30,0.8); border:2px solid rgba(167,139,250,0.25); color:var(--primary-glow); border-radius:12px; text-align:center; font-family:system-ui,-apple-system,sans-serif; box-sizing:border-box;">
+            <div id="best-score-display" style="font-size:0.9rem; color:#64748b; margin-top:10px;"></div>
+            <button onclick="startTest()">Expert-Modus Starten</button>
+        </div>
+
+        <!-- PHASE 2: QUIZ -->
+        <div id="quiz-screen" class="screen">
+            <div class="hud">
+                <div class="hud-item" id="level-display">LVL <span>1</span></div>
+                <div class="hud-item" id="xp-display">XP: <span>0</span></div>
+                <div class="hud-item" id="streak-display">STREAK: <span>0</span></div>
+            </div>
+
+            <div id="question-category"
+                style="color: var(--secondary-glow); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;">
+                KATEGORIE</div>
+            <div id="question-text" style="font-size: 1.25rem; font-weight: 500; margin: 20px 0; line-height: 1.6;">Lade...</div>
+
+            <div id="input-area"></div>
+
+            <div id="joker-area" style="display: none; text-align: center;">
+                <button class="joker-btn" id="btn-joker" onclick="useJoker()">💡 Tipp freischalten (−80 XP)</button>
+                <div id="joker-hint" class="joker-text"></div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <button id="next-btn" onclick="submitAnswer()" style="display: none; margin: 30px auto 0;">Antwort einloggen</button>
+        </div>
+
+        <!-- PHASE 3: AUSWERTUNG -->
+        <div id="result-screen" class="screen">
+            <h1 id="cert-title" style="font-size: 2rem;">GK⁺ Zertifikat</h1>
+            <h2 id="final-stats" style="color: var(--text-main); margin-bottom: 40px; text-transform: none;">Gesamt XP: 0</h2>
+
+            <div id="feedback-area"></div>
+
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="window.print()"
+                    style="background: linear-gradient(135deg, var(--success), #059669);">📄 Als PDF speichern / Drucken</button>
+                <button onclick="location.reload()"
+                    style="background: linear-gradient(135deg, var(--secondary-glow), #be185d);">Neue Diagnose starten</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // localStorage
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('diagnose-expert-name');
+            if (savedName) document.getElementById('student-name').value = savedName;
+            const bestXP = localStorage.getItem('diagnose-expert-best-xp');
+            if (bestXP) document.getElementById('best-score-display').innerText = `🏆 Bestes Ergebnis: ${bestXP} XP`;
+        });
+
+        // ── FRAGEN ──────────────────────────────────────────────────────────────
+        const allQuestions = [
+
+            // === 1. ABLEITEN & EXTREMSTELLEN ===
+            {
+                category: "Ableiten & Extremstellen", categoryId: "ableitung", type: "text", isFallback: false,
+                text: "Leite <span class='math-text'>f(x) = (3x+1) · e^x</span> ab und schreibe das Ergebnis in faktorisierter Form.<br><small style='color:#94a3b8'>(Schreibweise z.B.: (3x+4)*e^x)</small>",
+                correct: ["(3x+4)*e^x", "e^x*(3x+4)", "(3x+4)·e^x", "e^x·(3x+4)"],
+                hint: "Produktregel: f'(x) = 3·e^x + (3x+1)·e^x. Jetzt e^x ausklammern: e^x·(3 + 3x + 1) = e^x·(3x+4)."
+            },
+            {
+                category: "Ableiten & Extremstellen", categoryId: "ableitung", type: "text", isFallback: false,
+                text: "Die Funktion <span class='math-text'>f(x) = (2−x) · e^x</span> hat genau einen Hochpunkt. Gib die x-Koordinate an.",
+                correct: ["1"],
+                numericInput: true,
+                hint: "f'(x) = −e^x + (2−x)·e^x = e^x·(1−x). Das ist 0 bei x = 1. Vorzeichenwechsel: + → − → Hochpunkt!"
+            },
+            {
+                category: "Ableiten & Extremstellen", categoryId: "ableitung", type: "mc", isFallback: false,
+                text: "Für <span class='math-text'>f(x) = x² · e^(−x)</span>: Welches Paar aus Hoch- und Tiefpunkt ist korrekt?<br><small style='color:#94a3b8'>(Tipp: f'(x) = e^(−x)·x·(2−x))</small>",
+                options: [
+                    "Hochpunkt bei x = 0, Tiefpunkt bei x = 2",
+                    "Hochpunkt bei x = 2, Tiefpunkt bei x = 0",
+                    "Nur ein Hochpunkt bei x = 1, kein Tiefpunkt",
+                    "Kein Extrempunkt, f ist streng monoton"
+                ],
+                correct: 1,
+                hint: "f'(x) = 0 bei x = 0 und x = 2. Bei x = 0: VZW − → + (Minimum). Bei x = 2: VZW + → − (Maximum)."
+            },
+            {
+                category: "Ableiten & Extremstellen", categoryId: "ableitung", type: "text", isFallback: false,
+                text: "Leite <span class='math-text'>f(x) = x · e^(2x)</span> ab und klammere <span class='math-text'>e^(2x)</span> aus.<br><small style='color:#94a3b8'>(Schreibweise: (2x+1)*e^(2x))</small>",
+                correct: ["(2x+1)*e^(2x)", "e^(2x)*(2x+1)", "(1+2x)*e^(2x)", "e^(2x)*(1+2x)"],
+                hint: "Produktregel: 1·e^(2x) + x·2·e^(2x) = e^(2x)·(1 + 2x). Fertig!"
+            },
+            // Fallback Ableitung
+            {
+                category: "Ableiten (Basis)", categoryId: "ableitung", type: "mc", isFallback: true,
+                text: "Die Produktregel für f(x) = u(x)·v(x) lautet:",
+                options: ["f'(x) = u'·v + u·v'", "f'(x) = u'·v'", "f'(x) = u'·v − u·v'", "f'(x) = (u/v)'"],
+                correct: 0,
+                hint: "Merk-Satz: Ableitung mal Stehen-lassen, plus Stehen-lassen mal Ableitung."
+            },
+
+            // === 2. STAMMFUNKTIONEN & REKONSTRUKTION ===
+            {
+                category: "Stammfunktionen & Rekonstruktion", categoryId: "stamm", type: "mc", isFallback: false,
+                text: "Welche der folgenden Funktionen ist eine Stammfunktion von <span class='math-text'>f(x) = 4 · e^(2x)</span>?",
+                options: ["4e^(2x)", "2e^(2x)", "8e^(2x)", "½ · e^(2x)"],
+                correct: 1,
+                hint: "Beim Aufleiten von k·e^(ax) gilt F(x) = (k/a)·e^(ax). Hier: 4/2 = 2. Also F(x) = 2·e^(2x)."
+            },
+            {
+                category: "Stammfunktionen & Rekonstruktion", categoryId: "stamm", type: "mc", isFallback: false,
+                text: "Die Änderungsrate eines Bestands ist <span class='math-text'>f'(t) = e^(0,5t)</span>. Es gilt f(0) = 5. Wie groß ist <span class='math-text'>f(2)</span>?",
+                options: ["2e + 3", "2e + 5", "4e + 3", "5e"],
+                correct: 0,
+                hint: "F(t) = 2·e^(0,5t) + c. Aus f(0) = 2 + c = 5 folgt c = 3. Also f(2) = 2·e^1 + 3 = 2e + 3."
+            },
+            {
+                category: "Stammfunktionen & Rekonstruktion", categoryId: "stamm", type: "text", isFallback: false,
+                text: "Bestimme eine Stammfunktion F(x) von <span class='math-text'>f(x) = 6 · e^(−3x)</span>. (Ohne + c)<br><small style='color:#94a3b8'>(Schreibweise: -2*e^(-3x))</small>",
+                correct: ["-2*e^(-3x)", "-2e^(-3x)", "-2·e^(-3x)"],
+                hint: "F(x) = 6/(−3)·e^(−3x) = −2·e^(−3x). Der Vorfaktor dreht sein Vorzeichen beim Aufleiten!"
+            },
+            // Fallback Stamm
+            {
+                category: "Stammfunktionen (Basis)", categoryId: "stamm", type: "mc", isFallback: true,
+                text: "Beim Aufleiten von <span class='math-text'>f(x) = k · e^(ax)</span> gilt:",
+                options: ["F(x) = (k/a)·e^(ax)", "F(x) = a·k·e^(ax)", "F(x) = k·x·e^(ax)", "F(x) = k·e^(ax+1)/(ax+1)"],
+                correct: 0,
+                hint: "Merke: Die Konstante a im Exponenten kommt als Kehrwert 1/a nach vorne."
+            },
+
+            // === 3. BESTIMMTE INTEGRALE & FLÄCHEN ===
+            {
+                category: "Integrale & Flächen", categoryId: "integral", type: "mc", isFallback: false,
+                text: "Berechne <span class='math-text'>∫₀^(ln 2) 4 · e^x dx</span> exakt.",
+                options: ["2", "4", "8", "4e − 4"],
+                correct: 1,
+                hint: "[4e^x] von 0 bis ln(2) = 4·e^(ln 2) − 4·e^0 = 4·2 − 4·1 = 8 − 4 = 4."
+            },
+            {
+                category: "Integrale & Flächen", categoryId: "integral", type: "mc", isFallback: false,
+                text: "f(x) = e^x − e hat eine Nullstelle bei x = 1. Welcher Term gibt den <em>Flächeninhalt</em> zwischen f und der x-Achse auf [0; 2] korrekt an?",
+                options: ["e² − 2e + 1", "e² − 2e − 1", "2e − e²", "e² − e"],
+                correct: 0,
+                hint: "Auf [0;1]: f < 0, auf [1;2]: f > 0. Teilen & Beträge: |[e^x−ex]₀¹| + [e^x−ex]₁² = 1 + (e²−2e) = e²−2e+1 = (e−1)²."
+            },
+            {
+                category: "Integrale & Flächen", categoryId: "integral", type: "text", isFallback: false,
+                text: "Berechne <span class='math-text'>∫₀¹ e^(−x) dx</span>.<br>(Stammfunktion: −e^(−x). Gerundet auf 2 Nachkommastellen.)",
+                correct: ["0.63", "0,63"],
+                numericInput: true,
+                hint: "[−e^(−x)]₀¹ = −e^(−1) − (−e^0) = −1/e + 1 = 1 − 1/e ≈ 1 − 0,368 = 0,632 ≈ 0,63."
+            },
+            // Fallback Integral
+            {
+                category: "Integrale (Basis)", categoryId: "integral", type: "mc", isFallback: true,
+                text: "Der Graph schneidet die x-Achse im Integrationsintervall. Um den Flächeninhalt zu berechnen, muss man:",
+                options: [
+                    "Das Intervall an der Nullstelle aufteilen und Beträge der Teilintegrale addieren",
+                    "Das Integral direkt berechnen – es ergibt sich automatisch",
+                    "Das Integral von |f(x)|² berechnen",
+                    "Nur den positiven Teil integrieren"
+                ],
+                correct: 0,
+                hint: "Negative und positive Flächenanteile heben sich im Integral auf. Deshalb: aufteilen + Beträge nehmen!"
+            },
+
+            // === 4. SACHMODELLE & HALBWERTSZEIT ===
+            {
+                category: "Sachmodelle & Wachstum", categoryId: "sach", type: "mc", isFallback: false,
+                text: "Ein Bestand verdoppelt sich in 5 Zeiteinheiten: <span class='math-text'>f(5) = 2·f(0)</span>.<br>Welchen Wert hat k in <span class='math-text'>f(t) = f₀ · e^(kt)</span>? (ln 2 ≈ 0,693)",
+                options: ["k ≈ 0,14", "k ≈ 0,5", "k ≈ 1,39", "k = 1"],
+                correct: 0,
+                hint: "f₀·e^(5k) = 2f₀ → e^(5k) = 2 → 5k = ln(2) → k = ln(2)/5 ≈ 0,693/5 ≈ 0,139."
+            },
+            {
+                category: "Sachmodelle & Wachstum", categoryId: "sach", type: "mc", isFallback: false,
+                text: "<span class='math-text'>f(t) = 1000 · e^(−0,3t)</span> beschreibt radioaktiven Zerfall.<br>Wann gilt <span class='math-text'>f(t) = 500</span>? (ln 2 ≈ 0,693)",
+                options: ["t ≈ 1,0", "t ≈ 2,3", "t ≈ 3,5", "t ≈ 5,0"],
+                correct: 1,
+                hint: "e^(−0,3t) = 0,5 → −0,3t = ln(0,5) = −ln(2) → t = ln(2)/0,3 ≈ 0,693/0,3 ≈ 2,31."
+            },
+            {
+                category: "Sachmodelle & Wachstum", categoryId: "sach", type: "text", isFallback: false,
+                text: "Berechne die Halbwertszeit T von <span class='math-text'>f(t) = 300 · e^(−0,1t)</span>.<br>(ln 2 ≈ 0,693. Runde auf ganze Zeiteinheiten.)",
+                correct: ["7", "7.0"],
+                numericInput: true,
+                hint: "Halbwertszeit: T = ln(2)/k = 0,693/0,1 = 6,93 ≈ 7."
+            },
+            // Fallback Sach
+            {
+                category: "Sachmodelle (Basis)", categoryId: "sach", type: "mc", isFallback: true,
+                text: "Die Formel für die Halbwertszeit T beim exponentiellen Zerfall <span class='math-text'>f(t) = f₀·e^(−kt)</span> lautet:",
+                options: ["T = ln(2) / k", "T = k / ln(2)", "T = 1 / k", "T = e^(−k)"],
+                correct: 0,
+                hint: "f₀·e^(−kT) = f₀/2 → e^(−kT) = 1/2 → −kT = ln(1/2) = −ln(2) → T = ln(2)/k."
+            },
+
+            // === 5. BESCHRÄNKTES WACHSTUM (FORTGESCHRITTEN) ===
+            {
+                category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "mc", isFallback: false,
+                text: "Gegeben: <span class='math-text'>f(t) = 1000 − 800 · e^(−0,4t)</span>.<br>Zu welchem Zeitpunkt gilt <span class='math-text'>f(t) = 600</span>? (ln 0,5 ≈ −0,693)",
+                options: ["t ≈ 0,87", "t ≈ 1,73", "t ≈ 3,50", "t ≈ 5,00"],
+                correct: 1,
+                hint: "800·e^(−0,4t) = 400 → e^(−0,4t) = 0,5 → −0,4t = ln(0,5) ≈ −0,693 → t ≈ 1,73."
+            },
+            {
+                category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "text", isFallback: false,
+                text: "Gib die Sättigungsgrenze S von <span class='math-text'>f(t) = 750 − 700 · e^(−0,2t)</span> an.",
+                correct: ["750"],
+                numericInput: true,
+                hint: "Für t → ∞ gilt e^(−0,2t) → 0. Es bleibt: f(t) → 750 − 0 = 750 = S."
+            },
+            {
+                category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "mc", isFallback: false,
+                text: "Bei <span class='math-text'>f(t) = S·(1 − e^(−kt))</span>: Zu welchem Zeitpunkt ist die Wachstumsrate <span class='math-text'>f'(t)</span> am größten?",
+                options: ["Zum Zeitpunkt t = 0", "Bei t = S / k", "Für t → ∞", "Bei t = ln(k)"],
+                correct: 0,
+                hint: "f'(t) = S·k·e^(−kt). Da e^(−kt) für t = 0 maximal ist (Wert 1) und danach fällt, ist die Wachstumsrate am Anfang am stärksten."
+            },
+            // Fallback Beschränktes Wachstum
+            {
+                category: "Beschränktes Wachstum (Basis)", categoryId: "beschraenkt", type: "mc", isFallback: true,
+                text: "Für <span class='math-text'>f(t) = S − (S − f₀) · e^(−kt)</span> gilt: Was ist f(0)?",
+                options: ["f₀", "S", "S − f₀", "0"],
+                correct: 0,
+                hint: "f(0) = S − (S − f₀)·e^0 = S − (S − f₀)·1 = S − S + f₀ = f₀."
+            },
+
+            // === LEVEL 2 ===
+            {
+                category: "Extremstellen (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true,
+                text: "Bestimme die x-Koordinate des Hochpunkts von <span class='math-text'>f(x) = x² · e^(−x)</span>.<br><small style='color:#94a3b8'>(Tipp: f'(x) = e^(−x)·x·(2−x))</small>",
+                correct: ["2"],
+                numericInput: true,
+                hint: "f'(x) = 0 bei x = 0 (Tiefpunkt) und x = 2. Bei x = 2: VZW von + nach − → Hochpunkt."
+            },
+            {
+                category: "Uneigentliches Integral (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true,
+                text: "Das uneigentliche Integral <span class='math-text'>∫₀^∞ e^(−x) dx</span> konvergiert gegen:",
+                options: ["0", "1", "e", "∞"],
+                correct: 1,
+                hint: "lim_{b→∞} [−e^(−x)]₀^b = lim_{b→∞} (−e^(−b) + e^0) = 0 + 1 = 1."
+            }
+        ];
+
+        // ── STATE ────────────────────────────────────────────────────────────────
+        let currentQueue = [];
+        let currentIndex = 0;
+        let xp = 0;
+        let level = 1;
+        let streak = 0;
+        let consecutiveMistakesCategory = 0;
+        let lastErrorCategory = "";
+        let selectedOption = null;
+        let questionStartTime = 0;
+        let jokerUsedForCurrent = false;
+        let studentName = "Schüler/in";
+        let level2Started = false;
+        let baseQueueLength = 0;
+
+        const JOKER_COST = 80;
+        const XP_PER_LEVEL = 300;
+
+        const scores = {
+            "ableitung":   { correct: 0, total: 4, name: "Ableiten & Extremstellen" },
+            "stamm":       { correct: 0, total: 3, name: "Stammfunktionen & Rekonstruktion" },
+            "integral":    { correct: 0, total: 3, name: "Integrale & Flächen" },
+            "sach":        { correct: 0, total: 3, name: "Sachmodelle & Wachstum" },
+            "beschraenkt": { correct: 0, total: 3, name: "Beschränktes Wachstum" }
+        };
+
+        // ── QUEUE ────────────────────────────────────────────────────────────────
+        function buildQueue() {
+            allQuestions.forEach(q => { if (!q.isFallback && !q.isLevel2) currentQueue.push(q); });
+            baseQueueLength = currentQueue.length;
+        }
+
+        function buildLevel2Queue() {
+            level2Started = true;
+            allQuestions.forEach(q => { if (q.isLevel2) currentQueue.push(q); });
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = `<div class="feedback-message msg-success" style="animation:none;">🔥 LEVEL 2 ERREICHT! Ultraschwere Aufgaben freigeschaltet! 🔥</div>`;
+            setTimeout(loadQuestion, 3000);
+        }
+
+        function startTest() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            studentName = nameInput || "Schüler/in";
+            localStorage.setItem('diagnose-expert-name', studentName);
+            buildQueue();
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            loadQuestion();
+        }
+
+        // ── LOAD QUESTION ────────────────────────────────────────────────────────
+        function loadQuestion() {
+            questionStartTime = Date.now();
+            jokerUsedForCurrent = false;
+
+            if (currentIndex >= currentQueue.length) {
+                if (level >= 2 && !level2Started) {
+                    buildLevel2Queue();
+                } else {
+                    showResults();
+                    return;
+                }
+            }
+
+            const q = currentQueue[currentIndex];
+            document.getElementById('question-category').innerText = q.category;
+            document.getElementById('question-text').innerHTML = q.text;
+
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = "";
+
+            const jokerArea = document.getElementById('joker-area');
+            const jokerText = document.getElementById('joker-hint');
+            const jokerBtn = document.getElementById('btn-joker');
+            jokerText.style.display = "none";
+            jokerText.innerText = "";
+
+            if (q.hint && xp >= JOKER_COST) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "1";
+            } else if (q.hint) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "0.5";
+            } else {
+                jokerArea.style.display = "none";
+            }
+
+            selectedOption = null;
+
+            if (q.type === 'VisualGraph') {
+                const graphDiv = document.createElement('div');
+                graphDiv.className = 'graph-container';
+                graphDiv.innerHTML = q.graphSVG;
+                inputArea.appendChild(graphDiv);
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'mc') {
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'text') {
+                const input = document.createElement('input');
+                input.type = q.numericInput ? 'number' : 'text';
+                input.id = 'text-answer';
+                input.placeholder = q.numericInput ? "Zahl eingeben..." : "Term / Antwort eingeben...";
+                input.onkeyup = (e) => { if (e.key === 'Enter') submitAnswer(); };
+                inputArea.appendChild(input);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+            updateProgress();
+        }
+
+        function renderMCOptions(q, container) {
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'mc-options';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'mc-option';
+                btn.innerHTML = opt.replace(/e\^\((.*?)\)/g, 'e<sup>$1</sup>');
+                btn.onclick = () => {
+                    document.querySelectorAll('.mc-option').forEach(el => el.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOption = index;
+                };
+                optionsDiv.appendChild(btn);
+            });
+            container.appendChild(optionsDiv);
+        }
+
+        function useJoker() {
+            if (xp >= JOKER_COST) {
+                xp -= JOKER_COST;
+                jokerUsedForCurrent = true;
+                document.getElementById('xp-display').querySelector('span').innerText = xp;
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = currentQueue[currentIndex].hint;
+                hintDiv.style.display = "block";
+                document.getElementById('btn-joker').disabled = true;
+                document.getElementById('btn-joker').style.opacity = "0.2";
+            } else {
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = `Nicht genug XP! Du brauchst ${JOKER_COST} XP für einen Tipp.`;
+                hintDiv.style.color = "var(--error)";
+                hintDiv.style.display = "block";
+                setTimeout(() => { hintDiv.style.display = "none"; hintDiv.style.color = "var(--joker-color)"; }, 2000);
+            }
+        }
+
+        // ── SUBMIT ───────────────────────────────────────────────────────────────
+        function submitAnswer() {
+            const q = currentQueue[currentIndex];
+            let isCorrect = false;
+
+            if (q.type === 'mc' || q.type === 'VisualGraph') {
+                if (selectedOption === null) return;
+                isCorrect = (selectedOption === q.correct);
+            } else if (q.type === 'text') {
+                const userInput = document.getElementById('text-answer').value.trim().toLowerCase().replace(/\s+/g, '');
+                if (userInput === "") return;
+                const corrects = q.correct.map(c => c.toLowerCase().replace(/\s+/g, ''));
+                isCorrect = corrects.includes(userInput);
+            }
+
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('joker-area').style.display = 'none';
+            const inputArea = document.getElementById('input-area');
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = "feedback-message " + (isCorrect ? "msg-success" : "msg-error");
+
+            if (isCorrect) {
+                streak++;
+                const timeTakenStr = ((Date.now() - questionStartTime) / 1000);
+                let speedBonus = 0;
+                let bonusMsg = "";
+                if (timeTakenStr <= 15.0 && !jokerUsedForCurrent && !q.isFallback) {
+                    speedBonus = 75;
+                    bonusMsg = `<br><span style="color:var(--joker-color); font-size:0.9rem;">⚡ QUICK-BRAIN BONUS (+75 XP) – ${timeTakenStr.toFixed(1)}s</span>`;
+                }
+                let xpGain = 150 + (streak * 25) + speedBonus;
+                xp += xpGain;
+                if (!q.isFallback) scores[q.categoryId].correct++;
+                feedbackDiv.innerHTML = `Richtig! (+${xpGain} XP)` + bonusMsg;
+                consecutiveMistakesCategory = 0;
+            } else {
+                streak = 0;
+                let correctDisplay = (q.type === 'text') ? q.correct[0] : q.options[q.correct];
+                feedbackDiv.innerHTML = `Falsch. Richtig wäre: <b>${correctDisplay}</b>`;
+
+                if (!q.isFallback) {
+                    if (lastErrorCategory === q.categoryId) {
+                        consecutiveMistakesCategory++;
+                    } else {
+                        consecutiveMistakesCategory = 1;
+                        lastErrorCategory = q.categoryId;
+                    }
+                    if (consecutiveMistakesCategory === 2) {
+                        const fallbackQ = allQuestions.find(fb => fb.isFallback && fb.categoryId === q.categoryId);
+                        if (fallbackQ) {
+                            currentQueue.splice(currentIndex + 1, 0, fallbackQ);
+                            feedbackDiv.innerHTML += `<br><br><span style="color:var(--joker-color);">⚠️ Sicherheitsnetz aktiv – Basisaufgabe folgt!</span>`;
+                        }
+                        consecutiveMistakesCategory = 0;
+                    }
+                }
+            }
+
+            inputArea.appendChild(feedbackDiv);
+
+            const newLevel = Math.floor(xp / XP_PER_LEVEL) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                feedbackDiv.innerHTML += `<div style="color:var(--primary-glow); margin-top:10px;">⬆ LEVEL UP: STUFE ${level}!</div>`;
+            }
+
+            document.getElementById('xp-display').querySelector('span').innerText = xp;
+            document.getElementById('level-display').querySelector('span').innerText = level;
+
+            const streakSpan = document.getElementById('streak-display').querySelector('span');
+            streakSpan.innerText = streak;
+            if (streak >= 3) streakSpan.classList.add('streak-fire');
+            else streakSpan.classList.remove('streak-fire');
+
+            currentIndex++;
+            setTimeout(loadQuestion, 3000);
+        }
+
+        function updateProgress() {
+            const percent = (currentIndex / currentQueue.length) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        // ── RESSOURCEN ───────────────────────────────────────────────────────────
+        const categoryResources = {
+            ableitung: [
+                { type: 'video', label: '▶ Extremstellen mit e-Funktion berechnen', url: 'https://www.youtube.com/results?search_query=extremstellen+e-funktion+produktregel+NRW+gymnasium' },
+                { type: 'video', label: '▶ Kurvendiskussion mit e-Funktion', url: 'https://www.youtube.com/results?search_query=kurvendiskussion+e-funktion+vollständig+gymnasium' },
+                { type: 'web', label: '🔗 Kurvendiskussion (mathebibel.de)', url: 'https://www.mathebibel.de/kurvendiskussion' },
+            ],
+            stamm: [
+                { type: 'video', label: '▶ Rekonstruktionsaufgaben lösen', url: 'https://www.youtube.com/results?search_query=rekonstruktionsaufgabe+stammfunktion+anfangsbedingung+gymnasium' },
+                { type: 'web', label: '🔗 Stammfunktionen (mathebibel.de)', url: 'https://www.mathebibel.de/stammfunktion' },
+            ],
+            integral: [
+                { type: 'video', label: '▶ Fläche zwischen Graph und x-Achse', url: 'https://www.youtube.com/results?search_query=flächeninhalt+nullstelle+integral+betragsstriche+NRW' },
+                { type: 'video', label: '▶ Bestimmtes Integral berechnen', url: 'https://www.youtube.com/results?search_query=bestimmtes+integral+e-funktion+berechnen+abitur+NRW' },
+                { type: 'web', label: '🔗 Bestimmtes Integral (mathebibel.de)', url: 'https://www.mathebibel.de/bestimmtes-integral' },
+            ],
+            sach: [
+                { type: 'video', label: '▶ Halbwertszeit & Verdopplungszeit', url: 'https://www.youtube.com/results?search_query=halbwertszeit+verdopplungszeit+e-funktion+berechnen+NRW' },
+                { type: 'video', label: '▶ Wachstum: k aus Bedingung bestimmen', url: 'https://www.youtube.com/results?search_query=wachstumskonstante+k+ln+e-funktion+sachaufgabe' },
+                { type: 'web', label: '🔗 Exponentielles Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/exponentielles-wachstum' },
+            ],
+            beschraenkt: [
+                { type: 'video', label: '▶ Beschränktes Wachstum: t berechnen', url: 'https://www.youtube.com/results?search_query=beschränktes+wachstum+zeitpunkt+berechnen+ln+NRW' },
+                { type: 'web', label: '🔗 Beschränktes Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/beschraenktes-wachstum' },
+            ],
+        };
+
+        // ── ERGEBNIS ─────────────────────────────────────────────────────────────
+        function showResults() {
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            const today = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('cert-title').innerText = `GK⁺ Zertifikat: ${studentName}`;
+            document.getElementById('final-stats').innerText = `Expert-Score: ${xp} XP | Level ${level} | ${today}`;
+
+            const bestXP = parseInt(localStorage.getItem('diagnose-expert-best-xp') || '0');
+            if (xp > bestXP) localStorage.setItem('diagnose-expert-best-xp', xp);
+
+            const feedbackArea = document.getElementById('feedback-area');
+            feedbackArea.innerHTML = "";
+
+            const specificHints = {
+                ableitung:   "Übe Produkt- und Kettenregel an mehreren Funktionen. Faktorisiere immer e^(ax) aus f'(x) heraus und setze den Klammerausdruck = 0.",
+                stamm:       "Rekonstruktion: Stammfunktion bilden, Konstante c über die Anfangsbedingung bestimmen. Vorzeichen bei negativem a beachten!",
+                integral:    "Prüfe bei Flächenaufgaben immer: Hat f Nullstellen im Intervall? Falls ja → Aufteilen und Beträge addieren.",
+                sach:        "Schlüsselformel: T₁/₂ = ln(2)/k. Beim Aufstellen von Gleichungen mit e^(kt) = a direkt ln auf beiden Seiten anwenden.",
+                beschraenkt: "S per Grenzwertbetrachtung ablesen. Gleichung nach e^(-kt) auflösen, dann ln anwenden und nach t umformen."
+            };
+
+            for (const key in scores) {
+                const s = scores[key];
+                const catDiv = document.createElement('div');
+                catDiv.className = 'result-category';
+
+                const ratio = s.correct / s.total;
+                const color = ratio === 1 ? 'var(--success)' : (ratio >= 0.5 ? '#f59e0b' : 'var(--error)');
+                catDiv.style.borderLeftColor = color;
+
+                let fbText = "";
+                const hint = specificHints[key] || "";
+
+                if (ratio === 1) {
+                    fbText = `Perfekt (${s.correct}/${s.total}). Abi-niveau erreicht! 🎯`;
+                } else if (ratio >= 0.5) {
+                    fbText = `Solide (${s.correct}/${s.total}). Noch kleine Lücken.<br><strong style="color:var(--joker-color); font-size:0.9rem; display:inline-block; margin-top:8px;">💡 Fokus-Tipp: ${hint}</strong>`;
+                } else {
+                    fbText = `Förderbedarf (${s.correct}/${s.total}). Hier lohnt gezieltes Üben!<br><strong style="color:var(--error); font-size:0.9rem; display:inline-block; margin-top:8px;">🎯 Lernplan: ${hint}</strong>`;
+                }
+
+                catDiv.innerHTML = `
+                    <h3 style="margin:0; font-size:1.1rem; color:${color};">${s.name}</h3>
+                    <div class="feedback-text">${fbText}</div>
+                `;
+
+                if (ratio < 1 && categoryResources[key]) {
+                    const resSection = document.createElement('div');
+                    resSection.className = 'resources-section';
+                    const resTitle = document.createElement('div');
+                    resTitle.className = 'resources-title';
+                    resTitle.innerText = '📚 Lernmaterial für diesen Bereich';
+                    const resLinks = document.createElement('div');
+                    resLinks.className = 'resource-links';
+                    categoryResources[key].forEach(r => {
+                        const a = document.createElement('a');
+                        a.href = r.url;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.className = `resource-link ${r.type}`;
+                        a.innerText = r.label;
+                        resLinks.appendChild(a);
+                    });
+                    resSection.appendChild(resTitle);
+                    resSection.appendChild(resLinks);
+                    catDiv.appendChild(resSection);
+                }
+
+                feedbackArea.appendChild(catDiv);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,22 +1,28 @@
-# Anforderungen: Diagnose-Tool Mathematik (Q1)
+# Requirements: Ralph Wiggum Loop Refactor (Math Diagnostic Tool)
 
-## 1. Übersicht
-- **Zielgruppe/Klassenstufe:** Q1 **Grundkurs (GK) nach Kernlehrplan NRW**
-- **Themenbereich:** Exponentialfunktionen, e-Funktionen und Integrale
-- **Format:** HTML, CSS, Vanilla-JS in einer einzigen `index.html`-Datei. PWA-fähig (iPad).
+Dieses Dokument definiert die Anforderungen für die Überarbeitung des Diagnosetools für Exponentialfunktionen (Klasse 10) im **Ralph Wiggum Loop** Stil.
 
-## 2. Design & UX
-- **Motto/Stil:** Modern Gamification (Dark Mode, Neon)
-- **Elemente:** Erfahrungspunkte (XP), Level-System, Fortschrittsbalken, Streak-Bonus.
+## 1. Design & Ästhetik (Ralph Wiggum Style)
+- **Primary Color:** Simpsons-Gelb (`#FFD100`).
+- **Secondary Color:** Simpsons-Blau (`#009DDF`).
+- **Font:** Freundlich, abgerundet (z.B. Inter oder Comic-artige Serifenlose).
+- **Vibe:** "Happy-go-lucky", motivierend, humorvoll, aber funktional.
+- **Charakter-Integration:** Ralph Wiggum fungiert als Guide.
 
-## 3. Neue pädagogische Features
-1. **NRW GK-Fokus:** Nur abiturrelevante Fragen für den Grundkurs (z.B. keine komplexen Substitutionen oder Quotientenregel-Kombinationen, Fokus auf Produkt-/Kettenregel bei einfachen e-Funktionen und lineares Rückwärtsarbeiten).
-2. **Joker-System:** Ein Schüler kann verdiente XP opfern (z.B. -50 XP), um sich einen Hint (Tipp) freizuschalten.
-3. **Visuelle Graphen-Aufgaben:** Aufgaben, die das grafische Verständnis prüfen (z.B. Flächenabschätzung anhand einer SVG-Grafik).
-4. **Adaptive Schwierigkeit:** Wenn ein Schüler zweimal in Folge etwas falsch macht, wird eine leichtere "Fallback-Aufgabe" (Basic) eingeschoben, um Frust zu vermeiden.
-5. **Zertifikat (PDF-Export):** Auf der Auswertungsseite gibt es einen "Zertifikat erstellen"-Button, der das Drucker-Dialogfenster öffnet, um via `print` ein sauberes A4-Zertifikat mit Auswertung zu generieren (ideal für iPad -> GoodNotes).
+## 2. Pädagogischer Flow (The Loop)
+- **🎯 Klare Mission:** Der Test ist nicht nur ein Test, sondern eine Mission (z.B. "Hilf Ralph, sein Sparbuch für 100 Jahre zu verstehen").
+- **🔁 Scaffolding:** Abgestufte Hilfen (Tipps) müssen prominent sein und sich "lohnend" anfühlen.
+- **✅ Sofort-Feedback:** Ralph gibt Feedback zu jeder Antwort (z.B. "Das ist ein Wort, das ich kenne!" bei Erfolg).
+- **📈 Progress:** XP und Level bleiben, werden aber stärker visualisiert (z.B. "Ralph-Level").
 
-## 4. Struktur (3 Phasen)
-- Phase 1: Startbildschirm.
-- Phase 2: Diagnosebogen (mit Joker-Button, Graphen, Adaptiven Quests).
-- Phase 3: Diagnose-Auswertung (mit Druck-Funktion).
+## 3. Technische Anforderungen
+- **Standalone HTML:** Das Projekt bleibt eine einzelne HTML-Datei.
+- **KaTeX:** Beibehaltung der sauberen Formeldarstellung.
+- **Interaktivität:** Beibehaltung der Fallback-Logik (wenn man 2x falsch liegt, kommt eine einfachere Aufgabe).
+- **Barrierefreiheit:** Kontrastreiche Farben trotz des gelben Themes.
+
+## 4. Struktur der Überarbeitung
+- Anpassung des CSS an das "Ralph"-Farbschema.
+- Implementierung von Ralph als Kommentar-Geber (Zufalls-Sprüche).
+- Umformulierung der Einleitung und der Erfolgsmeldungen.
+- Optimierung des Layouts für mobile Endgeräte (Responsive Design).

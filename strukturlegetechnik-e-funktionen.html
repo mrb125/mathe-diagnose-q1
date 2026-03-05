@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strukturlegetechnik: e-Funktionen (GK NRW)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --bg:    #0f172a;
+      --prim:  #38bdf8;
+      --sec:   #c084fc;
+      --warn:  #fbbf24;
+      --text:  #f8fafc;
+      --muted: #94a3b8;
+      --border: rgba(255,255,255,0.11);
+      --glass: rgba(30,41,59,0.9);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: radial-gradient(ellipse at top, #1e293b 0%, var(--bg) 100%);
+      background-color: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    header {
+      flex-shrink: 0;
+      padding: 10px 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 {
+      font-size: clamp(0.9rem, 2vw, 1.3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--prim), var(--sec));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    /* ── BOARD-TABS ─────────────────────────────────────────── */
+    .board-tabs {
+      display: flex; gap: 3px;
+      overflow-x: auto; padding-bottom: 0;
+      scrollbar-width: none;
+    }
+    .board-tabs::-webkit-scrollbar { display: none; }
+    .board-tab {
+      flex-shrink: 0;
+      padding: 6px 14px 9px;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem; font-weight: 600;
+      transition: color .15s, background .15s;
+      position: relative; bottom: -1px;
+    }
+    .board-tab .tab-num {
+      font-size: 0.58rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .07em;
+      display: block; margin-bottom: 1px; opacity: .55;
+    }
+    .board-tab:hover { color: var(--text); }
+    .board-tab.active {
+      background: var(--glass);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .board-tab.active::after {
+      content: ''; position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 1px; background: var(--glass);
+    }
+    .board-tab[data-board="b1"].active { color: var(--prim); }
+    .board-tab[data-board="b2"].active { color: #a78bfa; }
+    .board-tab[data-board="b3"].active { color: #34d399; }
+    .board-tab[data-board="b4"].active { color: var(--warn); }
+
+    /* ── TOOLBAR ────────────────────────────────────────────── */
+    .toolbar {
+      flex-shrink: 0;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: var(--glass);
+      border-bottom: 1px solid var(--border);
+    }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-right: 6px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 0.65rem; color: var(--muted);
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+    .sep { width: 1px; height: 18px; background: var(--border); }
+
+    /* Kartentyp-Legende */
+    .type-legend {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .type-badge {
+      font-size: 0.62rem; font-weight: 700; padding: 2px 6px;
+      border-radius: 4px; letter-spacing: .04em;
+    }
+    .type-badge-t { background: #1d4ed8; color: #fff; }
+    .type-badge-f { background: #080e1c; color: #38bdf8;
+                    border: 1px solid rgba(56,189,248,.4); }
+    .type-badge-d { background: rgba(30,41,59,.8); color: #cbd5e1;
+                    border: 1px solid rgba(255,255,255,.2); }
+    .type-badge-n { background: #141d30; color: #94a3b8;
+                    border: 1px dashed rgba(255,255,255,.25);
+                    font-style: italic; }
+
+    .btn {
+      padding: 4px 10px; border-radius: 6px; border: none;
+      font-size: 0.74rem; font-weight: 600; cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:hover { opacity: .82; transform: translateY(-1px); }
+    .btn-prim  { background: var(--prim);  color: #0f172a; }
+    .btn-sec   { background: var(--sec);   color: #0f172a; }
+    .btn-warn  { background: var(--warn);  color: #0f172a; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: rgba(255,255,255,.05); }
+
+    /* ── WORKSPACE ──────────────────────────────────────────── */
+    #ws-container { flex: 1; position: relative; overflow: hidden; }
+
+    .board-ws {
+      display: none;
+      position: absolute; inset: 0;
+    }
+    .board-ws.active { display: block; }
+
+    .board-bg-label {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(1.5rem, 6vw, 4rem);
+      font-weight: 900; letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(255,255,255,.03);
+      pointer-events: none; user-select: none;
+    }
+
+    svg.connections {
+      position: absolute; inset: 0;
+      pointer-events: none; overflow: visible;
+    }
+    .conn-line {
+      stroke: rgba(255,255,255,.22); stroke-width: 1.8;
+      stroke-dasharray: 6 4; fill: none;
+    }
+
+    /* ── KARTEN: Basisstil ──────────────────────────────────── */
+    /* Konzeptfarben über --accent-rgb */
+    .cat-def   { --accent-rgb: 29,78,216;   --accent: #1d4ed8; }
+    .cat-graph { --accent-rgb: 109,40,217;  --accent: #6d28d9; }
+    .cat-calc  { --accent-rgb: 15,118,110;  --accent: #0f766e; }
+    .cat-exam  { --accent-rgb: 146,64,14;   --accent: #92400e; }
+    .cat-conn  { --accent-rgb: 159,18,57;   --accent: #9f1239; }
+
+    .card {
+      position: absolute;
+      width: 200px;
+      border-radius: 9px;
+      cursor: grab; user-select: none;
+      touch-action: none;
+      transition: box-shadow .12s, transform .08s;
+      box-shadow: 0 3px 12px rgba(0,0,0,.4);
+    }
+    .card:hover  { box-shadow: 0 6px 20px rgba(0,0,0,.6); z-index: 5; }
+    .card.active { cursor: grabbing; z-index: 20;
+                   box-shadow: 0 10px 30px rgba(0,0,0,.75);
+                   transform: scale(1.02); }
+
+    /* ── TYP: TITEL ─────────────────────────────────────────── */
+    .card-type-t {
+      background: var(--accent);
+      border: 1px solid rgba(255,255,255,.2);
+      padding: 8px 11px 10px;
+    }
+    .ct-badge {
+      font-size: 0.55rem; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .09em;
+      opacity: .65; margin-bottom: 3px;
+    }
+    .ct-name {
+      font-weight: 800; font-size: 0.86rem; line-height: 1.2;
+    }
+
+    /* ── TYP: FORMEL ─────────────────────────────────────────── */
+    .card-type-f {
+      background: #080e1c;
+      border: 1px solid rgba(255,255,255,.12);
+      border-left: 4px solid rgba(var(--accent-rgb), 0.85);
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .cf-label {
+      font-size: 0.52rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(var(--accent-rgb), 0.85);
+      margin-bottom: 5px;
+    }
+    .card-type-f .katex { color: #fff; }
+    .card-type-f .katex-display { margin: 0; overflow-x: auto; }
+    .card-type-f .katex-display > .katex { font-size: 0.95em; }
+
+    /* ── TYP: BESCHREIBUNG ───────────────────────────────────── */
+    .card-type-d {
+      background: rgba(var(--accent-rgb), 0.42);
+      border: 1px solid rgba(var(--accent-rgb), 0.5);
+      padding: 8px 11px 9px;
+    }
+    .cd-label {
+      font-size: 0.52rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .09em;
+      opacity: .6; margin-bottom: 4px;
+    }
+    .cd-text {
+      font-size: 0.75rem; line-height: 1.45;
+      color: rgba(255,255,255,.92);
+    }
+    .cd-text .katex { color: #fff; font-size: 0.95em; }
+
+    /* ── TYP: HINWEIS ────────────────────────────────────────── */
+    .card-type-n {
+      background: #141d30;
+      border: 1px dashed rgba(var(--accent-rgb), 0.55);
+      padding: 7px 11px 8px;
+    }
+    .cn-label {
+      font-size: 0.52rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .09em;
+      color: rgba(var(--accent-rgb), 0.75);
+      margin-bottom: 3px;
+    }
+    .cn-text {
+      font-size: 0.72rem; font-style: italic;
+      color: rgba(255,255,255,.75); line-height: 1.4;
+    }
+    .cn-text .katex { color: #e2e8f0; font-size: 0.92em; }
+
+    /* ── VERBINDUNGSMODUS ────────────────────────────────────── */
+    body.connect-mode .card { cursor: crosshair; }
+    body.connect-mode .card:hover { outline: 2px solid var(--warn); outline-offset: 2px; }
+    .card.connect-sel { outline: 3px solid var(--warn) !important; outline-offset: 2px; }
+
+    /* ── POPUP ──────────────────────────────────────────────── */
+    #popup-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.65); z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    #popup-overlay.open { display: flex; }
+    #popup {
+      background: #1e293b; border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 28px;
+      max-width: 560px; width: 92%; max-height: 82vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    }
+    #popup h2 { color: var(--prim); margin-bottom: 10px; font-size: 1rem; }
+    #popup p, #popup li { font-size: 0.83rem; line-height: 1.65; color: #cbd5e1; }
+    #popup ul { padding-left: 18px; margin-top: 6px; }
+    #popup .note { margin-top: 10px; color: var(--muted); font-style: italic; font-size: 0.78rem; }
+    #popup .close-btn {
+      margin-top: 16px; display: block; width: 100%;
+      padding: 9px; border-radius: 8px;
+      background: var(--prim); color: #0f172a;
+      border: none; font-weight: 700; cursor: pointer;
+    }
+
+    @media print {
+      body { background: white; color: black; height: auto; overflow: auto; }
+      .toolbar, .board-tabs { display: none; }
+      .card { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Strukturlegetechnik · e-Funktionen · GK Mathematik NRW</h1>
+  <nav class="board-tabs">
+    <button class="board-tab active" data-board="b1" onclick="switchBoard('b1')">
+      <span class="tab-num">Board 1</span>Grundlagen
+    </button>
+    <button class="board-tab" data-board="b2" onclick="switchBoard('b2')">
+      <span class="tab-num">Board 2</span>Graphen &amp; Parameter
+    </button>
+    <button class="board-tab" data-board="b3" onclick="switchBoard('b3')">
+      <span class="tab-num">Board 3</span>Ableitung &amp; Kurvendiskussion
+    </button>
+    <button class="board-tab" data-board="b4" onclick="switchBoard('b4')">
+      <span class="tab-num">Board 4</span>Modellierung
+    </button>
+  </nav>
+</header>
+
+<div class="toolbar">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div>Definition</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6d28d9"></div>Graph</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0f766e"></div>Rechnen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#92400e"></div>Modell</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9f1239"></div>Zusammenhang</div>
+  </div>
+  <div class="sep"></div>
+  <div class="type-legend">
+    <span class="type-badge type-badge-t">Titel</span>
+    <span class="type-badge type-badge-f">Formel</span>
+    <span class="type-badge type-badge-d">Beschreibung</span>
+    <span class="type-badge type-badge-n">Hinweis</span>
+  </div>
+  <div class="sep"></div>
+  <button class="btn btn-prim"  onclick="scatterCurrent()">Neu mischen</button>
+  <button class="btn btn-sec"   id="btn-connect" onclick="toggleConnect()">Verbindungen</button>
+  <button class="btn btn-warn"  onclick="showSolution()">Musterlösung</button>
+  <button class="btn btn-ghost" onclick="clearConn()">Linien löschen</button>
+  <button class="btn btn-ghost" onclick="window.print()">Drucken</button>
+</div>
+
+<div id="ws-container">
+  <div class="board-ws active" id="ws-b1">
+    <div class="board-bg-label">Grundlagen</div>
+    <svg class="connections"></svg>
+  </div>
+  <div class="board-ws" id="ws-b2">
+    <div class="board-bg-label">Graphen</div>
+    <svg class="connections"></svg>
+  </div>
+  <div class="board-ws" id="ws-b3">
+    <div class="board-bg-label">Ableitung</div>
+    <svg class="connections"></svg>
+  </div>
+  <div class="board-ws" id="ws-b4">
+    <div class="board-bg-label">Modellierung</div>
+    <svg class="connections"></svg>
+  </div>
+</div>
+
+<div id="popup-overlay">
+  <div id="popup">
+    <h2 id="popup-title"></h2>
+    <div id="popup-content"></div>
+    <button class="close-btn" onclick="closePopup()">Schließen</button>
+  </div>
+</div>
+
+<script>
+/* ── MATH HELPERS ──────────────────────────────────────────── */
+const mi = s => `\\(${s}\\)`;
+function rmath(el) {
+  renderMathInElement(el, {
+    delimiters: [
+      { left:'\\(', right:'\\)', display:false },
+      { left:'\\[', right:'\\]', display:true  }
+    ],
+    throwOnError: false
+  });
+}
+
+/* ── KONZEPT-DATEN ─────────────────────────────────────────── */
+// Jedes Konzept wird in 4 separate Karten aufgeteilt:
+// Titel (t) · Formel (f) · Beschreibung (d) · Hinweis (n)
+const CONCEPTS = {
+  c01: {
+    cat:'def', catLabel:'Definition',
+    title:'Natürliche Exponentialfunktion',
+    formula: 'f(x)=e^x',
+    desc: `Definitionsbereich: ${mi('\\mathbb{R}')} &nbsp;·&nbsp; Wertebereich: ${mi('(0;\\infty)')}`,
+    note: `Einzige Funktion mit ${mi('f^{\\prime}(x)=f(x)')} für alle ${mi('x\\in\\mathbb{R}')}`
+  },
+  c02: {
+    cat:'def', catLabel:'Definition',
+    title:'Eulersche Zahl e',
+    formula: 'e=\\lim_{n\\to\\infty}\\Bigl(1+\\tfrac{1}{n}\\Bigr)^n',
+    desc: `${mi('e\\approx 2{,}71828\\ldots')} — irrational und transzendent`,
+    note: `Basis der natürlichen Exponentialfunktion; nicht mit ${mi('10')} oder anderen Basen verwechseln`
+  },
+  c04: {
+    cat:'def', catLabel:'Definition',
+    title:'Natürlicher Logarithmus ln',
+    formula: '\\ln\\bigl(e^x\\bigr)=x \\qquad e^{\\ln x}=x',
+    desc: `Umkehrfunktion von ${mi('e^x')} &nbsp;·&nbsp; Definitionsbereich: ${mi('(0;\\infty)')}`,
+    note: `${mi('\\ln 1=0')} &nbsp;·&nbsp; ${mi('\\ln e=1')} &nbsp;·&nbsp; Graph: Spiegelung von ${mi('e^x')} an ${mi('y=x')}`
+  },
+  c05: {
+    cat:'graph', catLabel:'Eigenschaften',
+    title:`Graph von ${mi('f(x)=e^x')}`,
+    formula: 'e^x > 0 \\text{ für alle } x\\in\\mathbb{R}',
+    desc: `${mi('y')}-Achsenabschnitt: ${mi('(0\\mid 1)')} &nbsp;·&nbsp; keine Nullstelle
+           <br>Streng monoton steigend &nbsp;·&nbsp; linksgekrümmt`,
+    note: `Weder nach oben noch nach unten beschränkt`
+  },
+  c20: {
+    cat:'conn', catLabel:'Zusammenhang',
+    title:`${mi('e^x')} und ln: Umkehrfunktionen`,
+    formula: 'e^{\\ln x}=x \\;(x>0) \\qquad \\ln(e^x)=x \\;(x\\in\\mathbb{R})',
+    desc: `Graphen sind Spiegelbilder an der Geraden ${mi('y=x')}`,
+    note: `${mi('\\ln(e^{2x-1})=2x-1')} &nbsp;·&nbsp; ${mi('e^{\\ln 5}=5')} &nbsp;·&nbsp; Anwendung: Gleichungen lösen`
+  },
+  c03: {
+    cat:'def', catLabel:'Definition',
+    title:'Allgemeine e-Funktion',
+    formula: 'f(t)=c\\cdot e^{k\\,t}+d',
+    desc: `${mi('c')}: Streckfaktor &nbsp;·&nbsp; ${mi('k')}: Wachstumskonstante
+           <br>${mi('d')}: vertikale Verschiebung (Asymptote: ${mi('y=d')})`,
+    note: `Sonderfall ${mi('c=1, d=0')}: ${mi('f(t)=e^{kt}')}`
+  },
+  c06: {
+    cat:'graph', catLabel:'Grenzwert',
+    title:'Grenzwertverhalten & Asymptote',
+    formula: '\\lim_{x\\to+\\infty}e^x=\\infty \\qquad \\lim_{x\\to-\\infty}e^x=0',
+    desc: `Waagerechte Asymptote: ${mi('y=0')} (x-Achse)`,
+    note: `Bei ${mi('f(t)=c\\cdot e^{kt}+d')}: Asymptote ist ${mi('y=d')}`
+  },
+  c07: {
+    cat:'graph', catLabel:'Parameter',
+    title:`Einfluss von ${mi('k')}: Wachstum / Zerfall`,
+    formula: 'k>0: \\text{ Wachstum} \\qquad k<0:\\text{ Zerfall}',
+    desc: `Vorzeichen von ${mi('k')} bestimmt, ob der Graph steigt oder fällt`,
+    note: `Größeres ${mi('|k|')} → stärkere Krümmung; gleiche Asymptote`
+  },
+  c08: {
+    cat:'graph', catLabel:'Parameter',
+    title:`Einfluss von ${mi('c')}: Streckung / Spiegelung`,
+    formula: 'f(x)=c\\cdot e^{kx}',
+    desc: `${mi('c>0')}: Graph über der Asymptote &nbsp;·&nbsp; ${mi('c<0')}: darunter`,
+    note: `${mi('|c|>1')}: gestreckt &nbsp;·&nbsp; ${mi('0<|c|<1')}: gestaucht`
+  },
+  c09: {
+    cat:'graph', catLabel:'Graphenform',
+    title:'Beschränktes Wachstum — Kurvenform',
+    formula: 'f \\text{ rechtsgekrümmt, Asymptote } y=S',
+    desc: `Wächst zunächst schnell, wird langsamer
+           <br>Kein Extrempunkt &nbsp;·&nbsp; nähert sich ${mi('S')} von unten`,
+    note: `Streng monoton steigend, aber nach oben beschränkt durch ${mi('S')}`
+  },
+  c10: {
+    cat:'calc', catLabel:'Ableitung — Grundregel',
+    title:'Ableitung der e-Funktion',
+    formula: '\\bigl(e^x\\bigr)^{\\prime}=e^x',
+    desc: `Die e-Funktion ist ihre eigene Ableitung`,
+    note: `Gilt nur für Basis ${mi('e')} — bei ${mi('a^x')} mit ${mi('a\\neq e')} ist die Ableitung anders`
+  },
+  c11: {
+    cat:'calc', catLabel:'Ableitung — Kettenregel',
+    title:'Kettenregel',
+    formula: '\\bigl(e^{g(x)}\\bigr)^{\\prime}=g^{\\prime}(x)\\cdot e^{g(x)}',
+    desc: `Äußere Ableitung mal innere Ableitung`,
+    note: `Bsp.: ${mi('f(x)=e^{3x-1}\\;\\Rightarrow\\;f^{\\prime}(x)=3\\,e^{3x-1}')}`
+  },
+  c12: {
+    cat:'calc', catLabel:'Ableitung — Produktregel',
+    title:'Produktregel',
+    formula: '(u\\cdot v)^{\\prime}=u^{\\prime}\\cdot v+u\\cdot v^{\\prime}',
+    desc: `Nötig bei Produkten aus Polynom und e-Funktion`,
+    note: `Bsp.: ${mi('f(x)=x^2 e^{-x}\\;\\Rightarrow\\;f^{\\prime}(x)=(2x-x^2)e^{-x}')}`
+  },
+  c15: {
+    cat:'calc', catLabel:'Kurvendiskussion',
+    title:'Extrem- und Wendepunkte',
+    formula: 'f^{\\prime}(x)=0 \\quad\\text{bzw.}\\quad f^{\\prime\\prime}(x)=0',
+    desc: `Da ${mi('e^{kx}\\neq 0')}: nur den anderen Faktor gleich null setzen`,
+    note: `Wendepunkt nur, wenn VZW von ${mi('f^{\\prime\\prime}')} bei ${mi('x_0')} vorliegt`
+  },
+  c21: {
+    cat:'conn', catLabel:'Zusammenhang',
+    title:`${mi('f^{\\prime}')} ↔ Monotonieintervalle`,
+    formula: 'f^{\\prime}(x)>0 \\;\\Rightarrow\\; f \\text{ streng mon. steigend}',
+    desc: `${mi('f^{\\prime}(x)<0')} auf ${mi('I')} → ${mi('f')} streng monoton fallend auf ${mi('I')}`,
+    note: `Bei e-Fkt.: Vorzeichen von ${mi('f^{\\prime}')} durch anderen Faktor bestimmt`
+  },
+  c22: {
+    cat:'conn', catLabel:'Zusammenhang',
+    title:`${mi('f^{\\prime\\prime}')} ↔ Krümmungsverhalten`,
+    formula: 'f^{\\prime\\prime}(x)>0 \\;\\Leftrightarrow\\; \\text{linksgekrümmt (konvex)}',
+    desc: `${mi('f^{\\prime\\prime}(x)<0')}: rechtsgekrümmt (konkav)`,
+    note: `Vorzeichenwechsel von ${mi('f^{\\prime\\prime}')} bei ${mi('x_0')} → Wendepunkt`
+  },
+  c14: {
+    cat:'calc', catLabel:'Gleichung lösen',
+    title:'Exponentialgleichungen lösen',
+    formula: 'e^{\\,\\square}=a \\;\\Rightarrow\\; \\square=\\ln a',
+    desc: `Strategie: nach ${mi('e^{\\ldots}')} isolieren, dann ln anwenden`,
+    note: `Bsp.: ${mi('e^{2x-1}=7 \\Rightarrow 2x-1=\\ln 7 \\Rightarrow x=\\tfrac{\\ln 7+1}{2}')}`
+  },
+  c16: {
+    cat:'exam', catLabel:'Modell',
+    title:'Unbeschränktes Wachstum',
+    formula: 'f(t)=f_0\\cdot e^{\\,kt},\\quad k>0',
+    desc: `${mi('f_0')}: Anfangswert &nbsp;·&nbsp; ${mi('k')}: Wachstumskonstante`,
+    note: `Verdopplungszeit: ${mi('T_V=\\dfrac{\\ln 2}{k}')}`
+  },
+  c17: {
+    cat:'exam', catLabel:'Modell',
+    title:'Exponentieller Zerfall',
+    formula: 'f(t)=f_0\\cdot e^{-kt},\\quad k>0',
+    desc: `Gleichmäßiger relativer Rückgang pro Zeiteinheit`,
+    note: `Halbwertszeit: ${mi('T_{1/2}=\\dfrac{\\ln 2}{k}')}`
+  },
+  c18: {
+    cat:'exam', catLabel:'Modell',
+    title:'Beschränktes Wachstum',
+    formula: 'f(t)=S-\\bigl(S-f_0\\bigr)\\cdot e^{-kt}',
+    desc: `${mi('S')}: Sättigungsgrenze &nbsp;·&nbsp; ${mi('f_0')}: Anfangswert
+           <br>Asymptote: ${mi('y=S')}`,
+    note: `Wächst gegen ${mi('S')}, wird rechtsgekrümmt — kein Extrempunkt`
+  },
+  c19: {
+    cat:'exam', catLabel:'Abitur-Typ NRW',
+    title:'Typische Abituraufgabe (GK)',
+    formula: 'f(x)=(ax+b)\\cdot e^{-x}',
+    desc: `Aufgabenteile: Nullstellen · Extrem- und Wendepunkte
+           <br>Grenzverhalten · Parameterbestimmung`,
+    note: `${mi('e^{-x}\\neq 0')} → Nullstellen nur durch ${mi('ax+b=0')}`
+  },
+  c23: {
+    cat:'conn', catLabel:'Zusammenhang',
+    title:`${mi('e^{kx}>0')} — Konsequenz`,
+    formula: 'e^{kx}>0 \\text{ für alle } x\\in\\mathbb{R}',
+    desc: `Die e-Funktion allein hat <strong>keine Nullstelle</strong>`,
+    note: `Nullstellen/Extremstellen nur durch Faktoren wie ${mi('(x-a)')} oder ${mi('\\ln(\\ldots)')}`
+  },
+};
+
+/* ── BOARDS ─────────────────────────────────────────────────── */
+const BOARDS = {
+  b1: {
+    label:'Grundlagen',
+    conceptIds:['c01','c02','c04','c05','c20'],
+    solution:`
+      <p>Mögliche Struktur für <strong>Grundlagen</strong>:</p>
+      <ul>
+        <li><strong>Zentrum:</strong> Titel-Karte „Natürliche Exponentialfunktion" + Formelkarte</li>
+        <li><strong>Daneben:</strong> Eulersche Zahl e (Formel + Beschreibung)</li>
+        <li><strong>Rechts:</strong> ln + Umkehrfunktionen-Karten (eng verbinden!)</li>
+        <li><strong>Verbindungen:</strong> e^x ↔ ln &nbsp;·&nbsp; Eigenschaften ↔ Grenzwert &nbsp;·&nbsp; Formel ↔ Beschreibung</li>
+      </ul>
+      <p class="note">Tipp: Ordne gleiche Konzepte (Titel–Formel–Beschreibung–Hinweis) zuerst zusammen, dann vernetze die Konzepte.</p>`
+  },
+  b2: {
+    label:'Graphen & Parameter',
+    conceptIds:['c03','c06','c07','c08','c09'],
+    solution:`
+      <p>Mögliche Struktur für <strong>Graphen & Parameter</strong>:</p>
+      <ul>
+        <li><strong>Zentrum:</strong> Allgemeine e-Funktion (Formel zeigt alle Parameter)</li>
+        <li><strong>Links:</strong> Parameter k — Wachstum/Zerfall-Karten</li>
+        <li><strong>Rechts:</strong> Parameter c — Streckung/Spiegelung</li>
+        <li><strong>Oben:</strong> Grenzwertverhalten & Asymptote</li>
+        <li><strong>Unten:</strong> Beschränktes Wachstum als Sonderform</li>
+      </ul>`
+  },
+  b3: {
+    label:'Ableitung & Kurvendiskussion',
+    conceptIds:['c10','c11','c12','c15','c21','c22'],
+    solution:`
+      <p>Mögliche Struktur für <strong>Ableitung & Kurvendiskussion</strong>:</p>
+      <ul>
+        <li><strong>Zentrum:</strong> Grundregel (e^x)′ = e^x</li>
+        <li><strong>Lernpfad (→):</strong> Grundregel → Kettenregel → Produktregel</li>
+        <li><strong>Anwendung (↓):</strong> Extrem-/Wendepunkte</li>
+        <li><strong>Interpretation:</strong> f′ ↔ Monotonie &nbsp;·&nbsp; f″ ↔ Krümmung</li>
+      </ul>`
+  },
+  b4: {
+    label:'Modellierung',
+    conceptIds:['c14','c16','c17','c18','c19'],
+    solution:`
+      <p>Mögliche Struktur für <strong>Modellierung</strong>:</p>
+      <ul>
+        <li><strong>Oben:</strong> Gleichungen lösen (ln) als Werkzeug</li>
+        <li><strong>Mitte links:</strong> Unbeschr. Wachstum ↔ Zerfall (Halbwertszeit/Verdopplungszeit verbinden)</li>
+        <li><strong>Mitte rechts:</strong> Beschränktes Wachstum als Sonderfall</li>
+        <li><strong>Unten:</strong> Abitur-Aufgabentyp — alle Konzepte zusammen</li>
+      </ul>`
+  },
+};
+
+/* ── TEILKARTEN GENERIEREN ─────────────────────────────────── */
+// Aus jedem Konzept werden bis zu 4 Einzelkarten erzeugt.
+const SUBCARDS = {};
+for (const [id, c] of Object.entries(CONCEPTS)) {
+  SUBCARDS[`${id}-t`] = { type:'t', concept:id, cat:c.cat, catLabel:c.catLabel, content:c.title };
+  if (c.formula) SUBCARDS[`${id}-f`] = { type:'f', concept:id, cat:c.cat, content:c.formula };
+  SUBCARDS[`${id}-d`] = { type:'d', concept:id, cat:c.cat, content:c.desc };
+  if (c.note)    SUBCARDS[`${id}-n`] = { type:'n', concept:id, cat:c.cat, content:c.note };
+}
+
+function boardCardIds(bid) {
+  const ids = [];
+  for (const cid of BOARDS[bid].conceptIds) {
+    const c = CONCEPTS[cid];
+    ids.push(`${cid}-t`);
+    if (c.formula) ids.push(`${cid}-f`);
+    ids.push(`${cid}-d`);
+    if (c.note) ids.push(`${cid}-n`);
+  }
+  return ids;
+}
+
+/* ── STATE ──────────────────────────────────────────────────── */
+const boardStates = {
+  b1:{ wsCards:{}, connections:[], initialized:false },
+  b2:{ wsCards:{}, connections:[], initialized:false },
+  b3:{ wsCards:{}, connections:[], initialized:false },
+  b4:{ wsCards:{}, connections:[], initialized:false },
+};
+let currentBoard = 'b1';
+let connectMode = false, connectFirst = null;
+let wsActive = null, wsStartX=0, wsStartY=0, wsCardX=0, wsCardY=0;
+
+const CARD_W = 200;
+
+/* ── KARTE ERSTELLEN ────────────────────────────────────────── */
+function createCard(id, boardId) {
+  const d = SUBCARDS[id];
+  const el = document.createElement('div');
+  el.className = `card card-type-${d.type} cat-${d.cat}`;
+  el.dataset.id = id;
+  el.dataset.board = boardId;
+
+  if (d.type === 't') {
+    el.innerHTML = `
+      <div class="ct-badge">${d.catLabel}</div>
+      <div class="ct-name">${d.content}</div>`;
+
+  } else if (d.type === 'f') {
+    el.innerHTML = `
+      <div class="cf-label">Formel</div>
+      \\[${d.content}\\]`;
+
+  } else if (d.type === 'd') {
+    el.innerHTML = `
+      <div class="cd-label">Beschreibung</div>
+      <div class="cd-text">${d.content}</div>`;
+
+  } else { // 'n'
+    el.innerHTML = `
+      <div class="cn-label">Hinweis / Beispiel</div>
+      <div class="cn-text">${d.content}</div>`;
+  }
+
+  rmath(el);
+  el.addEventListener('mousedown', onMouseDown);
+  el.addEventListener('click', onCardClick);
+  return el;
+}
+
+/* ── RAND-POSITIONEN ────────────────────────────────────────── */
+const EST_H = 88; // geschätzte Kartenhöhe für Platzierung
+
+function edgePositions(count, ws) {
+  const W = ws.offsetWidth, H = ws.offsetHeight;
+  const pad = 8;
+  const maxX = W - CARD_W - pad, maxY = H - EST_H - pad;
+  const perim = 2*(maxX + maxY);
+  const jitter = () => (Math.random()-0.5)*16;
+  const ts = [...Array(count).keys()]
+    .map((_,i) => (i/count)*perim + jitter()).sort((a,b)=>a-b);
+
+  return ts.map(t => {
+    let x, y;
+    if      (t < maxX)           { x=t;               y=pad; }
+    else if (t < maxX+maxY)      { x=maxX;             y=t-maxX; }
+    else if (t < 2*maxX+maxY)    { x=maxX-(t-maxX-maxY); y=maxY; }
+    else                          { x=pad;              y=maxY-(t-2*maxX-maxY); }
+    return { x:Math.max(pad,Math.min(x,maxX)), y:Math.max(pad,Math.min(y,maxY)) };
+  });
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+/* ── SCATTER ────────────────────────────────────────────────── */
+function scatter(bid) {
+  const ws = document.getElementById('ws-'+bid);
+  const state = boardStates[bid];
+  Object.values(state.wsCards).forEach(c=>c.el.remove());
+  state.wsCards = {}; state.connections = [];
+  drawConnections(bid);
+
+  const ids = shuffle(boardCardIds(bid));
+  const positions = edgePositions(ids.length, ws);
+
+  ids.forEach((id,i) => {
+    const el = createCard(id, bid);
+    const {x,y} = positions[i];
+    el.style.left=x+'px'; el.style.top=y+'px';
+    ws.appendChild(el);
+    state.wsCards[id]={el,x,y};
+  });
+  state.initialized = true;
+}
+
+function scatterCurrent() { scatter(currentBoard); }
+
+/* ── BOARD WECHSELN ─────────────────────────────────────────── */
+function switchBoard(bid) {
+  if (bid===currentBoard) return;
+  if (connectMode) toggleConnect();
+  document.getElementById('ws-'+currentBoard).classList.remove('active');
+  document.querySelector(`.board-tab[data-board="${currentBoard}"]`).classList.remove('active');
+  currentBoard = bid;
+  document.getElementById('ws-'+bid).classList.add('active');
+  document.querySelector(`.board-tab[data-board="${bid}"]`).classList.add('active');
+  if (!boardStates[bid].initialized) scatter(bid);
+}
+
+/* ── MAUS-DRAG ──────────────────────────────────────────────── */
+function onMouseDown(e) {
+  if (connectMode || e.button!==0) return;
+  wsActive = e.currentTarget;
+  wsCardX = parseInt(wsActive.style.left)||0;
+  wsCardY = parseInt(wsActive.style.top)||0;
+  wsStartX=e.clientX; wsStartY=e.clientY;
+  wsActive.classList.add('active');
+  e.preventDefault();
+}
+document.addEventListener('mousemove', e => {
+  if (!wsActive) return;
+  const ws = document.getElementById('ws-'+currentBoard);
+  const nx = Math.max(0, Math.min(wsCardX+e.clientX-wsStartX, ws.offsetWidth-CARD_W));
+  const ny = Math.max(0, Math.min(wsCardY+e.clientY-wsStartY, ws.offsetHeight-wsActive.offsetHeight));
+  wsActive.style.left=nx+'px'; wsActive.style.top=ny+'px';
+  const id=wsActive.dataset.id;
+  const s=boardStates[currentBoard].wsCards[id];
+  if(s){s.x=nx;s.y=ny;}
+  drawConnections(currentBoard);
+});
+document.addEventListener('mouseup', ()=>{
+  if(wsActive){wsActive.classList.remove('active');wsActive=null;}
+});
+
+/* ── VERBINDUNGSMODUS ───────────────────────────────────────── */
+function toggleConnect() {
+  connectMode=!connectMode; connectFirst=null;
+  document.body.classList.toggle('connect-mode',connectMode);
+  const btn=document.getElementById('btn-connect');
+  btn.style.background=connectMode?'var(--warn)':'';
+  btn.style.color=connectMode?'#0f172a':'';
+  btn.textContent=connectMode?'✕ Verbindungen':'Verbindungen';
+  document.querySelectorAll('.connect-sel').forEach(el=>el.classList.remove('connect-sel'));
+}
+
+function onCardClick(e) {
+  if (!connectMode) return;
+  const el=e.currentTarget;
+  if (el.dataset.board!==currentBoard) return;
+  const id=el.dataset.id;
+  const conns=boardStates[currentBoard].connections;
+  if (!connectFirst) {
+    connectFirst=id; el.classList.add('connect-sel');
+  } else {
+    if (connectFirst===id){el.classList.remove('connect-sel');connectFirst=null;return;}
+    const idx=conns.findIndex(c=>(c.from===connectFirst&&c.to===id)||(c.from===id&&c.to===connectFirst));
+    if (idx>=0) conns.splice(idx,1);
+    else conns.push({from:connectFirst,to:id});
+    document.querySelector(`#ws-${currentBoard} .card[data-id="${connectFirst}"]`)?.classList.remove('connect-sel');
+    connectFirst=null;
+    drawConnections(currentBoard);
+  }
+}
+
+function clearConn(){boardStates[currentBoard].connections=[];drawConnections(currentBoard);}
+
+/* ── VERBINDUNGEN ZEICHNEN ──────────────────────────────────── */
+function drawConnections(bid) {
+  const svg=document.querySelector(`#ws-${bid} svg.connections`);
+  if (!svg) return;
+  svg.innerHTML='';
+  for (const conn of boardStates[bid].connections) {
+    const a=boardStates[bid].wsCards[conn.from];
+    const b=boardStates[bid].wsCards[conn.to];
+    if (!a||!b) continue;
+    const ax=a.x+a.el.offsetWidth/2, ay=a.y+a.el.offsetHeight/2;
+    const bx=b.x+b.el.offsetWidth/2, by=b.y+b.el.offsetHeight/2;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',ax);line.setAttribute('y1',ay);
+    line.setAttribute('x2',bx);line.setAttribute('y2',by);
+    line.setAttribute('class','conn-line');
+    svg.appendChild(line);
+  }
+}
+
+/* ── MUSTERLÖSUNG ───────────────────────────────────────────── */
+function showSolution(){
+  const b=BOARDS[currentBoard];
+  document.getElementById('popup-title').textContent=`Musterlösung — ${b.label}`;
+  document.getElementById('popup-content').innerHTML=b.solution;
+  document.getElementById('popup-overlay').classList.add('open');
+}
+function closePopup(){document.getElementById('popup-overlay').classList.remove('open');}
+
+/* ── START ──────────────────────────────────────────────────── */
+window.addEventListener('load',()=>scatter('b1'));
+</script>
+</body>
+</html>

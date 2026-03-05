@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Klasse 10 Expo">
+    <title>Klasse 10 Diagnose – Exponentialfunktionen</title>
+    <style>
+        :root {
+            /* Emerald (Default) */
+            --bg-dark: #052e16;
+            --bg-gradient: radial-gradient(circle at top, #064e3b 0%, #052e16 100%);
+            --primary-glow: #34d399;
+            --secondary-glow: #6ee7b7;
+            --joker-color: #fbbf24;
+            --text-main: #f0fdf4;
+            --glass-bg: rgba(5, 46, 22, 0.85);
+            --glass-border: rgba(52, 211, 153, 0.18);
+            --success: #34d399;
+            --error: #f87171;
+            --h1-shadow: 0 0 20px var(--primary-glow);
+            --h1-color: #fff;
+        }
+
+        body.theme-midnight {
+            --bg-dark: #020617;
+            --bg-gradient: radial-gradient(circle at top, #1e1b4b 0%, #020617 100%);
+            --primary-glow: #818cf8;
+            --secondary-glow: #c7d2fe;
+            --joker-color: #fbbf24;
+            --text-main: #f8fafc;
+            --glass-bg: rgba(15, 23, 42, 0.9);
+            --glass-border: rgba(129, 140, 248, 0.3);
+            --success: #4ade80;
+            --error: #f87171;
+            --h1-shadow: 0 0 25px rgba(129, 140, 248, 0.5);
+            --h1-color: #fff;
+        }
+
+        body.theme-ocean {
+            --bg-dark: #0c4a6e;
+            --bg-gradient: radial-gradient(circle at top, #0369a1 0%, #0c4a6e 100%);
+            --primary-glow: #38bdf8;
+            --secondary-glow: #bae6fd;
+            --joker-color: #fbbf24;
+            --text-main: #f0f9ff;
+            --glass-bg: rgba(12, 74, 110, 0.85);
+            --glass-border: rgba(56, 189, 248, 0.3);
+            --success: #22d3ee;
+            --error: #fb7185;
+            --h1-shadow: 0 0 20px var(--primary-glow);
+            --h1-color: #fff;
+        }
+
+        body.theme-sunset {
+            --bg-dark: #450a0a;
+            --bg-gradient: radial-gradient(circle at top, #7f1d1d 0%, #450a0a 100%);
+            --primary-glow: #f87171;
+            --secondary-glow: #fecaca;
+            --joker-color: #fca5a5;
+            --text-main: #fff1f2;
+            --glass-bg: rgba(69, 10, 10, 0.85);
+            --glass-border: rgba(248, 113, 113, 0.2);
+            --success: #fbbf24;
+            --error: #ef4444;
+            --h1-shadow: 0 0 20px var(--primary-glow);
+            --h1-color: #fff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--bg-gradient);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 60px rgba(52, 211, 153, 0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 900;
+            margin-top: 0;
+        }
+
+        h1 {
+            color: var(--h1-color);
+            text-shadow: var(--h1-shadow);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--secondary-glow);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* HUD */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 3px solid var(--primary-glow);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-item span {
+            color: var(--primary-glow);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.5s ease;
+        }
+
+        /* Buttons */
+        button {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #fff;
+            border: none;
+            padding: 18px 36px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button:hover {
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .joker-btn {
+            background: linear-gradient(135deg, var(--joker-color), #d97706);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            font-size: 1rem;
+            padding: 12px 24px;
+            margin-top: 15px;
+            max-width: 280px;
+        }
+
+        .joker-text {
+            color: #000;
+            font-weight: bold;
+            margin-top: 15px;
+            background: #fff;
+            padding: 15px;
+            border: 3px solid var(--joker-color);
+            border-radius: 10px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .mc-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .mc-option {
+            background: rgba(52, 211, 153, 0.05);
+            border: 2px solid rgba(52, 211, 153, 0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .mc-option:hover {
+            border-color: var(--primary-glow);
+            background: rgba(52, 211, 153, 0.12);
+        }
+
+        .mc-option.selected {
+            border-color: var(--primary-glow);
+            background: rgba(52, 211, 153, 0.2);
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
+        }
+
+        .mc-option.correct {
+            border-color: var(--success);
+            background: rgba(52, 211, 153, 0.25);
+        }
+
+        .mc-option.wrong {
+            border-color: var(--error);
+            background: rgba(248, 113, 113, 0.15);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            max-width: 340px;
+            background: rgba(52, 211, 153, 0.06);
+            border: 2px solid rgba(52, 211, 153, 0.25);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 1.3rem;
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
+            padding: 14px 18px;
+            margin-top: 20px;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.3);
+        }
+
+        .question-card {
+            background: rgba(0, 20, 10, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .question-category {
+            font-size: 0.8rem;
+            color: var(--secondary-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            font-weight: 600;
+            color: #ecfdf5;
+        }
+
+        .math-text {
+            font-family: ui-monospace, 'SF Mono', 'Courier New', monospace;
+            background: rgba(52, 211, 153, 0.12);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 1.05em;
+            color: #a7f3d0;
+        }
+
+        .feedback-message {
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .msg-success {
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .msg-error {
+            background: rgba(248, 113, 113, 0.12);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .xp-popup {
+            position: fixed;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px var(--primary-glow);
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+            z-index: 999;
+        }
+
+        @keyframes floatUp {
+            from {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.2);
+            }
+        }
+
+        .level-up-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #059669, #34d399);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.5rem;
+            font-weight: 900;
+            z-index: 1000;
+            transform: translateY(-100%);
+            transition: transform 0.4s ease-out;
+            box-shadow: 0 4px 20px rgba(52, 211, 153, 0.5);
+        }
+
+        .level-up-banner.show {
+            transform: translateY(0);
+        }
+
+        .streak-display {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+        }
+
+        .streak-fire {
+            animation: firePulse 0.5s ease-out;
+        }
+
+        @keyframes firePulse {
+            0% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.4)
+            }
+
+            100% {
+                transform: scale(1)
+            }
+        }
+
+        /* Start screen */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .info-card {
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .info-card .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .info-card .label {
+            font-size: 0.85rem;
+            color: var(--secondary-glow);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .info-card .value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #fff;
+            margin-top: 4px;
+        }
+
+        .class-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(52, 211, 153, 0.3);
+        }
+
+        .name-input-wrapper {
+            margin: 20px auto;
+            max-width: 360px;
+        }
+
+        .name-input-wrapper label {
+            display: block;
+            color: var(--secondary-glow);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        #student-name {
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        /* Results */
+        .score-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .score-card {
+            background: rgba(52, 211, 153, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .score-card .cat-name {
+            font-size: 0.78rem;
+            color: var(--secondary-glow);
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .score-card .cat-score {
+            font-size: 1.3rem;
+            font-weight: 900;
+        }
+
+        .score-card .cat-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .score-card .cat-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .resources-section {
+            text-align: left;
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-top: 10px;
+        }
+
+        .resources-section h4 {
+            color: var(--joker-color);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 0 0 12px 0;
+        }
+
+        .resource-link {
+            display: block;
+            color: #a7f3d0;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(52, 211, 153, 0.1);
+            transition: color 0.2s;
+        }
+
+        .resource-link:last-child {
+            border-bottom: none;
+        }
+
+        .resource-link:hover {
+            color: var(--primary-glow);
+        }
+
+        .graph-container {
+            margin: 15px auto;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .package-selector {
+            text-align: left;
+            margin: 18px 0 10px;
+        }
+
+        .package-selector label {
+            font-weight: 700;
+            color: var(--secondary-glow);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .package-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .package-option input {
+            display: none;
+        }
+
+        .package-option span {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            background: rgba(52, 211, 153, 0.08);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .package-option input:checked+span {
+            background: rgba(52, 211, 153, 0.25);
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+        }
+
+        .competency-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .competency-card {
+            background: rgba(52, 211, 153, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .competency-level {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            margin: 6px 0 10px;
+        }
+
+        .level-ok {
+            background: rgba(52, 211, 153, 0.2);
+            color: var(--success);
+        }
+
+        .level-mid {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--joker-color);
+        }
+
+        .level-low {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--error);
+        }
+
+        .competency-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .competency-list li {
+            margin: 6px 0;
+            font-size: 0.95rem;
+        }
+
+        /* Print */
+        @media print {
+            body {
+                background: #fff;
+                color: #000;
+            }
+
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 20px;
+                margin: 0;
+            }
+
+            .hud,
+            .progress-bar-container,
+            button,
+            .joker-text,
+            #joker-area,
+            .resources-section {
+                display: none !important;
+            }
+
+            h1,
+            h2,
+            h3 {
+                color: #000;
+                text-shadow: none;
+            }
+
+            .score-card {
+                border: 1px solid #ccc;
+                background: #fff;
+            }
+
+            .cat-name,
+            .cat-score {
+                color: #000;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 25px 18px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .score-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .competency-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hud {
+                flex-wrap: wrap;
+                gap: 8px;
+                font-size: 0.9rem;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="level-up-banner" id="level-up-banner">⬆️ LEVEL UP! Gut gemacht!</div>
+
+    <div class="container">
+
+        <!-- START SCREEN -->
+        <div class="screen active" id="start-screen">
+            <div class="class-badge">Mathe-Trainer · Klasse 10</div>
+            <h1>Exponential-Trainer</h1>
+            <h2>Diagnose & Prüfungstraining</h2>
+            <p style="color:#86efac; font-size:1rem; line-height:1.6; margin-bottom:20px;">
+                Teste dein Wissen über Exponentialfunktionen, Wachstum &amp; Zerfall und Zinseszins.<br>
+                <small style="color:#6ee7b7;">Basierend auf dem Kernlehrplan Mathematik Sek&nbsp;I · NRW (2021)</small>
+            </p>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="icon">📊</div>
+                    <div class="label">Fragen</div>
+                    <div class="value" id="question-count">–</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon">⭐</div>
+                    <div class="label">XP pro Frage</div>
+                    <div class="value">bis zu 200</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon">🃏</div>
+                    <div class="label">Joker kostet</div>
+                    <div class="value">50 XP</div>
+                </div>
+                <div class="info-card">
+                    <div class="icon">🔥</div>
+                    <div class="label">Speed-Bonus</div>
+                    <div class="value">≤ 12 s</div>
+                </div>
+            </div>
+
+            <div class="name-input-wrapper">
+                <label for="student-name">Dein Name</label>
+                <input type="text" id="student-name" placeholder="Name eingeben..."
+                    style="width:100%; box-sizing:border-box;" />
+            </div>
+
+            <div class="package-selector">
+                <label>Design wählen</label>
+                <div class="package-options" id="theme-options">
+                    <label class="package-option">
+                        <input type="radio" name="theme" value="emerald" checked>
+                        <span>Emerald</span>
+                    </label>
+                    <label class="package-option">
+                        <input type="radio" name="theme" value="midnight">
+                        <span>Midnight</span>
+                    </label>
+                    <label class="package-option">
+                        <input type="radio" name="theme" value="ocean">
+                        <span>Ocean</span>
+                    </label>
+                    <label class="package-option">
+                        <input type="radio" name="theme" value="sunset">
+                        <span>Sunset</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="package-selector">
+                <label>Aufgabenpaket</label>
+                <div class="package-options" id="package-options">
+                    <label class="package-option">
+                        <input type="radio" name="package" value="basis" checked>
+                        <span>Basis</span>
+                    </label>
+                    <label class="package-option">
+                        <input type="radio" name="package" value="aufbau">
+                        <span>Aufbau</span>
+                    </label>
+                    <label class="package-option">
+                        <input type="radio" name="package" value="profi">
+                        <span>Profi</span>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="startTest()">🚀 Test starten</button>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div class="screen" id="quiz-screen">
+            <div class="hud">
+                <div class="hud-item" id="xp-display">⭐ XP: <span>0</span></div>
+                <div class="hud-item" id="level-display">🏅 Level: <span>1</span></div>
+                <div class="hud-item"><span class="streak-display" id="streak-display">🔥 ×0</span></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-category" id="question-category">Kategorie</div>
+                <div class="question-text" id="question-text"></div>
+            </div>
+
+            <div id="input-area"></div>
+
+            <div id="joker-area" style="display:none; margin-top:15px;">
+                <button class="joker-btn" id="btn-joker" onclick="useJoker()">🃏 Tipp (50 XP)</button>
+                <div class="joker-text" id="joker-hint"></div>
+            </div>
+
+            <button id="next-btn" onclick="submitAnswer()">Antwort bestätigen ✓</button>
+
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div class="screen" id="result-screen">
+            <h1 id="cert-title">Zertifikat</h1>
+            <h2>Exponentialfunktionen</h2>
+            <p id="final-stats" style="color:var(--secondary-glow); font-weight:700; font-size:1rem;"></p>
+
+            <div class="score-grid" id="score-grid"></div>
+
+            <h3
+                style="margin:18px 0 8px; color:var(--secondary-glow); letter-spacing:1px; text-transform:uppercase; font-size:0.9rem;">
+                Diagnoseraster</h3>
+            <div class="competency-grid" id="competency-grid"></div>
+
+            <div id="resources-container"></div>
+
+            <button onclick="window.print()"
+                style="margin-top:10px; background: linear-gradient(135deg, #64748b, #475569); box-shadow:none; max-width:200px; font-size:0.95rem; padding:12px;">🖨️
+                Drucken</button>
+            <button onclick="exportToCSV()"
+                style="margin-top:10px; background: linear-gradient(135deg, #0ea5e9, #0284c7); box-shadow:none; max-width:200px; font-size:0.95rem; padding:12px;">📤
+                Lehrer-Export</button>
+            <button onclick="submitToForms()" id="btn-submit-forms"
+                style="margin-top:10px; background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow:none; max-width:200px; font-size:0.95rem; padding:12px; display:none;">✅
+                An Lehrer senden</button>
+            <button onclick="location.reload()"
+                style="max-width:200px; margin-top:10px; font-size:0.95rem; padding:12px;">🔄 Nochmal</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ── KONFIGURATION FÜR LEHRKRÄFTE (MICROSOFT FORMS) ────────────────────────
+        const formConfig = {
+            enabled: false,     // Auf true setzen, um den Button "An Lehrer senden" zu aktivieren
+            formUrl: "",        // Die Basis-URL Ihres Microsoft Formulars
+            // Die Feld-IDs Ihres Formulars (Details siehe Anleitung-Datei)
+            fields: {
+                name: "r...1",
+                datum: "r...2",
+                xp: "r...3",
+                level: "r...4"
+            },
+            // Erweiterte Optionen (optional)
+            webhookUrl: "",     // Nur für Power Automate Premium
+            autoSubmit: false   // Nur für Webhooks
+        };
+
+        // ── QUESTIONS ─────────────────────────────────────────────────────────────
+        const allQuestions = [
+
+            // ===== 1. EIGENSCHAFTEN =====
+            {
+                category: "Eigenschaften", categoryId: "eigenschaften", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Die Funktion <span class='math-text'>f(x) = a<sup>x</sup></span> geht für jede Basis <span class='math-text'>a &gt; 0, a ≠ 1</span> durch den Punkt …",
+                options: ["(0 | 1)", "(1 | 0)", "(0 | 0)", "(1 | a)"],
+                correct: 0,
+                hint: "f(0) = a⁰ = 1 für alle Basen a. Der Graph läuft also immer durch (0 | 1)."
+            },
+            {
+                category: "Eigenschaften", categoryId: "eigenschaften", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Welche Aussage gilt für <span class='math-text'>f(x) = 0,5<sup>x</sup></span>?",
+                options: [
+                    "f fällt streng (wird immer kleiner)",
+                    "f steigt streng (wird immer größer)",
+                    "f hat eine Nullstelle bei x = 0",
+                    "f ist für x &lt; 0 negativ"
+                ],
+                correct: 0,
+                hint: "Da 0 < 0,5 < 1, fällt der Graph von links nach rechts. Nullstellen hat f nie, denn a^x > 0 für alle x."
+            },
+            {
+                category: "Eigenschaften", categoryId: "eigenschaften", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Welcher Geraden nähert sich der Graph von <span class='math-text'>f(x) = 3<sup>x</sup></span> immer weiter an?",
+                options: ["y = 0 (x-Achse)", "x = 0 (y-Achse)", "y = 1", "y = 3"],
+                correct: 0,
+                hint: "Für x → −∞ gilt 3^x → 0, aber f(x) erreicht 0 nie. Die waagrechte Gerade, der sich der Graph nähert (Annäherung), ist daher y = 0."
+            },
+            {
+                category: "Eigenschaften", categoryId: "eigenschaften", type: "text", isFallback: false, difficulty: "basis",
+                text: "Berechne <span class='math-text'>f(4)</span> für <span class='math-text'>f(x) = 2<sup>x</sup></span>.",
+                correct: ["16"],
+                numericInput: true,
+                hint: "f(4) = 2⁴ = 2 · 2 · 2 · 2 = 16."
+            },
+            // Fallback
+            {
+                category: "Eigenschaften (Basis)", categoryId: "eigenschaften", type: "mc", isFallback: true, difficulty: "basis",
+                text: "Für welche Basis <span class='math-text'>a</span> beschreibt <span class='math-text'>f(x) = a<sup>x</sup></span> eine <em>Wachstums</em>funktion?",
+                options: ["a &gt; 1", "0 &lt; a &lt; 1", "a = 0", "a &lt; 0"],
+                correct: 0,
+                hint: "Für a > 1 wächst a^x mit wachsendem x. Beispiele: 2^x, 3^x, 10^x."
+            },
+
+            // ===== 2. GRAPHEN =====
+            {
+                category: "Graphen", categoryId: "graphen", type: "VisualGraph", isFallback: false, difficulty: "basis",
+                text: "Welche Kurve zeigt eine <strong>Wachstumsfunktion</strong>?",
+                graphSVG: `<svg viewBox="0 0 200 160" style="width:100%; height:180px;">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
+                    </marker>
+                  </defs>
+                  <!-- Gitter -->
+                  <path d="M 20 20 L 180 20 M 20 40 L 180 40 M 20 60 L 180 60 M 20 80 L 180 80 M 20 100 L 180 100 M 20 120 L 180 120" stroke="#e2e8f0" stroke-width="0.5" />
+                  <path d="M 40 20 L 40 140 M 60 20 L 60 140 M 80 20 L 80 140 M 100 20 L 100 140 M 120 20 L 120 140 M 140 20 L 140 140 M 160 20 L 160 140" stroke="#e2e8f0" stroke-width="0.5" />
+                  <!-- Achsen -->
+                  <line x1="15" y1="120" x2="190" y2="120" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                  <line x1="100" y1="145" x2="100" y2="10" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                  <!-- Kurve A: Wachstum -->
+                  <path d="M 20 119 Q 80 118 100 100 T 170 30" fill="transparent" stroke="var(--primary-glow)" stroke-width="3"/>
+                  <!-- Kurve B: Zerfall -->
+                  <path d="M 30 30 Q 100 80 100 100 T 180 119" fill="transparent" stroke="#f87171" stroke-width="3"/>
+                  <!-- Beschriftung -->
+                  <text x="175" y="45" font-size="14" fill="var(--primary-glow)" font-weight="bold">A</text>
+                  <text x="25" y="45" font-size="14" fill="#f87171" font-weight="bold">B</text>
+                  <text x="192" y="132" font-size="11" fill="#64748b">x</text>
+                  <text x="105" y="12" font-size="11" fill="#64748b">y</text>
+                </svg>`,
+                options: ["Kurve A", "Kurve B", "Beide", "Keine"],
+                correct: 0,
+                hint: "Wachstum: Je größer x, desto größer f(x). Kurve A steigt von links nach rechts → Wachstumsfunktion."
+            },
+            {
+                category: "Graphen", categoryId: "graphen", type: "VisualGraph", isFallback: false, difficulty: "aufbau",
+                text: "Der abgebildete Graph läuft durch <span class='math-text'>(0 | 1)</span> und <span class='math-text'>(1 | 2)</span>. Welche Basis <span class='math-text'>a</span> hat die Funktion <span class='math-text'>f(x) = a<sup>x</sup></span>?",
+                graphSVG: `<svg viewBox="0 0 200 160" style="width:100%; height:180px;">
+                  <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
+                    </marker>
+                  </defs>
+                  <!-- Gitter -->
+                  <path d="M 20 20 L 180 20 M 20 40 L 180 40 M 20 60 L 180 60 M 20 80 L 180 80 M 20 100 L 180 100 M 20 120 L 180 120" stroke="#e2e8f0" stroke-width="0.5" />
+                  <path d="M 40 20 L 40 140 M 60 20 L 60 140 M 80 20 L 80 140 M 100 20 L 100 140 M 120 20 L 120 140 M 140 20 L 140 140 M 160 20 L 160 140" stroke="#e2e8f0" stroke-width="0.5" />
+                  <!-- Achsen -->
+                  <line x1="20" y1="120" x2="195" y2="120" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                  <line x1="100" y1="145" x2="100" y2="10" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+                  <!-- Kurve: f(x) = 2^x -->
+                  <path d="M 40 115 Q 80 110 100 100 T 140 40" fill="transparent" stroke="var(--primary-glow)" stroke-width="3"/>
+                  <!-- Punkte -->
+                  <circle cx="100" cy="100" r="4" fill="#fbbf24" stroke="#fff" />
+                  <circle cx="120" cy="80" r="4" fill="#fbbf24" stroke="#fff" />
+                  <text x="105" y="95" font-size="10" fill="#fbbf24" font-weight="bold">(0|1)</text>
+                  <text x="125" y="75" font-size="10" fill="#fbbf24" font-weight="bold">(1|2)</text>
+                  <!-- Skalierung -->
+                  <text x="95" y="132" font-size="9" fill="#94a3b8">0</text>
+                  <text x="117" y="132" font-size="9" fill="#94a3b8">1</text>
+                </svg>`,
+                correct: ["2"],
+                numericInput: true,
+                hint: "f(0) = a⁰ = 1 ✓. f(1) = a¹ = a = 2 → Die Basis ist a = 2."
+            },
+            {
+                category: "Graphen", categoryId: "graphen", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Welche Beschreibung passt zum Graphen von <span class='math-text'>f(x) = (⅓)<sup>x</sup></span>?",
+                options: [
+                    "Fallender Graph, der sich der Geraden y = 0 annähert und durch (0 | 1) läuft",
+                    "Steigender Graph durch (0 | 1)",
+                    "Graph mit Nullstelle bei x = 1",
+                    "Graph mit negativen y-Werten für x &gt; 0"
+                ],
+                correct: 0,
+                hint: "Da 0 < 1/3 < 1, fällt der Graph. Er nähert sich y = 0 an. y-Achsenabschnitt: (1/3)⁰ = 1, also (0 | 1). Keine Nullstellen."
+            },
+            // Fallback
+            {
+                category: "Graphen (Basis)", categoryId: "graphen", type: "mc", isFallback: true, difficulty: "basis",
+                text: "Was kann man am Graphen von <span class='math-text'>f(x) = a<sup>x</sup></span> immer direkt ablesen?",
+                options: [
+                    "Den y-Achsenabschnitt (0 | 1)",
+                    "Eine Nullstelle",
+                    "Den Scheitelpunkt",
+                    "Einen Wendepunkt"
+                ],
+                correct: 0,
+                hint: "Jede Exponentialfunktion f(x) = a^x geht durch (0 | 1), denn a⁰ = 1. Nullstellen und Scheitelpunkte gibt es nicht."
+            },
+
+            // ===== 3. WACHSTUM & ZERFALL =====
+            {
+                category: "Wachstum & Zerfall", categoryId: "wachstum", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Ein radioaktives Präparat zerfällt. Die Menge nach <span class='math-text'>t</span> Jahren beträgt <span class='math-text'>M(t) = 800 · 0,9<sup>t</sup></span>.<br>Um wie viel Prozent sinkt die Menge pro Jahr?",
+                options: ["10 %", "90 %", "9 %", "0,9 %"],
+                correct: 0,
+                hint: "Der Wachstumsfaktor q = 0,9 bedeutet: Es bleiben 90% übrig → 10% Abnahme pro Jahr."
+            },
+            {
+                category: "Wachstum & Zerfall", categoryId: "wachstum", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Eine Bakterienkultur startet mit 50 Bakterien und verdoppelt sich jede Stunde. Wie viele Bakterien gibt es nach <span class='math-text'>4</span> Stunden?",
+                options: ["800", "400", "200", "1 600"],
+                correct: 0,
+                hint: "N(4) = 50 · 2⁴ = 50 · 16 = 800."
+            },
+            {
+                category: "Wachstum & Zerfall", categoryId: "wachstum", type: "mc", isFallback: false, difficulty: "aufbau",
+                text: "Ein Tierbestand sinkt jährlich um 25 %. Der Anfangsbestand ist 1 000 Tiere. Welcher Term beschreibt den Bestand nach <span class='math-text'>n</span> Jahren?",
+                options: ["1000 · 0,75<sup>n</sup>", "1000 · 0,25<sup>n</sup>", "1000 · 1,25<sup>n</sup>", "1000 − 250n"],
+                correct: 0,
+                hint: "25 % Abnahme → jedes Jahr bleiben 75 % übrig → Wachstumsfaktor q = 0,75."
+            },
+            {
+                category: "Wachstum & Zerfall", categoryId: "wachstum", type: "text", isFallback: false, difficulty: "basis",
+                text: "Eine Menge wächst jährlich um 6 % (Startmenge 500). Wie groß ist die Menge nach <span class='math-text'>0</span> Jahren?",
+                correct: ["500"],
+                numericInput: true,
+                hint: "M(0) = 500 · 1,06⁰ = 500 · 1 = 500. Nach 0 Jahren ist die Menge noch unverändert."
+            },
+            // Fallback
+            {
+                category: "Wachstum & Zerfall (Basis)", categoryId: "wachstum", type: "mc", isFallback: true, difficulty: "basis",
+                text: "Eine Population wächst jährlich um 5 %. Welcher Wachstumsfaktor <span class='math-text'>q</span> gehört dazu?",
+                options: ["1,05", "0,95", "1,5", "0,05"],
+                correct: 0,
+                hint: "p % Wachstum → q = 1 + p/100 = 1 + 5/100 = 1,05."
+            },
+
+            // ===== 4. ZINSESZINS =====
+            {
+                category: "Zinseszins", categoryId: "zinseszins", type: "mc", isFallback: false, difficulty: "aufbau",
+                text: "Erik legt 2 000 € zu 3 % p.a. an. Wie viel hat er nach 10 Jahren?<br><small style='color:#6ee7b7'>(Hinweis: 1,03<sup>10</sup> ≈ 1,344)</small>",
+                options: ["2 688 €", "2 600 €", "2 300 €", "3 000 €"],
+                correct: 0,
+                hint: "K₁₀ = 2000 · 1,03¹⁰ ≈ 2000 · 1,344 = 2688 €."
+            },
+            {
+                category: "Zinseszins", categoryId: "zinseszins", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Nach 1 Jahr sind aus 1 000 € genau 1 050 € geworden. Wie hoch ist der Zinssatz <span class='math-text'>p</span>?",
+                options: ["5 %", "50 %", "0,5 %", "1,05 %"],
+                correct: 0,
+                hint: "1000 · q = 1050 → q = 1,05 → p = (q − 1) · 100 = 5 %."
+            },
+            {
+                category: "Zinseszins", categoryId: "zinseszins", type: "mc", isFallback: false, difficulty: "aufbau",
+                text: "Eva hat 800 € auf einem Konto mit 2 % Zinsen p.a. Nach wie vielen Jahren hat sie <em>erstmals</em> mehr als 900 €?<br><small style='color:#6ee7b7'>(1,02⁵ ≈ 1,104 · · · 1,02⁶ ≈ 1,126)</small>",
+                options: ["6 Jahre", "5 Jahre", "7 Jahre", "10 Jahre"],
+                correct: 0,
+                hint: "800 · 1,02^n > 900 → 1,02^n > 1,125. Da 1,02⁵ ≈ 1,104 < 1,125 und 1,02⁶ ≈ 1,126 > 1,125, gilt n = 6."
+            },
+            {
+                category: "Zinseszins", categoryId: "zinseszins", type: "text", isFallback: false, difficulty: "basis",
+                text: "Maria legt 500 € zu 4 % p.a. an. Welcher Wachstumsfaktor <span class='math-text'>q</span> gilt hier? (Komma als Punkt eingeben, z.&nbsp;B. 1.04)",
+                correct: ["1.04", "1,04"],
+                numericInput: false,
+                hint: "q = 1 + p/100 = 1 + 4/100 = 1,04."
+            },
+            // Fallback
+            {
+                category: "Zinseszins (Basis)", categoryId: "zinseszins", type: "mc", isFallback: true, difficulty: "basis",
+                text: "Die Zinseszinsformel lautet <span class='math-text'>K<sub>n</sub> = K<sub>0</sub> · q<sup>n</sup></span>. Was bedeutet <span class='math-text'>q</span>?",
+                options: [
+                    "Der Wachstumsfaktor (q = 1 + p/100)",
+                    "Der Zinssatz in Prozent",
+                    "Die Anzahl der Jahre",
+                    "Das Endkapital"
+                ],
+                correct: 0,
+                hint: "q = 1 + p/100 ist der Wachstumsfaktor. Für 3 % gilt q = 1,03."
+            },
+
+            // ===== 6. ANWENDUNGEN (TRANSFER) =====
+            {
+                category: "Anwendungen", categoryId: "anwendungen", type: "text", isFallback: false, difficulty: "aufbau",
+                text: "Ein Auto verliert jährlich 15 % an Wert. Der Neupreis war 40&nbsp;000 €. Berechne den Wert nach <strong>5 Jahren</strong>.<br><small style='color:#6ee7b7'>(0,85⁵ ≈ 0,4437)</small>",
+                correct: ["17748", "17749"],
+                numericInput: true,
+                hint: "W(5) = 40000 · 0,85⁵ ≈ 40000 · 0,4437 = 17748. Der Wert sinkt auf ca. 17.748 €."
+            },
+            {
+                category: "Anwendungen", categoryId: "anwendungen", type: "mc", isFallback: false, difficulty: "profi",
+                text: "Wann hat sich ein Kapital von 1&nbsp;000 € bei 10 % Zinsen p.a. <strong>verdreifacht</strong>?",
+                options: [
+                    "Nach ca. 11,5 Jahren",
+                    "Nach ca. 15 Jahren",
+                    "Nach ca. 20 Jahren",
+                    "Nach ca. 7,3 Jahren"
+                ],
+                correct: 0,
+                hint: "3 = 1,1ⁿ → n = lg(3) / lg(1,1) ≈ 0,477 / 0,0414 ≈ 11,5 Jahre."
+            },
+            {
+                category: "Anwendungen", categoryId: "anwendungen", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Welche Funktionsgleichung beschreibt einen Bestand, der bei 100 startet und jede Stunde um 4 % <strong>abnimmt</strong>?",
+                options: [
+                    "f(x) = 100 · 0,96<sup>x</sup>",
+                    "f(x) = 100 · 1,04<sup>x</sup>",
+                    "f(x) = 100 − 4x",
+                    "f(x) = 100 · 0,04<sup>x</sup>"
+                ],
+                correct: 0,
+                hint: "Startwert a = 100. Abnahme um 4 % bedeutet q = 1 − 0,04 = 0,96."
+            },
+
+            // ===== 5. EXPONENTIALGLEICHUNGEN =====
+            {
+                category: "Exponentialgleichungen", categoryId: "gleichungen", type: "mc", isFallback: false, difficulty: "basis",
+                text: "Löse: <span class='math-text'>2<sup>x</sup> = 16</span>",
+                options: ["x = 4", "x = 8", "x = 2", "x = 3"],
+                correct: 0,
+                hint: "2⁴ = 2 · 2 · 2 · 2 = 16. Also x = 4."
+            },
+            {
+                category: "Exponentialgleichungen", categoryId: "gleichungen", type: "text", isFallback: false, difficulty: "basis",
+                text: "Löse: <span class='math-text'>3<sup>x</sup> = 27</span>",
+                correct: ["3"],
+                numericInput: true,
+                hint: "3¹ = 3, 3² = 9, 3³ = 27 → x = 3."
+            },
+            {
+                category: "Exponentialgleichungen", categoryId: "gleichungen", type: "mc", isFallback: false, difficulty: "aufbau",
+                text: "Löse mithilfe des Logarithmus: <span class='math-text'>5<sup>x</sup> = 12</span>.<br>Welche Umformung ist korrekt?",
+                options: [
+                    "x = lg(12) / lg(5) = ln(12) / ln(5)",
+                    "x = 12 / 5",
+                    "x = 12 − 5",
+                    "x = 5 · lg(12)"
+                ],
+                correct: 0,
+                hint: "5^x = 12 → x = log₅(12). Mit dem Basiswechselsatz: log₅(12) = lg(12)/lg(5) = ln(12)/ln(5) ≈ 1,544."
+            },
+            // Fallback
+            {
+                category: "Exponentialgleichungen (Basis)", categoryId: "gleichungen", type: "mc", isFallback: true, difficulty: "basis",
+                text: "Für welches <span class='math-text'>x</span> gilt <span class='math-text'>4<sup>x</sup> = 1</span>?",
+                options: ["x = 0", "x = 4", "x = 1", "x = −1"],
+                correct: 0,
+                hint: "a⁰ = 1 für alle a ≠ 0. Also 4⁰ = 1 → x = 0."
+            },
+
+            // ===== LEVEL 2 =====
+            {
+                category: "Wachstum Level 2", categoryId: "wachstum", type: "text", isFallback: false, isLevel2: true, difficulty: "profi",
+                text: "Eine Bakterienkultur startet mit <strong>1 Bakterium</strong> und verdoppelt sich jede Stunde. Nach wie vielen Stunden gibt es <strong>mindestens eine Million</strong> Bakterien?<br><small style='color:#6ee7b7'>(Tipp: lg 2 ≈ 0,301)</small>",
+                correct: ["20"],
+                numericInput: true,
+                hint: "2^n ≥ 1 000 000 → n ≥ lg(1 000 000)/lg(2) = 6 / 0,301 ≈ 19,93. Aufgerundet: n = 20 Stunden."
+            },
+            {
+                category: "Zinseszins Level 2", categoryId: "zinseszins", type: "mc", isFallback: false, isLevel2: true, difficulty: "profi",
+                text: "Ein Kapital wächst bei <strong>8 % p.a.</strong> auf das Doppelte. Nach ungefähr wie vielen Jahren?<br><small style='color:#6ee7b7'>(Verdopplungszeit: n = lg(2) / lg(1,08) · · · lg(1,08) ≈ 0,0334)</small>",
+                options: ["ca. 9 Jahre", "ca. 12 Jahre", "ca. 6 Jahre", "ca. 16 Jahre"],
+                correct: 0,
+                hint: "n = lg(2)/lg(1,08) ≈ 0,301/0,0334 ≈ 9. Nach etwa 9 Jahren hat sich das Kapital verdoppelt."
+            }
+        ];
+
+        // ── RESSOURCEN ────────────────────────────────────────────────────────────
+        const categoryResources = {
+            "eigenschaften": {
+                title: "Eigenschaften von Exponentialfunktionen",
+                links: [
+                    { label: "📺 YouTube: Exponentialfunktion Eigenschaften", url: "https://www.youtube.com/results?search_query=Exponentialfunktion+Eigenschaften+Klasse+10" },
+                    { label: "📖 mathebibel.de: Exponentialfunktionen", url: "https://www.mathebibel.de/exponentialfunktionen" }
+                ]
+            },
+            "graphen": {
+                title: "Graphen von Exponentialfunktionen",
+                links: [
+                    { label: "📺 YouTube: Graphen Exponentialfunktionen lesen", url: "https://www.youtube.com/results?search_query=Graphen+Exponentialfunktionen+lesen+Klasse+10" },
+                    { label: "📖 mathebibel.de: Graphen von Exponentialfunktionen", url: "https://www.mathebibel.de/exponentialfunktionen" }
+                ]
+            },
+            "wachstum": {
+                title: "Exponentielles Wachstum & Zerfall",
+                links: [
+                    { label: "📺 YouTube: Exponentielles Wachstum und Zerfall", url: "https://www.youtube.com/results?search_query=exponentielles+Wachstum+Zerfall+erkl%C3%A4rt" },
+                    { label: "📖 mathebibel.de: Exponentielles Wachstum", url: "https://www.mathebibel.de/exponentielles-wachstum" }
+                ]
+            },
+            "zinseszins": {
+                title: "Zinseszinsrechnung",
+                links: [
+                    { label: "📺 YouTube: Zinseszinsformel erklärt", url: "https://www.youtube.com/results?search_query=Zinseszinsformel+Klasse+10+erkl%C3%A4rt" },
+                    { label: "📖 mathebibel.de: Zinseszinsrechnung", url: "https://www.mathebibel.de/zinseszinsrechnung" }
+                ]
+            },
+            "gleichungen": {
+                title: "Exponentialgleichungen",
+                links: [
+                    { label: "📺 YouTube: Exponentialgleichungen lösen", url: "https://www.youtube.com/results?search_query=Exponentialgleichungen+l%C3%B6sen+Klasse+10" },
+                    { label: "📖 mathebibel.de: Exponentialgleichungen", url: "https://www.mathebibel.de/exponentialgleichungen" }
+                ]
+            },
+            "anwendungen": {
+                title: "Anwendungen (Wachstumsprozesse)",
+                links: [
+                    { label: "📺 YouTube: Reale Anwendungen Exponentialfunktionen", url: "https://www.youtube.com/results?search_query=Exponentialfunktionen+Anwendungsaufgaben+Klasse+10" },
+                    { label: "📖 studyflix.de: Exponentielles Wachstum", url: "https://studyflix.de/mathematik/exponentielles-wachstum-2396" }
+                ]
+            }
+        };
+
+        const packageOrder = { basis: 1, aufbau: 2, profi: 3 };
+        const packageLabel = { basis: "Basis", aufbau: "Aufbau", profi: "Profi" };
+
+        const competenciesByCategory = {
+            "eigenschaften": {
+                basis: [
+                    "Ich kann Exponentialfunktionen an der Form erkennen.",
+                    "Ich kann sagen: Der Graph geht durch (0|1) und nähert sich y = 0.",
+                    "Ich kann entscheiden: Wachstum oder Zerfall?"
+                ],
+                aufbau: [
+                    "Ich kann Eigenschaften zuordnen (steigend/fallend, Annäherung).",
+                    "Ich kann beschreiben, wie der Faktor b den Graphen verändert.",
+                    "Ich kann Graph, Tabelle und Term zusammen nutzen."
+                ],
+                profi: [
+                    "Ich kann Parameterwirkungen sicher erklären und begründen.",
+                    "Ich kann Funktionsklassen mit klaren Argumenten vergleichen.",
+                    "Ich kann das auf neue Funktionen übertragen."
+                ]
+            },
+            "anwendungen": {
+                basis: [
+                    "Ich kann einfache Textaufgaben zu Wachstum verstehen.",
+                    "Ich kann Startwert und Wachstumsfaktor in Sachkontexten finden."
+                ],
+                aufbau: [
+                    "Ich kann mehrstufige Aufgaben (z.B. Wertverlust) lösen.",
+                    "Ich kann Terme für reale Prozesse aufstellen."
+                ],
+                profi: [
+                    "Ich kann komplexe Transferaufgaben (Verdopplungszeit etc.) lösen.",
+                    "Ich kann Ergebnisse im Sachkontext kritisch beurteilen."
+                ]
+            },
+            "graphen": {
+                basis: [
+                    "Ich kann Wachstum/Zerfall am Graphen ablesen.",
+                    "Ich kann den Punkt (0|1) erkennen.",
+                    "Ich kann den Graphen in Worten deuten."
+                ],
+                aufbau: [
+                    "Ich kann die Basis aus markierten Punkten bestimmen.",
+                    "Ich kann Graph und Funktionsterm verknüpfen.",
+                    "Ich kann die Form des Graphen erklären."
+                ],
+                profi: [
+                    "Ich kann Parameter aus Graphen sicher bestimmen.",
+                    "Ich kann meine Wahl mit Eigenschaften begründen.",
+                    "Ich kann prüfen, ob ein Graph plausibel ist."
+                ]
+            },
+            "wachstum": {
+                basis: [
+                    "Ich kann mit Wachstum/Zerfall (q) rechnen.",
+                    "Ich kann Prozentangaben korrekt umrechnen.",
+                    "Ich kann Startwert und Faktor erkennen."
+                ],
+                aufbau: [
+                    "Ich kann Modelle aus Texten aufstellen.",
+                    "Ich kann beurteilen, ob ein Modell passt.",
+                    "Ich kann Entwicklungen in Alltagssituationen erklären."
+                ],
+                profi: [
+                    "Ich kann Prognosen treffen und prüfen.",
+                    "Ich kann verschiedene Modelle vergleichen.",
+                    "Ich kann Entscheidungen mathematisch begründen."
+                ]
+            },
+            "zinseszins": {
+                basis: [
+                    "Ich kann die Zinseszinsformel sicher nutzen.",
+                    "Ich kann den Wachstumsfaktor q bestimmen.",
+                    "Ich kann einfache Sachaufgaben rechnen."
+                ],
+                aufbau: [
+                    "Ich kann Zinseszins als Exponentialfunktion erkennen.",
+                    "Ich kann Parameter im Kontext deuten.",
+                    "Ich kann Ergebnisse auf Plausibilität prüfen."
+                ],
+                profi: [
+                    "Ich kann komplexere Zinseszinsfragen lösen.",
+                    "Ich kann langfristige Entwicklungen erklären.",
+                    "Ich kann verschiedene Zinsszenarien vergleichen."
+                ]
+            },
+            "gleichungen": {
+                basis: [
+                    "Ich kann einfache Exponentialgleichungen lösen.",
+                    "Ich kann passende Potenzen erkennen.",
+                    "Ich kann Lösungen überprüfen."
+                ],
+                aufbau: [
+                    "Ich kann Gleichungen durch Probieren/Umformen lösen.",
+                    "Ich kann den Weg mit Logarithmen erkennen.",
+                    "Ich kann Lösungen im Kontext deuten."
+                ],
+                profi: [
+                    "Ich kann Exponentialgleichungen mit Logarithmen sicher lösen.",
+                    "Ich kann Näherungen sinnvoll rechnen.",
+                    "Ich kann jeden Schritt verständlich erklären."
+                ]
+            }
+        };
+
+        // ── STATE ─────────────────────────────────────────────────────────────────
+        let currentQueue = [];
+        let currentIndex = 0;
+        let xp = 0;
+        let level = 1;
+        let streak = 0;
+        let consecutiveMistakesCategory = 0;
+        let lastErrorCategory = "";
+        let selectedOption = null;
+        let questionStartTime = 0;
+        let jokerUsedForCurrent = false;
+        let studentName = "Schüler/in";
+        let level2Started = false;
+        let baseQueueLength = 0;
+        let selectedPackage = "basis";
+
+        const JOKER_COST = 50;
+        const XP_PER_LEVEL = 250;
+
+        let scores = {};
+
+        function getSelectedPackage() {
+            const checked = document.querySelector("input[name='package']:checked");
+            return checked ? checked.value : "basis";
+        }
+
+        function isAllowedDifficulty(difficulty) {
+            if (!difficulty) return true;
+            return packageOrder[difficulty] <= packageOrder[selectedPackage];
+        }
+
+        function initScoresFromQueue(queue) {
+            const totals = {};
+            queue.forEach(q => {
+                if (q.isFallback || q.isLevel2) return;
+                if (!totals[q.categoryId]) {
+                    totals[q.categoryId] = { correct: 0, total: 0, name: q.category };
+                }
+                totals[q.categoryId].total += 1;
+            });
+            return totals;
+        }
+
+        function updatePackageInfo() {
+            const baseQuestions = allQuestions.filter(q => !q.isFallback && !q.isLevel2 && isAllowedDifficulty(q.difficulty));
+            const bonusQuestions = allQuestions.filter(q => q.isLevel2 && selectedPackage === "profi");
+            const label = packageLabel[selectedPackage] || "Basis";
+            const countText = `${baseQuestions.length}${bonusQuestions.length ? " + Bonus" : ""}`;
+            document.getElementById('question-count').innerText = countText + ` (${label})`;
+        }
+
+        // ── QUEUE ─────────────────────────────────────────────────────────────────
+        function buildQueue() {
+            currentQueue = [];
+            allQuestions.forEach(q => {
+                if (q.isFallback || q.isLevel2) return;
+                if (!isAllowedDifficulty(q.difficulty)) return;
+                currentQueue.push(q);
+            });
+            baseQueueLength = currentQueue.length;
+            scores = initScoresFromQueue(currentQueue);
+        }
+
+        function buildLevel2Queue() {
+            if (selectedPackage !== "profi") return;
+            level2Started = true;
+            allQuestions.forEach(q => { if (q.isLevel2 && isAllowedDifficulty(q.difficulty)) currentQueue.push(q); });
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = `<div class="feedback-message msg-success" style="animation:none;">🔥 LEVEL 2 ERREICHT! Knifflige Bonus-Aufgaben freigeschaltet! 🔥</div>`;
+            setTimeout(loadQuestion, 3000);
+        }
+
+        function startTest() {
+            const nameInput = document.getElementById('student-name').value.trim();
+            studentName = nameInput || "Schüler/in";
+            localStorage.setItem('diagnose-k10-name', studentName);
+            selectedPackage = getSelectedPackage();
+
+            const theme = document.querySelector("input[name='theme']:checked").value;
+            // Remove previous themes
+            document.body.classList.remove('theme-midnight', 'theme-ocean', 'theme-sunset');
+            // Add selected theme
+            if (theme !== 'emerald') {
+                document.body.classList.add(`theme-${theme}`);
+            }
+
+            updatePackageInfo();
+            buildQueue();
+            document.getElementById('start-screen').classList.remove('active');
+            document.getElementById('quiz-screen').classList.add('active');
+            loadQuestion();
+        }
+
+        // ── LOAD QUESTION ─────────────────────────────────────────────────────────
+        function loadQuestion() {
+            questionStartTime = Date.now();
+            jokerUsedForCurrent = false;
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.onclick = submitAnswer;
+            nextBtn.innerText = "Antwort bestätigen ✓";
+
+            if (currentIndex >= currentQueue.length) {
+                if (level >= 2 && !level2Started && selectedPackage === "profi") {
+                    buildLevel2Queue();
+                } else {
+                    showResults();
+                    return;
+                }
+            }
+
+            const q = currentQueue[currentIndex];
+            document.getElementById('question-category').innerText = q.category;
+            document.getElementById('question-text').innerHTML = q.text;
+
+            const inputArea = document.getElementById('input-area');
+            inputArea.innerHTML = "";
+
+            const jokerArea = document.getElementById('joker-area');
+            const jokerText = document.getElementById('joker-hint');
+            const jokerBtn = document.getElementById('btn-joker');
+            jokerText.style.display = "none";
+            jokerText.innerText = "";
+
+            if (q.hint && xp >= JOKER_COST) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "1";
+            } else if (q.hint) {
+                jokerArea.style.display = "block";
+                jokerBtn.disabled = false;
+                jokerBtn.style.opacity = "0.5";
+            } else {
+                jokerArea.style.display = "none";
+            }
+
+            selectedOption = null;
+
+            if (q.type === 'VisualGraph') {
+                const graphDiv = document.createElement('div');
+                graphDiv.className = 'graph-container';
+                graphDiv.innerHTML = q.graphSVG;
+                inputArea.appendChild(graphDiv);
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'mc') {
+                renderMCOptions(q, inputArea);
+            } else if (q.type === 'text') {
+                const input = document.createElement('input');
+                input.type = q.numericInput ? 'number' : 'text';
+                input.id = 'text-answer';
+                input.placeholder = q.numericInput ? "Zahl eingeben …" : "Antwort eingeben …";
+                input.onkeyup = (e) => { if (e.key === 'Enter') submitAnswer(); };
+                inputArea.appendChild(input);
+                setTimeout(() => input.focus(), 100);
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+            updateProgress();
+        }
+
+        function renderMCOptions(q, container) {
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'mc-options';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'mc-option';
+                btn.innerHTML = opt;
+                btn.onclick = () => {
+                    document.querySelectorAll('.mc-option').forEach(el => el.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOption = index;
+                };
+                optionsDiv.appendChild(btn);
+            });
+            container.appendChild(optionsDiv);
+        }
+
+        function useJoker() {
+            if (xp >= JOKER_COST) {
+                xp -= JOKER_COST;
+                jokerUsedForCurrent = true;
+                document.getElementById('xp-display').querySelector('span').innerText = xp;
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = currentQueue[currentIndex].hint;
+                hintDiv.style.display = "block";
+                document.getElementById('btn-joker').disabled = true;
+                document.getElementById('btn-joker').style.opacity = "0.2";
+            } else {
+                const hintDiv = document.getElementById('joker-hint');
+                hintDiv.innerText = `Nicht genug XP! Du brauchst ${JOKER_COST} XP für einen Tipp.`;
+                hintDiv.style.color = "var(--error)";
+                hintDiv.style.display = "block";
+                setTimeout(() => { hintDiv.style.display = "none"; hintDiv.style.color = "var(--joker-color)"; }, 2000);
+            }
+        }
+
+        // ── SUBMIT ────────────────────────────────────────────────────────────────
+        function submitAnswer() {
+            const q = currentQueue[currentIndex];
+            const inputArea = document.getElementById('input-area');
+            let isCorrect = false;
+
+            if (q.type === 'mc' || q.type === 'VisualGraph') {
+                if (selectedOption === null) return;
+                isCorrect = selectedOption === q.correct;
+                const options = document.querySelectorAll('.mc-option');
+                options.forEach((el, i) => {
+                    if (i === q.correct) el.classList.add('correct');
+                    else if (i === selectedOption) el.classList.add('wrong');
+                });
+            } else if (q.type === 'text') {
+                const textInput = document.getElementById('text-answer');
+                if (!textInput || textInput.value.trim() === '') return;
+                const userVal = textInput.value.trim().toLowerCase().replace(/\s/g, '');
+                const corrects = q.correct.map(c => c.toLowerCase().replace(/\s/g, ''));
+                isCorrect = corrects.includes(userVal);
+                textInput.style.borderColor = isCorrect ? 'var(--success)' : 'var(--error)';
+                textInput.disabled = true;
+
+                if (!isCorrect) {
+                    const correctLabel = document.createElement('div');
+                    correctLabel.className = 'feedback-message msg-error';
+                    correctLabel.innerHTML = `Richtige Antwort: <strong>${q.correct[0]}</strong>`;
+                    inputArea.appendChild(correctLabel);
+                }
+            }
+
+            // XP-Berechnung
+            if (isCorrect) {
+                let earnedXP = 100;
+                const elapsed = (Date.now() - questionStartTime) / 1000;
+                if (elapsed <= 12 && !jokerUsedForCurrent) earnedXP += 50;
+                if (jokerUsedForCurrent) earnedXP = Math.floor(earnedXP * 0.6);
+
+                streak++;
+                if (streak >= 3) earnedXP += 20;
+                if (streak >= 5) earnedXP += 30;
+
+                xp += earnedXP;
+                if (!q.isFallback && !q.isLevel2 && scores[q.categoryId]) {
+                    scores[q.categoryId].correct++;
+                }
+
+                showXPPopup(`+${earnedXP} XP`);
+                updateStreak(true);
+
+                if (!q.isFallback) {
+                    const oldLevel = level;
+                    level = Math.floor(xp / XP_PER_LEVEL) + 1;
+                    if (level > oldLevel) showLevelUp();
+                }
+
+                consecutiveMistakesCategory = 0;
+                lastErrorCategory = "";
+
+            } else {
+                streak = 0;
+                updateStreak(false);
+                consecutiveMistakesCategory++;
+                lastErrorCategory = q.categoryId;
+
+                if (consecutiveMistakesCategory >= 2) {
+                    const fallback = allQuestions.find(fq => fq.isFallback && fq.categoryId === lastErrorCategory);
+                    if (fallback && !currentQueue.includes(fallback)) {
+                        currentQueue.splice(currentIndex + 1, 0, fallback);
+                        consecutiveMistakesCategory = 0;
+                    }
+                }
+            }
+
+            updateHUD();
+            currentIndex++;
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerText = currentIndex >= currentQueue.length ? 'Ergebnis anzeigen ➜' : 'Weiter ➜';
+            nextBtn.onclick = loadQuestion;
+        }
+
+        // ── HUD & UI ──────────────────────────────────────────────────────────────
+        function updateHUD() {
+            document.getElementById('xp-display').querySelector('span').innerText = xp;
+            document.getElementById('level-display').querySelector('span').innerText = level;
+        }
+
+        function updateStreak(correct) {
+            const el = document.getElementById('streak-display');
+            el.innerText = `🔥 ×${streak}`;
+            if (correct && streak > 1) {
+                el.classList.remove('streak-fire');
+                void el.offsetWidth;
+                el.classList.add('streak-fire');
+            }
+        }
+
+        function updateProgress() {
+            const total = baseQueueLength || currentQueue.length;
+            const pct = Math.min((currentIndex / total) * 100, 100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
+
+        function getCompetencyLevel(ratio) {
+            if (ratio >= 0.76) return { label: "Kann", cls: "level-ok" };
+            if (ratio >= 0.5) return { label: "Teilweise", cls: "level-mid" };
+            return { label: "Kann noch nicht", cls: "level-low" };
+        }
+
+        function renderCompetencies() {
+            const grid = document.getElementById('competency-grid');
+            grid.innerHTML = '';
+            for (const [key, s] of Object.entries(scores)) {
+                const ratio = s.total > 0 ? s.correct / s.total : 1;
+                const level = getCompetencyLevel(ratio);
+                const byPackage = competenciesByCategory[key] || {};
+                const items = byPackage[selectedPackage] || byPackage.basis || [];
+                const card = document.createElement('div');
+                card.className = 'competency-card';
+                card.innerHTML = `
+                    <div class="cat-name">${s.name}</div>
+                    <div class="competency-level ${level.cls}">${level.label}</div>
+                    <ul class="competency-list">
+                        ${items.map(i => `<li>${i}</li>`).join('')}
+                    </ul>`;
+                grid.appendChild(card);
+            }
+        }
+
+        function showXPPopup(text) {
+            const popup = document.createElement('div');
+            popup.className = 'xp-popup';
+            popup.innerText = text;
+            popup.style.left = (Math.random() * 60 + 20) + '%';
+            popup.style.top = '40%';
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1300);
+        }
+
+        function showLevelUp() {
+            const banner = document.getElementById('level-up-banner');
+            banner.innerText = `⬆️ LEVEL ${level} ERREICHT! Weiter so!`;
+            banner.classList.add('show');
+            setTimeout(() => banner.classList.remove('show'), 2500);
+        }
+
+        // ── RESULTS ───────────────────────────────────────────────────────────────
+        function showResults() {
+            document.getElementById('quiz-screen').classList.remove('active');
+            document.getElementById('result-screen').classList.add('active');
+
+            const today = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            document.getElementById('cert-title').innerText = `Zertifikat: ${studentName}`;
+            document.getElementById('final-stats').innerText = `Ergebnis: ${xp} XP | Level ${level} | ${today}`;
+
+            const bestXP = parseInt(localStorage.getItem('diagnose-k10-best-xp') || '0');
+            if (xp > bestXP) localStorage.setItem('diagnose-k10-best-xp', xp);
+
+            const scoreGrid = document.getElementById('score-grid');
+            scoreGrid.innerHTML = '';
+
+            const resourcesContainer = document.getElementById('resources-container');
+            resourcesContainer.innerHTML = '';
+
+            let hasWeakness = false;
+
+            for (const [key, s] of Object.entries(scores)) {
+                const ratio = s.total > 0 ? s.correct / s.total : 1;
+                const pct = Math.round(ratio * 100);
+                const color = ratio >= 0.8 ? '#34d399' : ratio >= 0.5 ? '#fbbf24' : '#f87171';
+
+                const card = document.createElement('div');
+                card.className = 'score-card';
+                card.innerHTML = `
+                    <div class="cat-name">${s.name}</div>
+                    <div class="cat-score" style="color:${color}">${s.correct} / ${s.total}</div>
+                    <div class="cat-bar"><div class="cat-fill" style="width:${pct}%; background:${color}"></div></div>`;
+                scoreGrid.appendChild(card);
+
+                if (ratio < 1 && categoryResources[key]) {
+                    hasWeakness = true;
+                    const res = categoryResources[key];
+                    const resSection = document.createElement('div');
+                    resSection.className = 'resources-section';
+                    resSection.innerHTML = `<h4>📚 Lernhilfe: ${res.title}</h4>`;
+                    res.links.forEach(link => {
+                        const a = document.createElement('a');
+                        a.className = 'resource-link';
+                        a.href = link.url;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.innerText = link.label;
+                        resSection.appendChild(a);
+                    });
+                    resourcesContainer.appendChild(resSection);
+                }
+            }
+
+            renderCompetencies();
+
+            if (!hasWeakness) {
+                resourcesContainer.innerHTML = `<div class="feedback-message msg-success" style="margin-top:15px;">🏆 Perfektes Ergebnis! Alle Aufgaben richtig!</div>`;
+            }
+
+            // Button einblenden, wenn MS Forms konfiguriert
+            if (formConfig.enabled) {
+                document.getElementById('btn-submit-forms').style.display = 'inline-block';
+            }
+
+            // Automatischer Versand (nur falls Webhook konfiguriert)
+            if (formConfig.webhookUrl && formConfig.autoSubmit) {
+                submitToWebhook();
+            }
+        }
+
+        function submitToForms() {
+            if (!formConfig.enabled || !formConfig.formUrl) {
+                alert("Konfiguration fehlt! Bitte formConfig im HTML-Code prüfen.");
+                return;
+            }
+
+            const today = new Date().toLocaleDateString('de-DE');
+            const dataObj = {};
+            dataObj[formConfig.fields.name] = studentName;
+            dataObj[formConfig.fields.datum] = today;
+            dataObj[formConfig.fields.xp] = xp.toString();
+            dataObj[formConfig.fields.level] = level.toString();
+
+            const jsonStr = JSON.stringify(dataObj);
+            const encodedData = encodeURIComponent(jsonStr);
+            const finalUrl = `${formConfig.formUrl}&f=${encodedData}`;
+
+            window.open(finalUrl, '_blank');
+        }
+
+        function submitToWebhook() {
+            const statusEl = createStatusElement();
+            const today = new Date().toLocaleDateString('de-DE');
+            const payload = { name: studentName, datum: today, xp: xp, level: level, scores: scores };
+
+            fetch(formConfig.webhookUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                updateStatus(statusEl, "✅ Daten übertragen!", "var(--success)");
+            }).catch(err => {
+                updateStatus(statusEl, "❌ Fehler: " + err.message, "var(--error)");
+            });
+        }
+
+        function createStatusElement() {
+            const statusEl = document.createElement('div');
+            statusEl.style.fontSize = "0.85rem";
+            statusEl.style.marginTop = "10px";
+            statusEl.style.color = "var(--secondary-glow)";
+            statusEl.innerText = "⏳ Status: Daten werden übertragen...";
+            document.getElementById('result-screen').appendChild(statusEl);
+            return statusEl;
+        }
+
+        function updateStatus(el, text, color) {
+            el.innerText = text;
+            el.style.color = color;
+        }
+
+        function exportToCSV() {
+            const today = new Date().toLocaleDateString('de-DE');
+            let csv = "Name;Datum;Gesamt_XP;Level;";
+
+            const cats = Object.keys(scores);
+            csv += cats.map(k => scores[k].name).join(";") + "\n";
+
+            csv += `${studentName};${today};${xp};${level};`;
+            csv += cats.map(k => scores[k].correct).join(";") + "\n";
+
+            const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Ergebnis_${studentName.replace(/\s+/g, '_')}_${today.replace(/\./g, '-')}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function submitToForms() {
+            if (!formConfig.enabled || !formConfig.formUrl) {
+                alert("Konfiguration fehlt! Bitte formConfig im HTML-Code prüfen.");
+                return;
+            }
+
+            // Microsoft Forms Pre-fill URL Struktur: 
+            // &f={%22r...%22:%22Wert%22,%22r...%22:%22Wert2%22}
+            const today = new Date().toLocaleDateString('de-DE');
+            const dataObj = {};
+            dataObj[formConfig.fields.name] = studentName;
+            dataObj[formConfig.fields.datum] = today;
+            dataObj[formConfig.fields.xp] = xp.toString();
+            dataObj[formConfig.fields.level] = level.toString();
+
+            const jsonStr = JSON.stringify(dataObj);
+            const encodedData = encodeURIComponent(jsonStr);
+            const finalUrl = `${formConfig.formUrl}&f=${encodedData}`;
+
+            window.open(finalUrl, '_blank');
+        }
+
+        // ── INIT ──────────────────────────────────────────────────────────────────
+        window.addEventListener('load', () => {
+            const savedName = localStorage.getItem('diagnose-k10-name');
+            if (savedName) document.getElementById('student-name').value = savedName;
+            const bestXP = localStorage.getItem('diagnose-k10-best-xp');
+            if (bestXP) document.getElementById('best-score-display').innerText = `🏆 Bestes Ergebnis: ${bestXP} XP`;
+            selectedPackage = getSelectedPackage();
+            updatePackageInfo();
+            const pkg = document.getElementById('package-options');
+            if (pkg) {
+                pkg.addEventListener('change', () => {
+                    selectedPackage = getSelectedPackage();
+                    updatePackageInfo();
+                });
+            }
+        });
+
+    </script>
+</body>
+
+</html>

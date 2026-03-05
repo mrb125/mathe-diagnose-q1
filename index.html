@@ -450,539 +450,466 @@
     // FRAGEN-DATEN (mit explanation + difficulty + isChallengeOnly)
     // ══════════════════════════════════════════════════════
     const allQuestions = [
-
-        // ─── 1. Ableitungsregeln ────────────────────────
+        // ─── Exponentialfunktion – Grundverständnis ───
         {
-            category: "Ableitungsregeln", categoryId: "ableitung", type: "VisualGraph", isFallback: false, difficulty: "easy",
-            text: "Welche Aussage trifft auf die Ableitungsfunktion f'(x) des abgebildeten Graphen von <span class='math-text'>f(x) = e^x</span> zu?",
-            options: ["Der Graph der Ableitung verläuft unterhalb der x-Achse.", "Der Graph der Ableitung ist exakt derselbe wie der abgebildete.", "Der Graph der Ableitung ist eine Ursprungsgerade."],
-            correct: 1,
-            hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!",
-            explanation: "Die natürliche Exponentialfunktion ist die einzige Funktion, die ihre eigene Ableitung ist: (eˣ)' = eˣ. Der Graph der Ableitung ist daher identisch mit dem Ausgangsgraphen.",
-            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                <path d="M 10 95 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
-                <text x="5" y="115" font-size="12" fill="#000">0</text>
-                <text x="85" y="115" font-size="12" fill="#000">x</text>
-            </svg>`
-        },
-        {
-            category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Gegeben ist <span class='math-text'>f(x) = e^(2x)</span>. Wie lautet die Ableitung f'(x)?",
-            options: ["e^(2x)", "2e^(2x)", "2xe^(2x)", "0.5e^(2x)"],
-            correct: 1,
-            hint: "Kettenregel: Schreibe die e-Funktion ab und multipliziere mit der Konstante aus dem Exponenten (hier: 2).",
-            explanation: "Kettenregel: äußere Funktion eᵘ bleibt, mal innere Ableitung. u = 2x, u' = 2 → f'(x) = 2·e^(2x)."
-        },
-        {
-            category: "Ableitungsregeln", categoryId: "ableitung", type: "text", isFallback: false, difficulty: "medium",
-            text: "Gegeben: <span class='math-text'>f(x) = x · e^x</span>.<br>Berechne f'(x) und klammere e^x aus.<br>(Schreibweise: <i>(x+1)*e^x</i>)",
-            correct: ["(x+1)*e^x", "(1+x)*e^x", "e^x*(x+1)", "e^x*(1+x)"],
-            hint: "Produktregel: (u·v)' = u'·v + u·v'. Hier u = x, v = eˣ.",
-            explanation: "Produktregel: u=x (u'=1), v=eˣ (v'=eˣ). Ergibt: 1·eˣ + x·eˣ = eˣ·(1+x)."
-        },
-        {
-            category: "Ableitungsregeln", categoryId: "ableitung", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Welche Regel benötigst du zwingend zur Ableitung von <span class='math-text'>f(x) = 5 · e^(−0.2x)</span>?",
-            options: ["Nur die Kettenregel", "Nur die Produktregel", "Die Quotientenregel", "Keine, das ist polynomisch"],
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Welche Funktion beschreibt exponentielles Wachstum?",
+            options: ["f(x)=2·1,3<sup>x</sup>", "f(x)=2·(1+x)", "f(x)=2·x<sup>2</sup>", "f(x)=2·x"],
             correct: 0,
-            hint: "Da vorne nur eine konstante 5 steht (kein x-Term), braucht man keine Produktregel.",
-            explanation: "Die 5 ist ein konstanter Faktor (Faktorregel). Für den Exponenten −0,2x braucht man die Kettenregel: f'(x) = 5·(−0,2)·e^(−0,2x) = −e^(−0,2x)."
-        },
-        // Fallback Ableitung
-        {
-            category: "Ableitungsregeln (Basis)", categoryId: "ableitung", type: "text", isFallback: true, difficulty: "easy",
-            text: "Lass uns einen Schritt zurückgehen. Was ist die Ableitung der einfachen e-Funktion <span class='math-text'>f(x) = e^x</span>?",
-            correct: ["e^x"],
-            hint: "Merksatz: Die einfache e-Funktion bleibt beim Ableiten genau gleich!"
-        },
-        // Challenge Ableitung (Feature 10)
-        {
-            category: "Ableitungsregeln (Herausforderung)", categoryId: "ableitung", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "Leite ab: <span class='math-text'>f(x) = e^(x²)</span>. Welches ist f'(x)?",
-            options: ["e^(x²)", "x · e^(x²)", "2x · e^(x²)", "e^(2x)"],
-            correct: 2,
-            hint: "Kettenregel mit u = x². u' = 2x. Also: f'(x) = u' · e^(u) = 2x · e^(x²).",
-            explanation: "Kettenregel: äußere Funktion eᵘ, innere Funktion u = x² mit u' = 2x. → f'(x) = 2x·e^(x²)."
-        },
-
-        // ─── 2. Stammfunktionen ────────────────────────
-        {
-            category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false, difficulty: "medium",
-            text: "Finde den Fehler! Max berechnet die Stammfunktion von <span class='math-text'>f(x) = e^(2x)</span> und kommt auf <span class='math-text'>F(x) = 2·e^(2x)</span>. Was ist falsch?",
-            options: ["Er hat die e-Funktion verändert.", "Er hat abgeleitet statt aufgeleitet.", "Das +c fehlt, sonst ist es richtig.", "Das Minus-Vorzeichen fehlt."],
-            correct: 1,
-            hint: "Eine mal-2 vorne ist die innere Ableitung. Beim Aufleiten muss dort der Kehrwert (1/2) stehen!",
-            explanation: "Beim Aufleiten von e^(kx) gilt: ∫e^(2x)dx = (1/2)·e^(2x). Max hat mit 2 multipliziert (= ableiten) statt durch 2 zu teilen (= aufleiten)."
+            hint: "Exponentielles Wachstum hat die Form a·b^x mit b > 1.",
+            explanation: "Bei f(x)=a·b^x mit b>1 steigt die Funktion pro Schritt um einen festen Faktor."
         },
         {
-            category: "Stammfunktionen", categoryId: "stamm", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Welcher Term ist eine Stammfunktion von <span class='math-text'>f(x) = e^(3x)</span>?",
-            options: ["e^(3x)", "3e^(3x)", "(1/3)e^(3x)", "e^(3x) + 3x"],
-            correct: 2,
-            hint: "Beim Aufleiten: e-Funktion behalten, durch k (die Zahl vor x) dividieren.",
-            explanation: "Aufleiten von e^(kx): ∫e^(3x)dx = (1/3)·e^(3x). Der Kehrwert 1/3 der inneren Ableitung 3 kommt als Faktor davor."
-        },
-        {
-            category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false, difficulty: "easy",
-            text: "Gesucht ist eine Stammfunktion von <span class='math-text'>f(x) = 2·e^x</span>. (Ohne +c)",
-            correct: ["2*e^x", "2e^x"],
-            hint: "Konstante Faktoren bleiben beim Aufleiten unverändert stehen.",
-            explanation: "Ein konstanter Faktor bleibt beim Aufleiten stehen: ∫2·eˣ dx = 2·∫eˣ dx = 2·eˣ."
-        },
-        {
-            category: "Stammfunktionen", categoryId: "stamm", type: "text", isFallback: false, difficulty: "medium",
-            text: "Bestimme eine Stammfunktion F(x) zu <span class='math-text'>f(x) = e^(−x) + 4</span>. (Ohne +c)",
-            correct: ["-e^(-x)+4x", "-1*e^(-x)+4x", "-e^(-x)+4*x"],
-            hint: "Vor dem x im Exponenten steht −1. Der Kehrwert davon ist auch −1. Aus der 4 wird 4x.",
-            explanation: "∫e^(-x)dx = (1/−1)·e^(−x) = −e^(−x). Die Konstante 4 wird zu 4x. → F(x) = −e^(−x) + 4x."
-        },
-        // Fallback Stammfunktionen
-        {
-            category: "Stammfunktionen (Basis)", categoryId: "stamm", type: "text", isFallback: true, difficulty: "easy",
-            text: "Ganz entspannt. Was ist eine Stammfunktion der Konstanten <span class='math-text'>f(x) = 5</span>? (Ohne +c)",
-            correct: ["5x", "5*x"],
-            hint: "Beim Aufleiten bekommt eine Zahl einfach ein 'x' angehängt."
-        },
-        // Challenge Stammfunktionen (Feature 10)
-        {
-            category: "Stammfunktionen (Herausforderung)", categoryId: "stamm", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "Welche Stammfunktion ist korrekt für <span class='math-text'>f(x) = e^(−2x)</span>?",
-            options: ["e^(−2x)", "−e^(−2x)", "−½ · e^(−2x)", "½ · e^(−2x)"],
-            correct: 2,
-            hint: "k = −2. Kehrwert von −2 ist −½. → F(x) = (1/−2)·e^(−2x) = −½·e^(−2x).",
-            explanation: "∫e^(−2x)dx = (1/−2)·e^(−2x) = −½·e^(−2x). Der Kehrwert der inneren Ableitung k = −2 liefert den Faktor −½."
-        },
-
-        // ─── 3. Bestimmte Integrale ──────────────────────
-        {
-            category: "Bestimmte Integrale", categoryId: "integral", type: "VisualGraph", isFallback: false, difficulty: "medium",
-            text: "Die blaue Kurve ist <span class='math-text'>f(x) = e^x</span>. Betrachte die rot schraffierte Fläche von x=0 bis x=1. Ist diese Fläche kleiner, gleich oder größer als 1?",
-            options: ["Kleiner als 1", "Genau gleich 1", "Größer als 1"],
-            correct: 2,
-            hint: "Berechne: [e^x] von 0 bis 1 = e¹ − e⁰ = e − 1 ≈ 2,718 − 1 = 1,718.",
-            explanation: "∫₀¹ eˣ dx = [eˣ]₀¹ = e¹ − e⁰ = e − 1 ≈ 1,718. Da e ≈ 2,718 ist, ist die Fläche größer als 1.",
-            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                <path d="M 10 90 Q 50 80 90 20" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
-                <path d="M 10 100 L 10 90 Q 50 80 90 20 L 90 100 Z" fill="rgba(248,113,113,0.4)"/>
-                <text x="5" y="115" font-size="12" fill="#000">0</text>
-                <text x="85" y="115" font-size="12" fill="#000">1</text>
-            </svg>`
-        },
-        {
-            category: "Bestimmte Integrale", categoryId: "integral", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Was passiert, wenn der Graph der untersuchten Funktion komplett unterhalb der x-Achse verläuft?",
-            options: ["Das Integral berechnet einen negativen Wert", "Das Integral ist immer 0", "Der Wert ist positiv, gibt aber nicht die Fläche an", "Darf man nicht integrieren"],
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f(x)=3·0,5<sup>x</sup>. Was passiert für x → ∞?",
+            options: ["f(x) → 0", "f(x) → ∞", "f(x) → −∞", "f(x) bleibt konstant"],
             correct: 0,
-            hint: "Integrale berechnen orientierte Flächen. Flächen unter der x-Achse gehen negativ ein.",
-            explanation: "Das bestimmte Integral liefert eine orientierte Fläche. Liegt der Graph ganz unter der x-Achse, ist der Integralwert negativ. Der geometrische Flächeninhalt wäre der Betrag davon."
+            hint: "Bei 0 < b < 1 liegt Zerfall vor.",
+            explanation: "Für 0<b<1 fällt b^x gegen 0."
         },
         {
-            category: "Bestimmte Integrale", categoryId: "integral", type: "text", isFallback: false, difficulty: "medium",
-            text: "Berechne: <span class='math-text'>∫[0 bis ln(2)] e^x dx</span>. (Hinweis: e^ln(2) = 2)",
-            correct: ["1"],
-            numericInput: true,
-            hint: "Setze ln(2) für x ein (ergibt 2) und ziehe den Wert bei x = 0 ab (e⁰ = 1).",
-            explanation: "[eˣ]₀^ln(2) = e^(ln2) − e⁰ = 2 − 1 = 1. Das Ergebnis ist genau 1."
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "text", isFallback: false, difficulty: "easy",
+            text: "Bestimme f(0) für f(x)=5·2<sup>x</sup>.",
+            correct: ["5"],
+            hint: "Setze x=0 ein: 2^0 = 1.",
+            explanation: "f(0)=5·2^0=5."
         },
-        // Fallback Integral
         {
-            category: "Bestimmte Integrale (Basis)", categoryId: "integral", type: "text", isFallback: true, difficulty: "easy",
-            text: "Basiswissen: Wofür stehen die Grenzen a und b beim bestimmten Integral?",
-            correct: ["x werte", "x-werte", "x", "intervallgrenzen"],
-            hint: "Die Grenzen zeigen, wo die Fläche auf der x-Achse beginnt und aufhört."
-        },
-        // Challenge Integral (Feature 10)
-        {
-            category: "Bestimmte Integrale (Herausforderung)", categoryId: "integral", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "Berechne <span class='math-text'>∫[0 bis 2] 3·e^x dx</span>. Welches Ergebnis ist korrekt? (e² ≈ 7,39)",
-            options: ["3·(e² − 1) ≈ 19,2", "e² − 1 ≈ 6,4", "3·e² ≈ 22,2", "3·e ≈ 8,2"],
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Verdopplungsfaktor: f(x)=4·2<sup>x</sup>. Wie ändert sich f bei x+1?",
+            options: ["verdoppelt sich", "halbiert sich", "bleibt gleich", "wird um 4 größer"],
             correct: 0,
-            hint: "Faktorregel: 3 bleibt vor dem Integral stehen. Dann: 3·[eˣ]₀² = 3·(e² − 1).",
-            explanation: "∫₀² 3eˣ dx = 3·[eˣ]₀² = 3·(e² − e⁰) = 3·(e² − 1) ≈ 3·6,389 ≈ 19,2."
-        },
-
-        // ─── 4. Sachzusammenhänge ────────────────────────
-        {
-            category: "Sachzusammenhänge", categoryId: "sach", type: "VisualGraph", isFallback: false, difficulty: "easy",
-            text: "Betrachte den Graphen einer Bestandsfunktion <span class='math-text'>f(t) = c · e^(kt)</span>. Was lässt sich über den Parameter k sagen?",
-            options: ["k ist größer als 0 (k > 0)", "k ist genau 0 (k = 0)", "k ist kleiner als 0 (k < 0)"],
-            correct: 2,
-            hint: "Der Graph fällt ab – die Menge wird weniger. Das bedeutet exponentiellen Zerfall!",
-            explanation: "Ein fallender Graph bedeutet, dass f(t) mit der Zeit abnimmt. Bei f(t) = c·e^(kt) ist das genau dann der Fall, wenn k < 0, denn e^(kt) → 0 für t → ∞.",
-            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                <path d="M 10 20 Q 50 80 100 95" fill="transparent" stroke="#c084fc" stroke-width="4"/>
-                <text x="5" y="115" font-size="12" fill="#000">0</text>
-                <text x="100" y="115" font-size="12" fill="#000">t</text>
-            </svg>`
+            hint: "Bei Basis 2 verdoppelt sich der Wert pro Schritt.",
+            explanation: "f(x+1)=4·2^(x+1)=2·(4·2^x)."
         },
         {
-            category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Ein Bestand entwickelt sich nach <span class='math-text'>f(t) = 100 · e^(0.5t)</span>. Was bedeutet die 100?",
-            options: ["Wachstumsrate in Prozent", "Maximaler Bestand", "Anfangsbestand zum Zeitpunkt t=0", "Halbwertszeit"],
-            correct: 2,
-            hint: "Setze t=0 ein. Da e⁰ = 1 ist, bleibt nur der Vorfaktor übrig.",
-            explanation: "Für t=0: f(0) = 100·e⁰ = 100·1 = 100. Der Faktor c vor der e-Funktion ist immer der Anfangswert (Startwert) zum Zeitpunkt t = 0."
-        },
-        {
-            category: "Sachzusammenhänge", categoryId: "sach", type: "text", isFallback: false, difficulty: "easy",
-            text: "Der Bestand ändert sich nach <span class='math-text'>f(t) = 500 · e^(−0.1t)</span>. Handelt es sich um 'Wachstum' oder 'Zerfall'?",
-            correct: ["zerfall"],
-            hint: "Schau auf das Vorzeichen von k. Positiv = Wachstum, Negativ = ?",
-            explanation: "k = −0,1 ist negativ. Damit wird e^(−0,1t) mit der Zeit kleiner, der Bestand nimmt ab → exponentieller Zerfall."
-        },
-        {
-            category: "Sachzusammenhänge", categoryId: "sach", type: "mc", isFallback: false, difficulty: "medium",
-            text: "f(t) ist die Zuflussrate von Wasser (L/min). Was liefert das bestimmte Integral über f(t)?",
-            options: ["Die aktuelle Tropfgeschwindigkeit", "Die gesamte Zu-/Abnahme an Wasser im Intervall", "Die maximale Wassermenge", "Die durchschnittliche Geschwindigkeit"],
-            correct: 1,
-            hint: "Wenn man eine Geschwindigkeit (L/min) aufleitet, bekommt man die echte Menge (Liter).",
-            explanation: "Integration summiert eine Rate über die Zeit: Liter/Minute × Minuten = Liter. Das Integral einer Zuflussrate liefert die gesamte Wassermenge, die im Intervall dazukam."
-        },
-        // Fallback Sachzusammenhänge
-        {
-            category: "Sachzusammenhänge (Basis)", categoryId: "sach", type: "mc", isFallback: true, difficulty: "easy",
-            text: "Basiswissen: Welche allgemeine Form hat eine Funktion mit exponentiellem Wachstum oder Zerfall?",
-            options: ["f(t) = m·t + b", "f(t) = c·e^(kt)", "f(t) = S − S·e^(−kt)", "f(t) = a·t²"],
-            correct: 1,
-            hint: "c ist der Startwert (f(0)), k > 0 bedeutet Wachstum, k < 0 bedeutet Zerfall."
-        },
-        // Challenge Sachzusammenhänge (Feature 10)
-        {
-            category: "Sachzusammenhänge (Herausforderung)", categoryId: "sach", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "Ein Bestand f(t) = 1000·e^(−0,5t). Wie groß ist er nach t = 2? (e^(−1) ≈ 0,37)",
-            options: ["ca. 630", "ca. 370", "ca. 500", "ca. 1000"],
-            correct: 1,
-            hint: "Setze t = 2 ein: f(2) = 1000·e^(−0,5·2) = 1000·e^(−1) ≈ 1000·0,37.",
-            explanation: "f(2) = 1000·e^(−1) ≈ 1000·0,368 ≈ 370. Nach 2 Zeiteinheiten sind noch ca. 37 % des Anfangsbestands vorhanden."
-        },
-
-        // ─── 5. Graphenanalyse ───────────────────────────
-        {
-            category: "Graphenanalyse", categoryId: "graph", type: "VisualGraph", isFallback: false, difficulty: "hard",
-            text: "Der Graph zeigt <span class='math-text'>f(x) = x · e^(−x)</span>. Die gestrichelte Linie markiert einen besonderen Punkt. Wo liegt das Maximum?",
-            options: ["Bei x = 0", "Bei x ≈ 1", "Bei x ≈ 2", "f wächst immer – kein Maximum"],
-            correct: 1,
-            hint: "Produktregel: f'(x) = e^(−x) − x·e^(−x) = e^(−x)·(1−x). Das wird 0 bei x = 1.",
-            explanation: "f'(x) = e^(−x)·(1−x) = 0 → x = 1 (da e^(−x) ≠ 0). Für x < 1 ist f' > 0 (steigend), für x > 1 ist f' < 0 (fallend) → Hochpunkt bei x = 1.",
-            graphSVG: `<svg viewBox="-10 -10 120 125" style="width:100%; height:160px;">
-                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                <path d="M 10 100 C 15 99 25 5 40 12 C 55 20 72 55 100 78" fill="transparent" stroke="#38bdf8" stroke-width="4"/>
-                <line x1="40" y1="10" x2="40" y2="100" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,4"/>
-                <line x1="40" y1="98" x2="40" y2="102" stroke="#000" stroke-width="1.5"/>
-                <line x1="70" y1="98" x2="70" y2="102" stroke="#000" stroke-width="1.5"/>
-                <line x1="100" y1="98" x2="100" y2="102" stroke="#000" stroke-width="1.5"/>
-                <text x="5" y="116" font-size="11" fill="#000">0</text>
-                <text x="36" y="116" font-size="11" fill="#f59e0b">1</text>
-                <text x="66" y="116" font-size="11" fill="#000">2</text>
-                <text x="96" y="116" font-size="11" fill="#000">3</text>
-                <text x="103" y="103" font-size="12" fill="#000">x</text>
-            </svg>`
-        },
-        {
-            category: "Graphenanalyse", categoryId: "graph", type: "mc", isFallback: false, difficulty: "easy",
-            text: "Der Graph von <span class='math-text'>f'(x)</span> schneidet die x-Achse von oben nach unten (Vorzeichenwechsel + → −). Was folgt für <span class='math-text'>f(x)</span>?",
-            options: ["f(x) hat dort ein Minimum", "f(x) hat dort ein Maximum", "f(x) hat dort eine Wendestelle", "f'(x) = 0 bedeutet: f ist konstant"],
-            correct: 1,
-            hint: "Wechsel f'(x): + → − bedeutet: f steigt vorher, fällt danach → Hochpunkt!",
-            explanation: "Vorzeichenwechsel von f': (+) → (−) bedeutet: f steigt davor und fällt danach. Das ist die Definition eines lokalen Maximums (Hochpunkt)."
-        },
-        {
-            category: "Graphenanalyse", categoryId: "graph", type: "mc", isFallback: false, difficulty: "medium",
-            text: "Welches Verhalten zeigt <span class='math-text'>f(x) = x² · e^x</span> für x → −∞?",
-            options: ["f(x) → +∞", "f(x) → −∞", "f(x) → 0", "f(x) schwankt ohne Grenzwert"],
-            correct: 2,
-            hint: "e^x dominiert jedes Polynom: für x → −∞ geht e^x viel schneller gegen 0 als x² gegen ∞ wächst.",
-            explanation: "e^x strebt für x → −∞ gegen 0 – deutlich stärker als x² gegen ∞ wächst. Das Produkt x²·e^x geht daher gegen 0 (e dominiert jedes Polynom)."
-        },
-        // Fallback Graphenanalyse
-        {
-            category: "Graphenanalyse (Basis)", categoryId: "graph", type: "mc", isFallback: true, difficulty: "easy",
-            text: "Was charakterisiert einen Hochpunkt (lokales Maximum) in einem Graphen?",
-            options: ["Der Graph erreicht dort den höchsten Wert der Umgebung – danach fällt er wieder.", "Die Funktion wird ab hier negativ.", "Die Ableitung ist dort maximal groß.", "Der Graph verläuft dort senkrecht."],
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Welche Kurve passt zu f(x)=2<sup>x</sup>?",
+            options: ["Kurve A", "Kurve B", "Kurve C"],
             correct: 0,
-            hint: "Hochpunkt = höchster Punkt in der Umgebung. Vorher steigt f, danach fällt f."
-        },
-        // Challenge Graphenanalyse (Feature 10)
-        {
-            category: "Graphenanalyse (Herausforderung)", categoryId: "graph", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "f(x) = x²·e^(−x). Wo liegt ein lokales Minimum für x > 0? (Tipp: f'(x) = x·e^(−x)·(2−x))",
-            options: ["x = 0", "x = 1", "x = 2", "Kein Minimum für x > 0"],
-            correct: 2,
-            hint: "f'(x) = 0 bei x = 0 und x = 2. Prüfe Vorzeichenwechsel von f' bei x = 2.",
-            explanation: "f'(x) = x·e^(−x)·(2−x) = 0 bei x=0 und x=2. Bei x=2: f' wechselt von + nach − → Hochpunkt bei x=2, nicht Minimum. Für x > 2 ist f' < 0 → kein Minimum, f fällt. Richtig: bei x=2 liegt ein Hochpunkt."
-        },
-
-        // ─── 6. Beschränktes Wachstum ───────────────────
-        {
-            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "VisualGraph", isFallback: false, difficulty: "easy",
-            text: "Die gestrichelte Linie zeigt eine waagerechte Asymptote. Welches Wachstumsmodell beschreibt der Graph?",
-            options: ["Unbeschränktes exponentielles Wachstum", "Beschränktes Wachstum (Sättigungsgrenze S)", "Exponentieller Zerfall", "Lineares Wachstum"],
-            correct: 1,
-            hint: "Der Graph wächst immer langsamer und nähert sich S an, überschreitet sie aber nie.",
-            explanation: "Die waagerechte Asymptote S ist die Sättigungsgrenze. Der Graph nähert sich S für t → ∞ an, ohne sie je zu überschreiten – typisches Merkmal des beschränkten Wachstums.",
-            graphSVG: `<svg viewBox="-10 -10 120 120" style="width:100%; height:150px;">
-                <line x1="0" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="110" x2="10" y2="0" stroke="#000" stroke-width="2"/>
-                <line x1="10" y1="12" x2="110" y2="12" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="7,4"/>
-                <path d="M 10 88 C 18 50 38 14 100 12" fill="transparent" stroke="#34d399" stroke-width="4"/>
-                <text x="5" y="115" font-size="11" fill="#000">0</text>
-                <text x="100" y="115" font-size="11" fill="#000">t</text>
-                <text x="112" y="15" font-size="11" fill="#f59e0b">S</text>
+            hint: "Die Kurve geht durch (0|1) und (1|2).",
+            explanation: "2^x hat die Punkte (0|1) und (1|2) und wächst zunehmend steiler.",
+            graphSVG: `<svg viewBox="0 0 220 150" style="width:100%; height:170px;">
+                <rect x="0" y="0" width="220" height="150" fill="#fff"/>
+                <line x1="20" y1="120" x2="210" y2="120" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="120" x2="20" y2="10" stroke="#000" stroke-width="2"/>
+                <line x1="60" y1="120" x2="60" y2="115" stroke="#000"/>
+                <line x1="100" y1="120" x2="100" y2="115" stroke="#000"/>
+                <line x1="140" y1="120" x2="140" y2="115" stroke="#000"/>
+                <text x="60" y="135" font-size="10" fill="#000">1</text>
+                <text x="100" y="135" font-size="10" fill="#000">2</text>
+                <text x="140" y="135" font-size="10" fill="#000">3</text>
+                <text x="6" y="15" font-size="10" fill="#000">y</text>
+                <text x="206" y="135" font-size="10" fill="#000">x</text>
+                <path d="M 20 108 C 60 105, 95 90, 130 55 C 160 30, 190 18, 210 12" fill="none" stroke="#38bdf8" stroke-width="3"/>
+                <path d="M 20 108 L 210 40" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                <path d="M 20 40 C 80 55, 130 80, 210 105" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <text x="175" y="20" font-size="12" fill="#38bdf8">A</text>
+                <text x="175" y="48" font-size="12" fill="#f59e0b">B</text>
+                <text x="175" y="112" font-size="12" fill="#ef4444">C</text>
             </svg>`
         },
         {
-            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "mc", isFallback: false, difficulty: "medium",
-            text: "Die Funktion <span class='math-text'>f(t) = 200 − 180 · e^(−0.3t)</span> beschreibt beschränktes Wachstum. Wie groß ist die Sättigungsgrenze S?",
-            options: ["S = 180", "S = 200", "S = 0,3", "S = 20"],
-            correct: 1,
-            hint: "Für t → ∞ gilt e^(−0,3t) → 0. Es bleibt: f → 200 − 0 = 200.",
-            explanation: "Für t → ∞ gilt e^(−0,3t) → 0. Also f(t) → 200 − 180·0 = 200. Die Sättigungsgrenze ist S = 200."
+            category: "Exponentialfunktion – Grundverständnis", categoryId: "exp_basic", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Welche Aussage ist richtig zu f(x)=a·b<sup>x</sup>?",
+            options: ["f(0)=a", "f(0)=b", "f(1)=a", "f(1)=b"],
+            correct: 0,
+            hint: "Setze x=0 ein.",
+            explanation: "b^0=1, daher f(0)=a."
+        },
+
+        // ─── Parameterwirkung und Graphen ───
+        {
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f(x)=2·e<sup>x</sup>. Wie wirkt der Faktor 2?",
+            options: ["Streckung in y-Richtung", "Stauchung in x-Richtung", "Verschiebung nach rechts", "Spiegelung an der x-Achse"],
+            correct: 0,
+            hint: "Vorfaktor multipliziert alle y-Werte.",
+            explanation: "Der Graph wird in y-Richtung gestreckt."
         },
         {
-            category: "Beschränktes Wachstum", categoryId: "beschraenkt", type: "text", isFallback: false, difficulty: "medium",
-            text: "Gegeben: <span class='math-text'>f(t) = 500 · (1 − e^(−0.2t))</span>. Welchen Wert hat <span class='math-text'>f(0)</span>? (Tipp: e⁰ = 1)",
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "mc", isFallback: false, difficulty: "easy",
+            text: "g(x)=e<sup>x−1</sup>. Wie ist g gegenüber e<sup>x</sup> verschoben?",
+            options: ["um 1 nach rechts", "um 1 nach links", "um 1 nach oben", "um 1 nach unten"],
+            correct: 0,
+            hint: "x−1 bedeutet Rechtsverschiebung.",
+            explanation: "f(x−a) verschiebt um a nach rechts."
+        },
+        {
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "mc", isFallback: false, difficulty: "easy",
+            text: "h(x)=e<sup>x</sup>+3. Was ändert sich?",
+            options: ["Verschiebung um 3 nach oben", "Verschiebung um 3 nach rechts", "Streckung in y-Richtung", "Spiegelung an der y-Achse"],
+            correct: 0,
+            hint: "+3 addiert zu allen Funktionswerten.",
+            explanation: "Der Graph wird nach oben verschoben."
+        },
+        {
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "mc", isFallback: false, difficulty: "easy",
+            text: "k(x)=3·0,8<sup>x</sup>. Monotonie?",
+            options: ["streng fallend", "streng wachsend", "konstant", "erst fallend, dann wachsend"],
+            correct: 0,
+            hint: "Basis < 1 → Zerfall.",
+            explanation: "Für 0<b<1 ist die Funktion streng fallend."
+        },
+        {
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Welche Kurve passt zu f(x)=e<sup>2x</sup>?",
+            options: ["Kurve A", "Kurve B", "Kurve C"],
+            correct: 0,
+            hint: "e<sup>2x</sup> wächst schneller als e<sup>x</sup>.",
+            explanation: "Der Faktor 2 im Exponenten macht den Graphen steiler.",
+            graphSVG: `<svg viewBox="0 0 220 150" style="width:100%; height:170px;">
+                <rect x="0" y="0" width="220" height="150" fill="#fff"/>
+                <line x1="20" y1="120" x2="210" y2="120" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="120" x2="20" y2="10" stroke="#000" stroke-width="2"/>
+                <line x1="60" y1="120" x2="60" y2="115" stroke="#000"/>
+                <line x1="100" y1="120" x2="100" y2="115" stroke="#000"/>
+                <text x="60" y="135" font-size="10" fill="#000">1</text>
+                <text x="100" y="135" font-size="10" fill="#000">2</text>
+                <text x="6" y="15" font-size="10" fill="#000">y</text>
+                <text x="206" y="135" font-size="10" fill="#000">x</text>
+                <path d="M 20 110 C 55 104, 90 84, 120 50 C 150 26, 185 15, 210 10" fill="none" stroke="#38bdf8" stroke-width="3"/>
+                <path d="M 20 110 C 70 104, 110 88, 150 60 C 180 45, 200 35, 210 30" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                <path d="M 20 110 C 90 108, 140 104, 210 98" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <text x="175" y="18" font-size="12" fill="#38bdf8">A</text>
+                <text x="175" y="50" font-size="12" fill="#f59e0b">B</text>
+                <text x="175" y="108" font-size="12" fill="#ef4444">C</text>
+            </svg>`
+        },
+        {
+            category: "Parameterwirkung und Graphen", categoryId: "exp_param", type: "text", isFallback: false, difficulty: "easy",
+            text: "f(x)=a·e<sup>x</sup> hat f(0)=10. Bestimme a.",
+            correct: ["10"],
+            hint: "Setze x=0 ein.",
+            explanation: "f(0)=a·e^0=a."
+        },
+
+        // ─── Ableitung e-Funktionen ───
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "text", isFallback: false, difficulty: "easy",
+            text: "Leite f(x)=e<sup>x</sup> ab.",
+            correct: ["e^x", "e<sup>x</sup>"],
+            hint: "Merksatz: e^x bleibt sich selbst.",
+            explanation: "(e^x)' = e^x."
+        },
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f(x)=3e<sup>x</sup>. f'(x)=?",
+            options: ["3e<sup>x</sup>", "e<sup>x</sup>+3", "e<sup>3x</sup>", "3x·e<sup>x</sup>"],
+            correct: 0,
+            hint: "Konstanter Faktor bleibt.",
+            explanation: "Faktorregel: (3e^x)'=3e^x."
+        },
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "mc", isFallback: false, difficulty: "medium",
+            text: "f(x)=e<sup>2x</sup>. f'(x)=?",
+            options: ["e<sup>2x</sup>", "2e<sup>2x</sup>", "2x·e<sup>2x</sup>", "0,5e<sup>2x</sup>"],
+            correct: 1,
+            hint: "Kettenregel mit u=2x.",
+            explanation: "(e^u)'=u'·e^u, u'=2."
+        },
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "mc", isFallback: false, difficulty: "medium",
+            text: "f(x)=x·e<sup>x</sup>. f'(x)=?",
+            options: ["e<sup>x</sup>+x·e<sup>x</sup>", "x·e<sup>x</sup>", "e<sup>x</sup>", "x<sup>2</sup>·e<sup>x</sup>"],
+            correct: 0,
+            hint: "Produktregel.",
+            explanation: "u=x, v=e^x → u'v+uv' = e^x + x·e^x."
+        },
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "mc", isFallback: false, difficulty: "medium",
+            text: "f(x)=(2x−1)e<sup>x</sup>. f'(x)=?",
+            options: ["2e<sup>x</sup>+(2x−1)e<sup>x</sup>", "2x·e<sup>x</sup>", "e<sup>x</sup>+(2x−1)e<sup>x</sup>", "(2x−1)e<sup>x</sup>"],
+            correct: 0,
+            hint: "Produktregel mit u=2x−1.",
+            explanation: "u'=2, v=e^x → 2e^x+(2x−1)e^x."
+        },
+        {
+            category: "Ableitung e-Funktionen", categoryId: "exp_derive", type: "mc", isFallback: false, difficulty: "hard",
+            text: "f(x)=e<sup>x²</sup>. f'(x)=?",
+            options: ["e<sup>x²</sup>", "x·e<sup>x²</sup>", "2x·e<sup>x²</sup>", "e<sup>2x</sup>"],
+            correct: 2,
+            hint: "Kettenregel mit u=x².",
+            explanation: "u'=2x → f'(x)=2x·e^(x²)."
+        },
+
+        // ─── Integral als Fläche/Bestand ───
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Berechne <span class='math-text'>∫<sub>0</sub><sup>2</sup> 3x dx</span>.",
+            options: ["3", "6", "9", "12"],
+            correct: 1,
+            hint: "Stammfunktion von 3x ist 1,5x².",
+            explanation: "F(2)−F(0)=1,5·4=6."
+        },
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "text", isFallback: false, difficulty: "medium",
+            text: "Zufluss r(t)=2t (L/min), Startbestand 5 L. Wie viel Wasser nach 3 min?",
+            correct: ["14"],
+            hint: "Bestand = Start + ∫<sub>0</sub><sup>3</sup> 2t dt.",
+            explanation: "∫<sub>0</sub><sup>3</sup> 2t dt = 9, plus 5 ergibt 14."
+        },
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Was bedeutet eine negative Integralfläche?",
+            options: ["Nettoabnahme/negativer Saldo", "größere Fläche", "positive Zunahme", "keine Bedeutung"],
+            correct: 0,
+            hint: "Unterhalb der x-Achse ist die orientierte Fläche negativ.",
+            explanation: "Das Integral zählt Flächen mit Vorzeichen."
+        },
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "mc", isFallback: false, difficulty: "easy",
+            text: "v(t) in m/s, ∫ v(t) dt liefert ...?",
+            options: ["Weg in m", "Beschleunigung in m/s²", "Zeit in s", "Kraft in N"],
+            correct: 0,
+            hint: "Einheiten prüfen.",
+            explanation: "(m/s)·s = m."
+        },
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "y=x von 0 bis 2. Flächeninhalt unter dem Graphen?",
+            options: ["1", "2", "3", "4"],
+            correct: 1,
+            hint: "Dreiecksfläche: 1/2 · Grundseite · Höhe.",
+            explanation: "0,5·2·2=2.",
+            graphSVG: `<svg viewBox="0 0 220 150" style="width:100%; height:170px;">
+                <rect x="0" y="0" width="220" height="150" fill="#fff"/>
+                <line x1="20" y1="120" x2="210" y2="120" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="120" x2="20" y2="10" stroke="#000" stroke-width="2"/>
+                <line x1="60" y1="120" x2="60" y2="115" stroke="#000"/>
+                <line x1="100" y1="120" x2="100" y2="115" stroke="#000"/>
+                <text x="60" y="135" font-size="10" fill="#000">1</text>
+                <text x="100" y="135" font-size="10" fill="#000">2</text>
+                <text x="6" y="15" font-size="10" fill="#000">y</text>
+                <text x="206" y="135" font-size="10" fill="#000">x</text>
+                <path d="M 20 120 L 100 20" stroke="#38bdf8" stroke-width="3" fill="none"/>
+                <polygon points="20,120 100,120 100,20" fill="rgba(56,189,248,0.2)"/>
+                <text x="110" y="30" font-size="12" fill="#38bdf8">y=x</text>
+            </svg>`
+        },
+        {
+            category: "Integral als Fläche/Bestand", categoryId: "int_area", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Gegeben f(x) ≥ 0. Welche Aussage stimmt?",
+            options: ["∫_a^b f(x) dx ist Flächeninhalt", "Integral ist immer 0", "Integral kann negativ sein", "Integral ist Steigung"],
+            correct: 0,
+            hint: "Bei f(x) ≥ 0 ist die orientierte Fläche positiv.",
+            explanation: "Das Integral entspricht dem Flächeninhalt unter dem Graphen."
+        },
+
+        // ─── Zusammenhang f–f' ───
+        {
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f'(x) > 0 auf (1,4). Aussage zu f?",
+            options: ["f ist dort steigend", "f ist dort fallend", "f ist konstant", "f hat dort ein Maximum"],
+            correct: 0,
+            hint: "Positive Ableitung bedeutet Wachstum.",
+            explanation: "f'(x) > 0 ⇒ f wächst."
+        },
+        {
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f'(x)=0 bei x=2 und f' wechselt von + nach −. Was liegt bei f vor?",
+            options: ["lokales Maximum", "lokales Minimum", "Wendepunkt", "Sattelpunkt"],
+            correct: 0,
+            hint: "Vorzeichenwechsel + → −.",
+            explanation: "Steigung wechselt von positiv zu negativ."
+        },
+        {
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "f'(x) ist konstant 3. Welche Aussage zu f stimmt?",
+            options: ["f ist eine Gerade mit Steigung 3", "f ist konstant", "f ist eine Parabel", "f ist eine Hyperbel"],
+            correct: 0,
+            hint: "Konstante Ableitung → lineare Funktion.",
+            explanation: "f(x)=3x+c.",
+            graphSVG: `<svg viewBox="0 0 220 150" style="width:100%; height:170px;">
+                <rect x="0" y="0" width="220" height="150" fill="#fff"/>
+                <line x1="20" y1="120" x2="210" y2="120" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="120" x2="20" y2="10" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="60" x2="210" y2="60" stroke="#38bdf8" stroke-width="3"/>
+                <text x="130" y="52" font-size="12" fill="#38bdf8">f'(x)=3</text>
+                <text x="6" y="15" font-size="10" fill="#000">y</text>
+                <text x="206" y="135" font-size="10" fill="#000">x</text>
+            </svg>`
+        },
+        {
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Wo ist f am steilsten?",
+            options: ["Dort, wo f'(x) am größten ist", "Dort, wo f'(x)=0", "Dort, wo f''(x)=0", "Dort, wo f negativ ist"],
+            correct: 0,
+            hint: "Große Ableitung bedeutet große Steigung.",
+            explanation: "Steilheit entspricht dem Betrag der Ableitung."
+        },
+        {
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "text", isFallback: false, difficulty: "easy",
+            text: "f hat Extremstelle bei x=1. Was gilt für f'(1)?",
             correct: ["0"],
-            numericInput: true,
-            hint: "Setze t = 0 ein: f(0) = 500·(1 − e⁰) = 500·(1 − 1) = 500·0 = ?",
-            explanation: "f(0) = 500·(1 − e⁰) = 500·(1 − 1) = 500·0 = 0. Bei dieser Form beschränkten Wachstums startet die Funktion immer bei 0."
+            hint: "Notwendige Bedingung.",
+            explanation: "An Extremstellen gilt f'(1)=0."
         },
-        // Fallback Beschränktes Wachstum
         {
-            category: "Beschränktes Wachstum (Basis)", categoryId: "beschraenkt", type: "mc", isFallback: true, difficulty: "easy",
-            text: "Was bedeutet 'Sättigungsgrenze S' beim beschränkten Wachstum?",
-            options: ["Der Maximalwert, dem f(t) sich annähert, den es aber nie überschreitet", "Der Anfangswert f(0)", "Die Wachstumsrate des Modells", "Der Zeitpunkt, ab dem die Funktion fällt"],
+            category: "Zusammenhang f–f'", categoryId: "rel_fdash", type: "mc", isFallback: false, difficulty: "easy",
+            text: "f'(x) < 0 für x<0, f'(x) > 0 für x>0. Aussage zu f?",
+            options: ["f hat Minimum bei x=0", "f hat Maximum bei x=0", "f ist konstant", "f ist fallend für x>0"],
             correct: 0,
-            hint: "Sättigung = voll. f wächst immer langsamer und kann S nie überschreiten."
+            hint: "Vorzeichenwechsel − → +.",
+            explanation: "f fällt und steigt dann → Minimum."
         },
-        // Challenge Beschränktes Wachstum (Feature 10)
+
+        // ─── Modellierung: Wachstum/Zerfall/Sättigung ───
         {
-            category: "Beschränktes Wachstum (Herausforderung)", categoryId: "beschraenkt", type: "mc",
-            isFallback: false, isLevel2: false, isChallengeOnly: true, difficulty: "hard",
-            text: "f(t) = 800 − 800·e^(−0,5t). Was ist der Anfangswert f(0) und die Sättigungsgrenze S?",
-            options: ["f(0) = 800, S = 0", "f(0) = 0, S = 800", "f(0) = 400, S = 800", "f(0) = 800, S = 800"],
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Ein Bestand nimmt proportional zu sich selbst zu. Welche Funktion passt?",
+            options: ["f(t)=a·e<sup>kt</sup>", "f(t)=a+kt", "f(t)=a·t<sup>2</sup>", "f(t)=a/t"],
+            correct: 0,
+            hint: "Proportionalität zum Bestand → exponentiell.",
+            explanation: "f' = kf führt zu f(t)=a·e^(kt)."
+        },
+        {
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "text", isFallback: false, difficulty: "easy",
+            text: "Halbwertszeit 10 Jahre, f(0)=100. f(10)=?",
+            correct: ["50"],
+            hint: "Halbwertszeit bedeutet Halbierung.",
+            explanation: "Nach 10 Jahren ist der Bestand halbiert."
+        },
+        {
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "mc", isFallback: false, difficulty: "easy",
+            text: "Zerfall mit 20% pro Zeiteinheit. Modell?",
+            options: ["f(t)=a·0,8<sup>t</sup>", "f(t)=a·1,2<sup>t</sup>", "f(t)=a−0,2t", "f(t)=a+0,2t"],
+            correct: 0,
+            hint: "20% Zerfall bedeutet Faktor 0,8.",
+            explanation: "Pro Schritt bleibt 80% übrig."
+        },
+        {
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "mc", isFallback: false, difficulty: "medium",
+            text: "Sättigung: Annäherung an Grenzwert. Welche Gleichung beschreibt das?",
+            options: ["f(t)=L−(L−a)e<sup>−kt</sup>", "f(t)=a·e<sup>kt</sup>", "f(t)=a+kt", "f(t)=a·t<sup>2</sup>"],
+            correct: 0,
+            hint: "Der Abstand zu L schrumpft exponentiell.",
+            explanation: "Mit e^(−kt) geht der Abstand zu L gegen 0."
+        },
+        {
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "text", isFallback: false, difficulty: "medium",
+            text: "Anfangsbestand 200, wächst 5% pro Jahr. f(3)=?",
+            correct: ["200*1.05^3", "200·1.05^3"],
+            hint: "Exponentielles Wachstum mit Faktor 1,05.",
+            explanation: "f(3)=200·1,05^3."
+        },
+        {
+            category: "Modellierung: Wachstum/Zerfall/Sättigung", categoryId: "model", type: "VisualGraph", isFallback: false, difficulty: "easy",
+            text: "Erkenne die Zerfallskurve.",
+            options: ["Kurve A", "Kurve B", "Kurve C"],
             correct: 1,
-            hint: "f(0) = 800 − 800·e⁰ = 800 − 800 = 0. Für t → ∞: e^(−0,5t) → 0, also f → 800.",
-            explanation: "f(0) = 800 − 800·1 = 0. Für t → ∞: f(t) → 800 − 0 = 800. Also: Startwert 0, Sättigungsgrenze S = 800."
+            hint: "Zerfall ist fallend und nähert sich 0 asymptotisch.",
+            explanation: "Typische Zerfallsgrafik: schnell fallend, dann abflachend.",
+            graphSVG: `<svg viewBox="0 0 220 150" style="width:100%; height:170px;">
+                <rect x="0" y="0" width="220" height="150" fill="#fff"/>
+                <line x1="20" y1="120" x2="210" y2="120" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="120" x2="20" y2="10" stroke="#000" stroke-width="2"/>
+                <text x="6" y="15" font-size="10" fill="#000">y</text>
+                <text x="206" y="135" font-size="10" fill="#000">x</text>
+                <path d="M 20 110 C 70 100, 130 85, 210 70" fill="none" stroke="#ef4444" stroke-width="3"/>
+                <path d="M 20 25 C 70 55, 130 85, 210 110" fill="none" stroke="#38bdf8" stroke-width="3"/>
+                <path d="M 20 110 L 210 40" fill="none" stroke="#f59e0b" stroke-width="3"/>
+                <text x="175" y="72" font-size="12" fill="#ef4444">A</text>
+                <text x="175" y="112" font-size="12" fill="#38bdf8">B</text>
+                <text x="175" y="48" font-size="12" fill="#f59e0b">C</text>
+            </svg>`
         },
 
-        // ─── LEVEL 2 ─────────────────────────────────────
+        // ─── Fallbacks ───
         {
-            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Kombiniere Produkt- und Kettenregel! <br>Leite ab: <span class='math-text'>f(x) = x · e^(2x)</span> <br>(Schreibweise: <i>(2x+1)*e^(2x)</i>)",
-            correct: ["(2x+1)*e^(2x)", "e^(2x)*(2x+1)", "(1+2x)*e^(2x)"],
-            hint: "u = x, v = e^(2x). Denk dran: die innere Ableitung von v bringt eine 2 nach vorne!",
-            explanation: "Produktregel: u=x (u'=1), v=e^(2x) (v'=2e^(2x)). → 1·e^(2x) + x·2e^(2x) = e^(2x)·(1+2x)."
-        },
-        {
-            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Gegeben ist <span class='math-text'>f(x) = e^x − 2</span>. Welche Aussage zum Flächeninhalt im Intervall [0; 2] ist korrekt?",
-            options: ["Der Graph liegt komplett oberhalb der x-Achse.", "Das Integral liefert direkt den exakten Flächeninhalt.", "Das Integral muss mit Betragsstrichen an der Nullstelle berechnet werden.", "Die e-Funktion kann keine negativ orientierten Flächen haben."],
-            correct: 2,
-            hint: "Setze f(x) = 0: e^x = 2 → x = ln(2) ≈ 0,69. Da ln(2) zwischen 0 und 2 liegt, schneidet der Graph die Achse!",
-            explanation: "f(x) = 0 → e^x = 2 → x = ln(2) ≈ 0,69 ∈ [0;2]. Der Graph schneidet also die x-Achse im Intervall. Der Flächeninhalt erfordert daher Betragsstriche: A = |∫₀^ln2| + |∫_ln2^2|."
-        },
-
-        // ─── ABLEITUNGSREGELN Level 2 (weitere 3) ────────────────
-        {
-            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Leite ab (Kettenregel): <span class='math-text'>f(x) = (3x + 1)⁴</span>",
-            options: ["f'(x) = 12·(3x+1)³", "f'(x) = 4·(3x+1)³", "f'(x) = 4·(3x+1)³·x", "f'(x) = (3x+1)⁴·3"],
+            category: "Exponentialfunktion – Grundverständnis (Basis)", categoryId: "exp_basic", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Ist f(x)=2<sup>x</sup> wachsend oder fallend?",
+            options: ["wachsend", "fallend"],
             correct: 0,
-            hint: "Äußere Ableitung: 4·(…)³, innere Ableitung von (3x+1): 3. Beide multiplizieren!",
-            explanation: "Kettenregel: f'(x) = 4·(3x+1)³ · 3 = 12·(3x+1)³. Die innere Ableitung von (3x+1) ist 3."
+            hint: "Basis > 1.",
+            explanation: "Exponentielles Wachstum."
         },
         {
-            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Leite ab (Produkt- und Kettenregel): <span class='math-text'>f(x) = x² · e^(3x)</span><br>(Schreibweise: z.B. <i>(2x+3x^2)*e^(3x)</i>)",
-            correct: ["(2x+3x^2)*e^(3x)", "e^(3x)*(2x+3x^2)", "(2x+3x²)*e^(3x)", "e^(3x)*(2x+3x²)", "x*(2+3x)*e^(3x)"],
-            hint: "u = x², u' = 2x. v = e^(3x), v' = 3e^(3x). Produktregel: u'v + uv'.",
-            explanation: "u=x², u'=2x; v=e^(3x), v'=3e^(3x). f'(x) = 2x·e^(3x) + x²·3e^(3x) = e^(3x)·(2x+3x²)."
+            category: "Exponentialfunktion – Grundverständnis (Basis)", categoryId: "exp_basic", type: "text", isFallback: true, difficulty: "easy",
+            text: "f(0) bei f(x)=3·2<sup>x</sup>?",
+            correct: ["3"],
+            hint: "2^0=1.",
+            explanation: "f(0)=3."
         },
         {
-            category: "Ableitungsregeln (Level 2)", categoryId: "ableitung", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Leite ab (Kettenregel): <span class='math-text'>f(x) = e^(−x²)</span>",
-            options: ["f'(x) = −2x · e^(−x²)", "f'(x) = −x² · e^(−x²−1)", "f'(x) = e^(−x²−1)", "f'(x) = −2 · e^(−x²)"],
+            category: "Parameterwirkung und Graphen (Basis)", categoryId: "exp_param", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f(x)=e<sup>x</sup>+2 ist gegenüber e<sup>x</sup> ...",
+            options: ["nach oben verschoben", "nach rechts verschoben", "gestreckt", "gespiegelt"],
             correct: 0,
-            hint: "Innere Funktion: g(x) = −x². Innere Ableitung: g'(x) = −2x.",
-            explanation: "Kettenregel: f'(x) = e^(−x²) · (−2x) = −2x·e^(−x²). Die innere Ableitung von −x² ist −2x."
+            hint: "+2 addiert zu y.",
+            explanation: "Vertikale Verschiebung."
         },
-
-        // ─── STAMMFUNKTIONEN Level 2 (4 neue) ────────────────────
         {
-            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Bestimme eine Stammfunktion von <span class='math-text'>f(x) = (4x + 2)³</span>.",
-            options: ["F(x) = (4x+2)⁴ / 16 + C", "F(x) = (4x+2)⁴ / 4 + C", "F(x) = 3·(4x+2)² + C", "F(x) = (4x+2)⁴ + C"],
+            category: "Parameterwirkung und Graphen (Basis)", categoryId: "exp_param", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f(x)=e<sup>x+1</sup> ist gegenüber e<sup>x</sup> ...",
+            options: ["nach links verschoben", "nach rechts verschoben", "nach oben verschoben", "gespiegelt"],
             correct: 0,
-            hint: "Stammfunktion von u^3 ist u^4/4. Aber die innere Ableitung von (4x+2) ist 4 – die muss geteilt werden!",
-            explanation: "∫(4x+2)³ dx: Stammfunktion der äußeren Funktion ist (4x+2)⁴/4, geteilt durch die innere Ableitung 4: F(x) = (4x+2)⁴/16 + C."
+            hint: "x+1 → links.",
+            explanation: "Horizontale Verschiebung."
         },
         {
-            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Bestimme eine Stammfunktion von <span class='math-text'>f(x) = 3·e^(2x) − 4x</span>.",
-            options: ["F(x) = (3/2)·e^(2x) − 2x² + C", "F(x) = 6·e^(2x) − 4 + C", "F(x) = 3·e^(2x) − 2x² + C", "F(x) = (3/2)·e^(2x) − 4x² + C"],
+            category: "Ableitung e-Funktionen (Basis)", categoryId: "exp_derive", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f(x)=e<sup>x</sup>. f'(x)=?",
+            options: ["e<sup>x</sup>", "x·e<sup>x</sup>", "e<sup>2x</sup>", "1"],
             correct: 0,
-            hint: "∫3·e^(2x) dx: Stammfunktion von e^(2x) ist e^(2x)/2 (wegen innerer Ableitung 2). ∫4x dx = 2x².",
-            explanation: "∫3·e^(2x) dx = 3·e^(2x)/2 = (3/2)e^(2x). ∫4x dx = 2x². Zusammen: F(x) = (3/2)·e^(2x) − 2x² + C."
+            hint: "Merksatz.",
+            explanation: "Ableitung bleibt gleich."
         },
         {
-            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "text", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Gegeben: <span class='math-text'>F'(x) = 2x − 6</span> und <span class='math-text'>F(3) = 1</span>.<br>Bestimme F(x). (Schreibweise: z.B. <i>x^2-6x+10</i>)",
-            correct: ["x^2-6x+10", "x²-6x+10", "x^2 - 6x + 10"],
-            hint: "Erst integrieren → F(x) = x² − 6x + C. Dann F(3) = 1 einsetzen, um C zu bestimmen.",
-            explanation: "F(x) = x² − 6x + C. Einsetzen: F(3) = 9 − 18 + C = 1 → C = 10. Also: F(x) = x² − 6x + 10."
-        },
-        {
-            category: "Stammfunktionen (Level 2)", categoryId: "stamm", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Ist <span class='math-text'>F(x) = (2x+1)³ / 6</span> eine Stammfunktion von <span class='math-text'>f(x) = (2x+1)²</span>?",
-            options: ["Ja, denn F'(x) = (2x+1)² nach Kettenregel.", "Nein, F(x) müsste (2x+1)³/3 sein.", "Nein, die innere Ableitung fehlt im Nenner.", "Ja, aber nur für x > −0,5."],
+            category: "Ableitung e-Funktionen (Basis)", categoryId: "exp_derive", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f(x)=5e<sup>x</sup>. f'(x)=?",
+            options: ["5e<sup>x</sup>", "e<sup>x</sup>+5", "e<sup>5x</sup>", "5x·e<sup>x</sup>"],
             correct: 0,
-            hint: "Leite F(x) ab: Kettenregel! Äußere Ableitung · innere Ableitung. Innere Ableitung von (2x+1) ist 2.",
-            explanation: "F'(x) = 3·(2x+1)²/6 · 2 = (2x+1)². ✓ Das 6 im Nenner und die innere Ableitung 2 heben sich richtig auf."
-        },
-
-        // ─── BESTIMMTE INTEGRALE Level 2 (weitere 3) ─────────────
-        {
-            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Berechne: <span class='math-text'>∫₀¹ (3x² + e^x) dx</span>",
-            options: ["e (≈ 2,72)", "e + 2 (≈ 4,72)", "2e − 1 (≈ 4,44)", "1"],
-            correct: 0,
-            hint: "Stammfunktion: x³ + e^x. Einsetzen: (1 + e¹) − (0 + e⁰) = 1 + e − 0 − 1 = e.",
-            explanation: "[x³ + e^x]₀¹ = (1 + e¹) − (0 + e⁰) = (1 + e) − (0 + 1) = e. Das Integral ergibt genau die Eulersche Zahl e ≈ 2,72."
+            hint: "Faktor bleibt.",
+            explanation: "Faktorregel."
         },
         {
-            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Berechne den Flächeninhalt, den <span class='math-text'>f(x) = 4 − x²</span> mit der x-Achse einschließt.",
-            options: ["32/3 (≈ 10,67)", "16", "8", "16/3 (≈ 5,33)"],
+            category: "Integral als Fläche/Bestand (Basis)", categoryId: "int_area", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Berechne <span class='math-text'>∫<sub>0</sub><sup>1</sup> x dx</span>.",
+            options: ["0,5", "1", "2", "0"],
             correct: 0,
-            hint: "Nullstellen: x = ±2. Flächeninhalt = ∫₋₂² (4−x²) dx. Stammfunktion: 4x − x³/3.",
-            explanation: "f(x) = 0: x = ±2. A = ∫₋₂²(4−x²)dx = [4x − x³/3]₋₂² = (8 − 8/3) − (−8 + 8/3) = 16 − 16/3 = 32/3 ≈ 10,67."
+            hint: "Stammfunktion 0,5x².",
+            explanation: "0,5·1²=0,5."
         },
         {
-            category: "Bestimmte Integrale (Level 2)", categoryId: "integral", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Berechne: <span class='math-text'>∫₀² e^(2x) dx</span>",
-            options: ["½·(e⁴ − 1) ≈ 26,8", "e⁴ − 1 ≈ 53,6", "½·e⁴ ≈ 27,3", "2·e⁴ ≈ 109,2"],
+            category: "Integral als Fläche/Bestand (Basis)", categoryId: "int_area", type: "mc", isFallback: true, difficulty: "easy",
+            text: "v(t) in m/s, ∫ v(t) dt liefert ...?",
+            options: ["Weg in m", "Beschleunigung", "Zeit", "Kraft"],
             correct: 0,
-            hint: "Stammfunktion von e^(2x) ist e^(2x)/2 (wegen innerer Ableitung 2).",
-            explanation: "[e^(2x)/2]₀² = e^4/2 − e^0/2 = ½·e⁴ − ½ = ½·(e⁴ − 1) ≈ 26,8."
-        },
-
-        // ─── SACHAUFGABEN Level 2 (4 neue) ───────────────────────
-        {
-            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Eine Wasserleitung hat den Durchfluss <span class='math-text'>f(t) = 3t² + 2</span> (Liter/Minute). Wie viel Wasser fließt von t = 1 bis t = 3 Minuten durch?",
-            options: ["30 Liter", "27 Liter", "36 Liter", "24 Liter"],
-            correct: 0,
-            hint: "Berechne ∫₁³ (3t²+2) dt. Stammfunktion: t³ + 2t.",
-            explanation: "∫₁³(3t²+2)dt = [t³+2t]₁³ = (27+6)−(1+2) = 33−3 = 30 Liter."
+            hint: "Einheiten prüfen.",
+            explanation: "m/s mal s = m."
         },
         {
-            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Die Gewinnfunktion lautet <span class='math-text'>G(x) = −x² + 40x − 300</span> (in €, x = Stückzahl in Zehnern). Bei welcher Stückzahl wird der maximale Gewinn erzielt?",
-            options: ["x = 20 (→ 200 Stück), G_max = 100 €", "x = 40, G_max = 300 €", "x = 10, G_max = 0 €", "x = 20, G_max = 400 €"],
+            category: "Zusammenhang f–f' (Basis)", categoryId: "rel_fdash", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f'(x) > 0. Aussage?",
+            options: ["f ist steigend", "f ist fallend", "f ist konstant", "f hat Maximum"],
             correct: 0,
-            hint: "G'(x) = −2x + 40 = 0 → x = 20. Dann G(20) ausrechnen.",
-            explanation: "G'(x) = −2x+40 = 0 → x = 20. G(20) = −400+800−300 = 100 €. Da x in Zehnern: 20·10 = 200 Stück."
+            hint: "Positive Ableitung.",
+            explanation: "Steigend."
         },
         {
-            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Der Mittelwert einer Funktion über [a;b] ist <span class='math-text'>(1/(b−a))·∫ₐᵇ f(x) dx</span>. Berechne den Mittelwert von <span class='math-text'>f(x) = 2x + 1</span> über [0; 4].",
-            options: ["5", "4", "9", "20"],
+            category: "Zusammenhang f–f' (Basis)", categoryId: "rel_fdash", type: "mc", isFallback: true, difficulty: "easy",
+            text: "f'(x) < 0. Aussage?",
+            options: ["f ist fallend", "f ist steigend", "f ist konstant", "f hat Minimum"],
             correct: 0,
-            hint: "Berechne ∫₀⁴ (2x+1) dx = [x²+x]₀⁴, dann durch (4−0) = 4 teilen.",
-            explanation: "∫₀⁴(2x+1)dx = [x²+x]₀⁴ = 16+4 = 20. Mittelwert: 20/4 = 5."
+            hint: "Negative Ableitung.",
+            explanation: "Fallend."
         },
         {
-            category: "Sachzusammenhänge (Level 2)", categoryId: "sach", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Eine Bakterienkolonie startet mit 500 Bakterien. Wachstumsrate: <span class='math-text'>f'(t) = 100·e^(0,2t)</span>. Wie viele Bakterien gibt es nach 5 Stunden?",
-            options: ["ca. 1359 Bakterien", "ca. 860 Bakterien", "ca. 500 Bakterien", "ca. 2000 Bakterien"],
+            category: "Modellierung: Wachstum/Zerfall/Sättigung (Basis)", categoryId: "model", type: "mc", isFallback: true, difficulty: "easy",
+            text: "10% Wachstum pro Jahr. Modell?",
+            options: ["f(t)=a·1,1<sup>t</sup>", "f(t)=a·0,9<sup>t</sup>", "f(t)=a+0,1t", "f(t)=a−0,1t"],
             correct: 0,
-            hint: "N(5) = 500 + ∫₀⁵ 100·e^(0,2t) dt. Stammfunktion von e^(0,2t) ist e^(0,2t)/0,2 = 5·e^(0,2t).",
-            explanation: "N(5) = 500 + [100/0,2·e^(0,2t)]₀⁵ = 500 + 500·(e¹−1) ≈ 500 + 500·1,718 ≈ 500 + 859 ≈ 1359 Bakterien."
-        },
-
-        // ─── GRAPHENANALYSE Level 2 (4 neue) ─────────────────────
-        {
-            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Die Ableitung einer Funktion f ist <span class='math-text'>f'(x) = x² − 4</span>. In welchen Intervallen ist f streng monoton steigend?",
-            options: ["(−∞; −2) und (2; ∞)", "(−2; 2)", "Nur für x > 0", "Für alle x ≠ 0"],
-            correct: 0,
-            hint: "f steigt, wo f'(x) > 0. Löse x²−4 > 0 → x² > 4 → |x| > 2.",
-            explanation: "f'(x) = x²−4 > 0 ⟺ x² > 4 ⟺ x < −2 oder x > 2. Also monoton steigend auf (−∞;−2) und (2;∞)."
+            hint: "Wachstumsfaktor 1,1.",
+            explanation: "Exponentialfunktion mit b=1,1."
         },
         {
-            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Bestimme den Wendepunkt von <span class='math-text'>f(x) = x³ − 3x² + 2</span>.",
-            options: ["W(1 | 0)", "W(0 | 2)", "W(2 | −2)", "W(−1 | 0)"],
+            category: "Modellierung: Wachstum/Zerfall/Sättigung (Basis)", categoryId: "model", type: "mc", isFallback: true, difficulty: "easy",
+            text: "Halbwertszeit 8 Jahre. f(8) im Vergleich zu f(0)?",
+            options: ["halb so groß", "doppelt so groß", "gleich groß", "viermal so groß"],
             correct: 0,
-            hint: "Wendepunkt: f''(x) = 0. Berechne f''(x) = 6x − 6. Setze gleich 0.",
-            explanation: "f'(x) = 3x²−6x, f''(x) = 6x−6 = 0 → x = 1. f(1) = 1−3+2 = 0. VZW von f'' prüfen: Wendepunkt bei W(1|0)."
-        },
-        {
-            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Bestimme das globale Maximum von <span class='math-text'>f(x) = −x² + 6x − 5</span> im Intervall [0; 5].",
-            options: ["Globales Maximum: f(3) = 4", "Globales Maximum: f(0) = −5", "Globales Maximum: f(5) = 0", "Globales Maximum: f(6) = 7"],
-            correct: 0,
-            hint: "Kandidaten: Randwerte f(0), f(5) und lokale Extremstellen (f'(x) = 0). Vergleiche alle!",
-            explanation: "f'(x) = −2x+6 = 0 → x = 3. Kandidaten: f(0)=−5, f(3)=−9+18−5=4, f(5)=−25+30−5=0. Globales Maximum: f(3)=4."
-        },
-        {
-            category: "Graphenanalyse (Level 2)", categoryId: "graph", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Eine quadratische Funktion f hat einen Tiefpunkt bei T(1|0) und verläuft durch den Punkt (0|2). Welche Funktionsgleichung hat f?",
-            options: ["f(x) = 2·(x−1)²", "f(x) = (x−1)² + 2", "f(x) = −2·(x−1)²", "f(x) = 2x² + 1"],
-            correct: 0,
-            hint: "Scheitelpunktform: f(x) = a·(x−1)². Einsetzen von (0|2): 2 = a·1² → a = 2.",
-            explanation: "Tiefpunkt T(1|0) → f(x) = a·(x−1)². Punkt (0|2): 2 = a·(0−1)² = a. Also f(x) = 2·(x−1)²."
-        },
-
-        // ─── BESCHRÄNKTES WACHSTUM Level 2 (4 neue) ──────────────
-        {
-            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Gegeben: <span class='math-text'>f(t) = 600 − 600·e^(−kt)</span>. Nach 5 Stunden gilt f(5) = 300. Welchen Wert hat k?",
-            options: ["k = ln(2)/5 ≈ 0,139", "k = 0,5", "k = ln(0,5)/5 ≈ −0,139", "k = 5/ln(2) ≈ 7,21"],
-            correct: 0,
-            hint: "Setze f(5) = 300 ein: 600·e^(−5k) = 300 → e^(−5k) = 0,5 → ln beider Seiten.",
-            explanation: "300 = 600−600·e^(−5k) → 600·e^(−5k) = 300 → e^(−5k) = ½ → −5k = ln(½) = −ln(2) → k = ln(2)/5 ≈ 0,139."
-        },
-        {
-            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Ein Lernprozess: <span class='math-text'>f(t) = 1000·(1 − e^(−0,5t))</span> (Sättigung S = 1000 Vokabeln). Ab wann wurden 90 % gelernt?",
-            options: ["t ≈ 4,6 Tage", "t ≈ 2,0 Tage", "t ≈ 9,0 Tage", "t ≈ 0,9 Tage"],
-            correct: 0,
-            hint: "Setze f(t) = 900: 1 − e^(−0,5t) = 0,9 → e^(−0,5t) = 0,1 → ln beider Seiten.",
-            explanation: "900 = 1000·(1−e^(−0,5t)) → e^(−0,5t) = 0,1 → −0,5t = ln(0,1) → t = −ln(0,1)/0,5 = 2·ln(10) ≈ 4,6."
-        },
-        {
-            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Fischbestand: Anfang 200 Fische, Kapazitätsgrenze 800. Nach 2 Jahren: 350 Fische. Welchen Wert hat k in <span class='math-text'>f(t) = 800 − 600·e^(−kt)</span>?",
-            options: ["k = −ln(0,75)/2 ≈ 0,14", "k = 0,25", "k = ln(0,75)/2 ≈ −0,14", "k = ln(2)/2 ≈ 0,35"],
-            correct: 0,
-            hint: "f(2) = 350 einsetzen: 800−600·e^(−2k) = 350 → e^(−2k) = 450/600 = 0,75.",
-            explanation: "350 = 800−600·e^(−2k) → 600·e^(−2k) = 450 → e^(−2k) = 0,75 → −2k = ln(0,75) → k = −ln(0,75)/2 ≈ 0,144."
-        },
-        {
-            category: "Beschränktes Wachstum (Level 2)", categoryId: "beschraenkt", type: "mc", isFallback: false, isLevel2: true, difficulty: "hard",
-            text: "Zwei Modelle: f₁(t) = 500·(1−e^(−0,3t)) und f₂(t) = 500·(1−e^(−0,1t)), beide mit S = 500 und f(0) = 0. Welche Aussage stimmt?",
-            options: [
-                "f₁ nähert sich S schneller an, da k₁ = 0,3 > k₂ = 0,1.",
-                "f₂ nähert sich S schneller an, da k₂ kleiner ist.",
-                "Beide nähern sich S gleich schnell an.",
-                "Der Wert von k hat keinen Einfluss auf die Geschwindigkeit."
-            ],
-            correct: 0,
-            hint: "Je größer k, desto schneller fällt e^(−kt) gegen 0 – und desto schneller nähert sich f an S.",
-            explanation: "Größeres k → e^(−kt) fällt schneller gegen 0 → f nähert sich schneller der Sättigungsgrenze S. f₁ mit k=0,3 ist schneller als f₂ mit k=0,1."
+            hint: "Definition Halbwertszeit.",
+            explanation: "Nach 8 Jahren ist der Bestand halbiert."
         }
     ];
 
@@ -991,14 +918,14 @@
     // ══════════════════════════════════════════════════════
     const FLOW_URL = "https://hook.eu1.make.com/qb4k33zyuudodz7kptwy44qrem8naepl";
 
-    const ALL_CATEGORY_IDS = ["ableitung", "stamm", "integral", "sach", "graph", "beschraenkt"];
+    const ALL_CATEGORY_IDS = ["exp_basic", "exp_param", "exp_derive", "int_area", "rel_fdash", "model"];
     const CATEGORY_NAMES = {
-        ableitung: "Ableitungsregeln",
-        stamm: "Stammfunktionen",
-        integral: "Bestimmte Integrale",
-        sach: "Sachzusammenhänge",
-        graph: "Graphenanalyse",
-        beschraenkt: "Beschränktes Wachstum"
+        exp_basic: "Exponentialfunktion - Grundverstaendnis",
+        exp_param: "Parameterwirkung und Graphen",
+        exp_derive: "Ableitung e-Funktionen",
+        int_area: "Integral als Flaeche/Bestand",
+        rel_fdash: "Zusammenhang f-f'",
+        model: "Modellierung: Wachstum/Zerfall/Saettigung"
     };
 
     // ══════════════════════════════════════════════════════
@@ -1053,21 +980,21 @@
             Level: lvl
         };
         // Kategorien-Scores (nur ausgewählte)
-        if (scoresObj.ableitung)    payload.Ableitungsregeln      = `${scoresObj.ableitung.correct}/${scoresObj.ableitung.total}`;
-        if (scoresObj.stamm)        payload.Stammfunktionen        = `${scoresObj.stamm.correct}/${scoresObj.stamm.total}`;
-        if (scoresObj.integral)     payload.Integrale              = `${scoresObj.integral.correct}/${scoresObj.integral.total}`;
-        if (scoresObj.sach)         payload.Sachaufgaben           = `${scoresObj.sach.correct}/${scoresObj.sach.total}`;
-        if (scoresObj.graph)        payload.Graphenanalyse         = `${scoresObj.graph.correct}/${scoresObj.graph.total}`;
-        if (scoresObj.beschraenkt)  payload.BeschraenktesWachstum  = `${scoresObj.beschraenkt.correct}/${scoresObj.beschraenkt.total}`;
+        if (scoresObj.exp_basic)    payload.ExpGrundverstaendnis  = `${scoresObj.exp_basic.correct}/${scoresObj.exp_basic.total}`;
+        if (scoresObj.exp_param)    payload.Parameterwirkung      = `${scoresObj.exp_param.correct}/${scoresObj.exp_param.total}`;
+        if (scoresObj.exp_derive)   payload.AbleitungEFunktionen  = `${scoresObj.exp_derive.correct}/${scoresObj.exp_derive.total}`;
+        if (scoresObj.int_area)     payload.IntegralFlaeche       = `${scoresObj.int_area.correct}/${scoresObj.int_area.total}`;
+        if (scoresObj.rel_fdash)    payload.ZusammenhangFDash     = `${scoresObj.rel_fdash.correct}/${scoresObj.rel_fdash.total}`;
+        if (scoresObj.model)        payload.Modellierung          = `${scoresObj.model.correct}/${scoresObj.model.total}`;
 
         // Feature 9: Fehleranalyse
         const fehlerKeys = {
-            ableitung:   "Ableitungsregeln_Fehler",
-            stamm:       "Stammfunktionen_Fehler",
-            integral:    "Integrale_Fehler",
-            sach:        "Sachaufgaben_Fehler",
-            graph:       "Graphenanalyse_Fehler",
-            beschraenkt: "BeschraenktesWachstum_Fehler"
+            exp_basic: "ExpGrundverstaendnis_Fehler",
+            exp_param: "Parameterwirkung_Fehler",
+            exp_derive: "AbleitungEFunktionen_Fehler",
+            int_area: "IntegralFlaeche_Fehler",
+            rel_fdash: "ZusammenhangFDash_Fehler",
+            model: "Modellierung_Fehler"
         };
         for (const catId of selectedCategories) {
             const key = fehlerKeys[catId] || (catId + "_Fehler");
@@ -1605,38 +1532,29 @@
     // AUSWERTUNG
     // ══════════════════════════════════════════════════════
     const categoryResources = {
-        ableitung: [
-            { type: 'video', label: '▶ Kettenregel bei e-Funktionen', url: 'https://www.youtube.com/results?search_query=kettenregel+e-funktion+ableiten+einfach+erklärt' },
-            { type: 'video', label: '▶ Produktregel – Schritt für Schritt', url: 'https://www.youtube.com/results?search_query=produktregel+e-funktion+ausklammern+mathe' },
+        exp_basic: [
+            { type: 'video', label: '▶ Exponentialfunktion einfach erklaert', url: 'https://www.youtube.com/results?search_query=exponentialfunktion+einfach+erklaert+gymnasium' },
+            { type: 'web',   label: '🔗 Exponentialfunktion (mathebibel.de)', url: 'https://www.mathebibel.de/exponentialfunktion' },
+        ],
+        exp_param: [
+            { type: 'video', label: '▶ Parameterwirkung bei Exponentialfunktionen', url: 'https://www.youtube.com/results?search_query=parameterwirkung+exponentialfunktion+a+b+verschiebung' },
+            { type: 'web',   label: '🔗 Transformationen (mathebibel.de)', url: 'https://www.mathebibel.de/verschiebung-streckung' },
+        ],
+        exp_derive: [
+            { type: 'video', label: '▶ Kettenregel bei e-Funktionen', url: 'https://www.youtube.com/results?search_query=kettenregel+e-funktion+ableiten+einfach+erklaert' },
             { type: 'web',   label: '🔗 Ableitungsregeln (mathebibel.de)', url: 'https://www.mathebibel.de/ableitungsregeln' },
-            { type: 'web',   label: '🔗 e-Funktion ableiten (mathe-im-abi.de)', url: 'https://www.mathe-im-abi.de/analysis/ableitungsfunktion' },
         ],
-        stamm: [
-            { type: 'video', label: '▶ Stammfunktion von e-Funktionen', url: 'https://www.youtube.com/results?search_query=stammfunktion+e-funktion+aufleiten+schritt+für+schritt' },
-            { type: 'video', label: '▶ Aufleiten – Grundregeln & Übungen', url: 'https://www.youtube.com/results?search_query=aufleiten+grundregeln+stammfunktion+übungen+gymnasium' },
-            { type: 'web',   label: '🔗 Stammfunktionen (mathebibel.de)', url: 'https://www.mathebibel.de/stammfunktion' },
-        ],
-        integral: [
-            { type: 'video', label: '▶ Bestimmtes Integral berechnen', url: 'https://www.youtube.com/results?search_query=bestimmtes+integral+berechnen+e-funktion+NRW' },
-            { type: 'video', label: '▶ Fläche mit Integral berechnen', url: 'https://www.youtube.com/results?search_query=flächeninhalt+integral+x-achse+nullstelle+betragsstriche' },
+        int_area: [
+            { type: 'video', label: '▶ Flaeche mit Integral berechnen', url: 'https://www.youtube.com/results?search_query=fl%C3%A4cheninhalt+integral+x-achse+gymnasium' },
             { type: 'web',   label: '🔗 Bestimmtes Integral (mathebibel.de)', url: 'https://www.mathebibel.de/bestimmtes-integral' },
-            { type: 'web',   label: '🔗 Interaktiv: GeoGebra Integral', url: 'https://www.geogebra.org/m/e-funktionen' },
         ],
-        sach: [
-            { type: 'video', label: '▶ Wachstum & Zerfall mit e-Funktion', url: 'https://www.youtube.com/results?search_query=exponentielles+wachstum+zerfall+e-funktion+sachaufgabe+NRW' },
-            { type: 'video', label: '▶ c und k interpretieren', url: 'https://www.youtube.com/results?search_query=e-funktion+anfangsbestand+wachstumsrate+k+c+sachaufgabe' },
+        rel_fdash: [
+            { type: 'video', label: '▶ Zusammenhang f und f\'', url: 'https://www.youtube.com/results?search_query=zusammenhang+f+und+f%27+ableitung+monotonie' },
+            { type: 'web',   label: '🔗 Monotonie und Ableitung (mathebibel.de)', url: 'https://www.mathebibel.de/monotonie' },
+        ],
+        model: [
+            { type: 'video', label: '▶ Wachstum und Zerfall modellieren', url: 'https://www.youtube.com/results?search_query=exponentielles+wachstum+zerfall+modellieren+gymnasium' },
             { type: 'web',   label: '🔗 Exponentielles Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/exponentielles-wachstum' },
-        ],
-        graph: [
-            { type: 'video', label: '▶ Kurvendiskussion mit e-Funktion', url: 'https://www.youtube.com/results?search_query=kurvendiskussion+e-funktion+maximum+minimum+gymnasium+NRW' },
-            { type: 'video', label: '▶ Grenzverhalten von e-Funktionen', url: 'https://www.youtube.com/results?search_query=grenzwert+e-funktion+gegen+unendlich+minus+unendlich+mathe' },
-            { type: 'web',   label: '🔗 Kurvendiskussion (mathebibel.de)', url: 'https://www.mathebibel.de/kurvendiskussion' },
-        ],
-        beschraenkt: [
-            { type: 'video', label: '▶ Beschränktes Wachstum erklärt', url: 'https://www.youtube.com/results?search_query=beschränktes+wachstum+sättigungsgrenze+e-funktion+gymnasium' },
-            { type: 'video', label: '▶ Sättigungsgrenze S bestimmen', url: 'https://www.youtube.com/results?search_query=sättigungsgrenze+beschränktes+wachstum+NRW+aufgabe' },
-            { type: 'web',   label: '🔗 Beschränktes Wachstum (mathebibel.de)', url: 'https://www.mathebibel.de/beschraenktes-wachstum' },
-            { type: 'web',   label: '🔗 Wachstumsmodelle (mathe-im-abi.de)', url: 'https://www.mathe-im-abi.de' },
         ],
     };
 
@@ -1703,12 +1621,12 @@
         feedbackArea.innerHTML = "";
 
         const specificHints = {
-            ableitung:   "Wiederhole die Kettenregel (Innere mal Äußere) und die Produktregel. Schau dir das Ausklammern von e^x an.",
-            stamm:       "Beim Aufleiten von e^(kx) durch k teilen. Konstante Faktoren bleiben stehen!",
-            integral:    "Achte auf Vorzeichenwechsel am Nullpunkt – Fläche ggf. in Teilbereiche aufteilen (Betragsstriche).",
-            sach:        "f(t) = c·e^(kt): c = Startwert, k > 0 = Wachstum, k < 0 = Zerfall. Integral der Rate = Gesamtmenge.",
-            graph:       "f'(x) > 0 → f steigt; Vorzeichenwechsel + → − bei f' = Hochpunkt. e^x dominiert Polynome.",
-            beschraenkt: "S = Grenzwert für t → ∞ (e-Term verschwindet). f(0) = Anfangswert. Form: f(t) = S − (S−f₀)·e^(−kt)."
+            exp_basic: "Wiederhole den Grundaufbau f(x)=a·b^x und den Einfluss von b (>1 Wachstum, 0<b<1 Zerfall).",
+            exp_param: "Merke: Vorfaktor streckt in y-Richtung, x-a verschiebt nach rechts, +c verschiebt nach oben.",
+            exp_derive: "Kettenregel: innere Ableitung mal e-Funktion. Produktregel bei x·e^x sauber anwenden.",
+            int_area: "Beim bestimmten Integral sauber aufleiten und die Grenzen einsetzen. Bei Flaechen: Vorzeichen beachten.",
+            rel_fdash: "f' zeigt Steigung: f'>0 steigend, f'<0 fallend, f'=0 an Extremstellen.",
+            model: "Modelle: Wachstum/Zerfall mit f(t)=a·b^t oder a·e^(kt). Parameter bedeuten Startwert und Rate."
         };
 
         for (const key of selectedCategories) {
@@ -1759,3 +1677,5 @@
 </script>
 </body>
 </html>
+
+

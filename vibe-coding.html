@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KI-Lernwerkstatt – Digitale Unterrichtsmaterialien</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;700&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --surface: #ffffff;
+      --primary: #4f46e5;
+      --primary-light: #eef2ff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent-beginner: #10b981;
+      --accent-inter: #f59e0b;
+      --accent-expert: #ef4444;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* --- LAYOUT --- */
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      display: grid;
+      gap: 40px;
+    }
+
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* --- LEVEL SELECTOR --- */
+    .level-nav {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .level-btn {
+      padding: 10px 24px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-muted);
+    }
+
+    .level-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .level-btn.active[data-level="beginner"] {
+      background: var(--accent-beginner);
+      color: white;
+      border-color: var(--accent-beginner);
+    }
+
+    .level-btn.active[data-level="intermediate"] {
+      background: var(--accent-inter);
+      color: white;
+      border-color: var(--accent-inter);
+    }
+
+    .level-btn.active[data-level="expert"] {
+      background: var(--accent-expert);
+      color: white;
+      border-color: var(--accent-expert);
+    }
+
+    /* --- DASHBOARD SECTION --- */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+
+    /* --- WORK AREA --- */
+    .work-area {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 240px;
+      padding: 24px;
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: vertical;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: filter 0.2s;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-main);
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-page);
+    }
+
+    /* --- ANALYSIS PANEL --- */
+    .analysis-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .stat-box h4 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-container {
+      height: 8px;
+      background: var(--bg-page);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--primary);
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: var(--text-muted);
+    }
+
+    .check-item.valid {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .check-item.valid::before {
+      content: '✓';
+      color: var(--accent-beginner);
+      font-weight: 800;
+    }
+
+    .check-item.invalid::before {
+      content: '○';
+      opacity: 0.3;
+    }
+
+    /* --- CONTENT CARDS --- */
+    .content-card {
+      margin-top: 20px;
+    }
+
+    .content-card h3 {
+      font-family: 'Fraunces', serif;
+      margin-bottom: 16px;
+    }
+
+    .example-box {
+      background: var(--primary-light);
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      border-left: 4px solid var(--primary);
+      font-style: italic;
+    }
+
+    .tips-box {
+      margin-top: 18px;
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .tips-box h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .tips-list {
+      display: grid;
+      gap: 8px;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+
+    .tips-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .tips-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 6px;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .sources-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .sources-box strong {
+      color: var(--text-main);
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* --- EVOLUTION SECTION --- */
+    .evolution-section {
+      margin-top: 20px;
+    }
+
+    .evolution-title {
+      text-align: center;
+      font-family: 'Fraunces', serif;
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .evolution-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .evo-step {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .evo-step h4 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .evo-beginner h4 {
+      color: var(--accent-beginner);
+    }
+
+    .evo-inter h4 {
+      color: var(--accent-inter);
+    }
+
+    .evo-expert h4 {
+      color: var(--accent-expert);
+    }
+
+    .evo-prompt {
+      background: var(--bg-page);
+      padding: 16px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      border-left: 4px solid;
+    }
+
+    .evo-beginner .evo-prompt {
+      border-color: var(--accent-beginner);
+    }
+
+    .evo-inter .evo-prompt {
+      border-color: var(--accent-inter);
+    }
+
+    .evo-expert .evo-prompt {
+      border-color: var(--accent-expert);
+    }
+
+    .evo-expl {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .evo-highlight {
+      background: rgba(245, 158, 11, 0.2);
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeIn 0.4s ease forwards;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>KI-Lernwerkstatt</h1>
+      <p class="subtitle">Erstelle interaktive Unterrichtsmaterialien durch einfache Beschreibungen.</p>
+    </header>
+
+    <nav class="level-nav">
+      <button class="level-btn active" data-level="beginner">Erste Schritte</button>
+      <button class="level-btn" data-level="intermediate">Interaktive Übungen</button>
+      <button class="level-btn" data-level="expert">Kleine Lern-Apps</button>
+    </nav>
+
+    <div class="dashboard">
+      <!-- MAIN WORK AREA -->
+      <div class="work-area">
+        <div class="card">
+          <div class="input-group">
+            <label id="inputLabel">Projekt-Beschreibung</label>
+            <textarea id="promptInput" placeholder="Was möchtest du erschaffen? Beschreibe deine Idee..."></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="analyzeBtn">Prompt analysieren</button>
+            <button class="btn-secondary" id="loadExample">Beispiel laden</button>
+            <button class="btn-secondary" id="exportTemplate">Prompt-Template exportieren</button>
+            <button class="btn-secondary" id="copyTemplate">Template kopieren</button>
+          </div>
+        </div>
+
+        <!-- GUIDANCE SECTION (Dynamic) -->
+        <div class="card content-card animate-in" id="guidanceCard">
+          <h3 id="guideTitle">Einstieg: Der Vibe-Flow</h3>
+          <p id="guideText">Als Einsteiger konzentrierst du dich darauf, der KI ein klares Bild deiner Vision zu
+            vermitteln. Denke an ein Gespräch mit einem sehr fähigen Praktikanten.</p>
+          <div class="example-box" id="guideExample">
+            "Ich brauche eine einfache Website für mein Café 'Zum Anker'. Sie soll gemütlich wirken, die Speisekarte
+            zeigen und eine Karte mit dem Standort haben."
+          </div>
+          <div class="tips-box">
+            <h4>Tipps aus dem Netz</h4>
+            <div class="tips-list" id="guideTips"></div>
+          </div>
+          <div class="sources-box" id="sourcesBox">
+            <strong>Quellen:</strong> OpenAI Prompting, Anthropic Prompting, Microsoft Learn, Google AI Prompting.
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR ANALYSIS -->
+      <div class="analysis-sidebar">
+        <div class="card">
+          <h4 style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 0.05em; color: var(--text-muted);">
+            Analyse-Ergebnis</h4>
+
+          <div class="stat-box">
+            <h4>Prompt-Qualität</h4>
+            <div class="progress-container">
+              <div class="progress-bar" id="scoreBar"></div>
+            </div>
+          </div>
+
+          <div id="checkList">
+            <div class="check-item invalid" data-check="goal">Klares Ziel definiert</div>
+            <div class="check-item invalid" data-check="style">Design & Ästhetik</div>
+            <div class="check-item invalid" data-check="target">Zielgruppe genannt</div>
+            <div class="check-item invalid" data-check="constraints">Einschränkungen (No-Go's)</div>
+          </div>
+
+          <div id="feedbackText"
+            style="margin-top: 24px; font-size: 0.95rem; border-top: 1px solid var(--border); padding-top: 20px;">
+            Schreibe etwas in das Feld, um die Analyse zu starten.
+          </div>
+        </div>
+
+        <div class="card" id="levelInfoCard" style="background: var(--primary-light); border: none;">
+          <h4 id="levelBadge" style="color: var(--primary); margin-bottom: 12px;">Aktuelles Level: Einsteiger</h4>
+          <p id="levelDesc" style="font-size: 0.9rem; color: var(--primary);">Du lernst hier die Grundlagen der
+            Kommunikation mit KIs.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVOLUTION SECTION -->
+    <section class="evolution-section">
+      <h2 class="evolution-title">Beispiel: Von der Idee zur interaktiven Lern-App</h2>
+      <p
+        style="text-align: center; color: var(--text-muted); margin-bottom: 40px; max-width: 600px; margin-inline: auto;">
+        Wie entwickelt man einen Prompt weiter? Hier ist ein Beispiel, wie aus einer einfachen Idee für den
+        Mathematikunterricht (Thema: Bruchrechnen) Schritt für Schritt ein mächtiges, digitales Werkzeug wird.
+      </p>
+
+      <div class="evolution-grid">
+        <!-- Level 1 -->
+        <div class="evo-step evo-beginner">
+          <h4>Stufe 1: Erste Schritte</h4>
+          <div class="evo-prompt">
+            "Erstelle ein kleines Quiz zum Thema Bruchrechnen für die 6. Klasse. Es soll freundlich und kindgerecht
+            aussehen. Stelle 5 einfache Aufgaben, bei denen man Brüche addieren muss."
+          </div>
+          <div class="evo-expl">
+            <strong>Was passiert hier?</strong> Du erhältst eine hübsche, funktionierende Seite mit 5 starren Fragen. Es
+            gibt noch kein spezielles Feedback bei Fehlern, nur "Richtig" oder "Falsch".
+          </div>
+        </div>
+
+        <!-- Level 2 -->
+        <div class="evo-step evo-inter">
+          <h4>Stufe 2: Interaktive Übungen</h4>
+          <div class="evo-prompt">
+            "... füge nun folgende Regel hinzu: Wenn ein Schüler eine Aufgabe falsch löst, soll der falsche Bruch <span
+              class="evo-highlight">grafisch als Pizzastück gezeichnet werden</span>. Gib außerdem einen kurzen Tipp
+            aus, z.B. 'Denke daran, den Nenner gleich zu machen!'"
+          </div>
+          <div class="evo-expl">
+            <strong>Das Upgrade:</strong> Du bringst Logik ins Spiel. Die KI programmiert nun eine Fehlererkennung und
+            fügt eine visuelle Hilfestellung hinzu, die nur bei falschen Antworten erscheint.
+          </div>
+        </div>
+
+        <!-- Level 3 -->
+        <div class="evo-step evo-expert">
+          <h4>Stufe 3: Kleine Lern-Apps</h4>
+          <div class="evo-prompt">
+            "... wandle das Quiz in eine interaktive Lernumgebung um. Baue <span class="evo-highlight">zwei
+              Schieberegler</span> ein, mit denen die Schüler Zähler und Nenner selbst verändern können. Auf der rechten
+            Seite soll sich die <span class="evo-highlight">grafische Pizza sofort (live) anpassen</span>, wenn man die
+            Regler bewegt."
+          </div>
+          <div class="evo-expl">
+            <strong>Das Endprodukt:</strong> Anstatt fester Fragen hast du nun ein digitales Explorations-Labor
+            (Sandkasten) gebaut. Die Schüler können selbst experimentieren und sehen die Auswirkungen ihrer Handlungen
+            in Echtzeit.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      KI-Lernwerkstatt &copy; 2026 | Von Lehrkräften für Lehrkräfte.
+    </footer>
+  </div>
+
+  <script>
+    const input = document.getElementById('promptInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadExampleBtn = document.getElementById('loadExample');
+    const exportTemplateBtn = document.getElementById('exportTemplate');
+    const copyTemplateBtn = document.getElementById('copyTemplate');
+    const levelBtns = document.querySelectorAll('.level-btn');
+
+    // Dynamic Content
+    const guideTitle = document.getElementById('guideTitle');
+    const guideText = document.getElementById('guideText');
+    const guideExample = document.getElementById('guideExample');
+    const guideTips = document.getElementById('guideTips');
+    const levelBadge = document.getElementById('levelBadge');
+    const levelDesc = document.getElementById('levelDesc');
+    const feedbackText = document.getElementById('feedbackText');
+    const scoreBar = document.getElementById('scoreBar');
+    const checkList = document.getElementById('checkList');
+
+    let currentLevel = 'beginner';
+
+    const CONTENT = {
+      beginner: {
+        title: "Erste Schritte: Einfache Arbeitsblätter",
+        text: "Beschreibe einfach, was du für deinen Unterricht brauchst. Konzentriere dich auf das Thema, die Klasse und wie es für die Schüler aussehen soll.",
+        example: "Ich brauche ein kleines, digitales Quiz zum Thema Photosynthese für die 8. Klasse. Es soll freundlich aussehen, 5 einfache Fragen haben und am Ende 'Gut gemacht!' anzeigen.",
+        badge: "Aktuelles Level: Erste Schritte",
+        desc: "Fokus: Thema, Klasse & Aufmachung.",
+        checks: ["Thema", "Klasse", "Aufmachung", "Anzahl der Fragen"],
+        tips: [
+          "Erwähne immer, für welches Alter oder welche Klasse das Material ist.",
+          "Beschreibe grob, wie es visuell wirken soll (z.B. 'kindgerecht').",
+          "Ein klares, einfaches Ziel reicht am Anfang vollkommen aus."
+        ]
+      },
+      intermediate: {
+        title: "Interaktive Übungen: Logik einbauen",
+        text: "Hier definierst du, wie die Schüler mit dem Material arbeiten. Was passiert bei richtigen Antworten? Gibt es Tipps bei Fehlern?",
+        example: "Erstelle einen interaktiven Lückentext zur Französischen Revolution für die 10. Klasse. Wenn ein Schüler ein falsches Wort eingibt, soll die Box rot werden und ein kleiner Hinweis erscheinen.",
+        badge: "Aktuelles Level: Interaktive Übungen",
+        desc: "Fokus: Interaktion, Feedback & Regeln.",
+        checks: ["Interaktion", "Klasse", "Feedback", "Regeln"],
+        tips: [
+          "Überlege dir, wie das Material auf Fehler reagieren soll.",
+          "Beschreibe genau, was 'Richtig' und was 'Falsch' bedeutet.",
+          "Fordere kleinschrittiges Feedback ein."
+        ]
+      },
+      expert: {
+        title: "Kleine Lern-Apps: Spezielle Abläufe",
+        text: "Jetzt baust du kleine Werkzeuge für den Unterricht. Definiere genau, wie Variablen (z.B. Schieberegler) die Anzeige (z.B. Graphen) verändern.",
+        example: "Programmiere ein Tool zum Üben von Exponentialfunktionen für die Oberstufe. Die Schüler können einen Schieberegler für den Wachstumsfaktor bewegen, und rechts aktualisiert sich sofort ein Diagramm.",
+        badge: "Aktuelles Level: Kleine Lern-Apps",
+        desc: "Fokus: Dynamische Elemente & Visualisierung.",
+        checks: ["Bedienfeld", "Zielgruppe", "Sichtbare Änderung", "Spezielle Wünsche"],
+        tips: [
+          "Beschreibe, was auf dem Bildschirm links/rechts/oben passieren soll.",
+          "Benenne die Bedienelemente (Button, Schieberegler, Eingabefeld).",
+          "Denke daran, wie die Schüler das Tool entdecken (z.B. 'Startbildschirm')."
+        ]
+      }
+    };
+
+    function setLevel(lvl) {
+      currentLevel = lvl;
+      levelBtns.forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.level-btn[data-level="${lvl}"]`).classList.add('active');
+
+      const content = CONTENT[lvl];
+      guideTitle.textContent = content.title;
+      guideText.textContent = content.text;
+      guideExample.textContent = `"${content.example}"`;
+      levelBadge.textContent = content.badge;
+      levelDesc.textContent = content.desc;
+
+      guideTips.innerHTML = '';
+      content.tips.forEach(tip => {
+        const item = document.createElement('div');
+        item.className = 'tips-item';
+        item.innerHTML = `<span class="tips-dot"></span><span>${tip}</span>`;
+        guideTips.appendChild(item);
+      });
+
+      // Re-render Checkbox labels
+      checkList.innerHTML = '';
+      content.checks.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'check-item invalid';
+        div.textContent = c;
+        checkList.appendChild(div);
+      });
+
+      // Reset UI
+      input.value = '';
+      scoreBar.style.width = '0%';
+      feedbackText.textContent = "Schreibe etwas in das Feld, um die Analyse zu starten.";
+
+      // Animation reset
+      document.getElementById('guidanceCard').classList.remove('animate-in');
+      void document.getElementById('guidanceCard').offsetWidth; // Trigger reflow
+      document.getElementById('guidanceCard').classList.add('animate-in');
+    }
+
+    function analyze() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      let score = 0;
+      const checks = CONTENT[currentLevel].checks;
+      const foundIndices = [];
+
+      // Simple Keyword Logic based on levels
+      const keywords = {
+        beginner: [/thema|quiz|arbeitsblatt|fragen/i, /klasse|schüler|alter/i, /aussehen|farbe|freundlich|kindgerecht/i, /zahl|anzahl|wie viele|fünf|zehn/i],
+        intermediate: [/klick|eingabe|interaktiv|lücke/i, /klasse|schüler/i, /falsch|richtig|hinweis|tipp|rot|grün/i, /regel|wenn|dann|soll/i],
+        expert: [/schieberegler|button|eingabefeld|tool/i, /schüler|oberstufe|klasse/i, /diagramm|anzeige|bild|graph/i, /speziell|verhindere|ohne|genau/i]
+      };
+
+      const currentKeywords = keywords[currentLevel];
+      const checkElements = checkList.querySelectorAll('.check-item');
+
+      currentKeywords.forEach((regex, i) => {
+        if (regex.test(text)) {
+          score += 25;
+          checkElements[i].className = 'check-item valid';
+        } else {
+          checkElements[i].className = 'check-item invalid';
+        }
+      });
+
+      scoreBar.style.width = score + '%';
+
+      if (score === 100) {
+        feedbackText.innerHTML = "<strong>Exzellent!</strong> Dein Prompt erfüllt alle Kriterien für dieses Level. Die KI wird sehr präzise Ergebnisse liefern.";
+      } else if (score > 50) {
+        feedbackText.textContent = "Guter Ansatz. Schau dir die grauen Punkte an, um deinen Prompt noch weiter zu verfeinern.";
+      } else {
+        feedbackText.textContent = "Dein Prompt ist noch etwas vage. Versuche mehr Details hinzuzufügen, um die Analyse-Punkte zu erfüllen.";
+      }
+    }
+
+    levelBtns.forEach(btn => {
+      btn.onclick = () => setLevel(btn.getAttribute('data-level'));
+    });
+
+    analyzeBtn.onclick = analyze;
+    loadExampleBtn.onclick = () => {
+      input.value = CONTENT[currentLevel].example;
+      analyze();
+    };
+
+    function buildTemplate() {
+      const content = CONTENT[currentLevel];
+      const tips = content.tips.map((t, i) => `${i + 1}. ${t}`).join('\n');
+      return [
+        `# Vibe Coding Prompt-Template (${content.badge})`,
+        "",
+        "Ziel:",
+        "- ",
+        "",
+        "Publikum:",
+        "- ",
+        "",
+        "Stil/Ton:",
+        "- ",
+        "",
+        "Grenzen (No-Go's):",
+        "- ",
+        "",
+        "Output-Format:",
+        "- ",
+        "",
+        "Beispiele (Input -> Output):",
+        "- ",
+        "",
+        "Tests / Erfolgskriterien:",
+        "- ",
+        "",
+        "Tipps:",
+        tips,
+        "",
+        "Beispiel-Prompt:",
+        `"${content.example}"`
+      ].join('\n');
+    }
+
+    exportTemplateBtn.onclick = () => {
+      const blob = new Blob([buildTemplate()], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `vibe-coding-template-${currentLevel}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    };
+
+    copyTemplateBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(buildTemplate());
+        copyTemplateBtn.textContent = 'Kopiert!';
+        setTimeout(() => {
+          copyTemplateBtn.textContent = 'Template kopieren';
+        }, 1200);
+      } catch (err) {
+        copyTemplateBtn.textContent = 'Kopieren fehlgeschlagen';
+        setTimeout(() => {
+          copyTemplateBtn.textContent = 'Template kopieren';
+        }, 1500);
+      }
+    };
+
+    input.oninput = () => { if (input.value.length % 10 === 0) analyze(); };
+
+    // Start
+    setLevel('beginner');
+
+  </script>
+</body>
+
+</html>

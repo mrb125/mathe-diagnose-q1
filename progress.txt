@@ -1,0 +1,49 @@
+# Progress Log: Ralph Loop Refactor - Math Diagnostic Tool
+
+## Iteration 1: Design & Logic Update [2026-03-03]
+- Status: Completed.
+- Goal: Apply Ralph Loop methodology to refactor `index-klasse10.html`.
+- Work done: Updated CSS variables to Simpsons-Gelb, refined HUD styling for better contrast, and integrated "Ralph sagt:" into the feedback logic.
+- Next step: Begin Phase 4 (Überprüfung) to verify the new design and mobile responsiveness.
+
+## Iteration 2: Verification [2026-03-03]
+- Status: Completed (with issues).
+- Goal: Verify the Ralph Wiggum theme and mobile responsiveness.
+- Results: User reported progression bug (stops after 2nd task), requested selectable design, and requested removal of Ralph quotes.
+
+## Iteration 5: Curriculum & Graph Overhaul [2026-03-03]
+- Status: Completed.
+- Goal: Align topics with NRW KLP and redesign SVG graphs.
+- Work done: Overhauled SVGs with grids and labels. Added "Anwendungen" category.
+- Next step: Simplify terminology (Klasse 10 focus).
+
+## Iteration 6: Terminology Simplification [2026-03-03]
+- Status: Completed.
+- Goal: Replace Oberstufen-terms (Asymptote, monoton) with Klasse 10 equivalents.
+- Work done: Replaced "Asymptote" with "Gerade der Annäherung" and "monoton" with "streng fallend/steigend".
+
+## Iteration 7: SharePoint & Office Workflow [2026-03-03]
+- Status: Completed.
+- Goal: Provide a way to retrieve and aggregate student data via SharePoint/Excel.
+- Work done: Added "Lehrer-Export" (CSV) button. Created workflow guide.
+
+## Iteration 8: Microsoft Forms Automatisierung [2026-03-03]
+- Status: Completed.
+- Goal: Automate data collection via Microsoft Forms pre-filled link.
+- Work done: Added `formConfig` and `submitToForms` logic. Created `forms-setup.md`.
+
+## Iteration 9: Hintergrund-Automatisierung [2026-03-03]
+- Status: Completed (Premium issue identified).
+- Goal: Truly automatic background submission via Webhooks.
+- Work done: Implemented basic `fetch` logic. Identified that MS Power Automate HTTP Trigger is premium.
+
+## Iteration 11: Finalisierung Microsoft Forms [2026-03-03]
+- Status: Completed.
+- Goal: Finalize submission logic for Microsoft Forms and ensure native MS workflow.
+- Work done: Simplified `formConfig` back to Microsoft Forms. Removed Google Forms logic as per user preference. Enhanced setup guide.
+
+## Iteration 12: Link-Verifizierung & Politur [2026-03-03]
+- Status: Completed.
+- Goal: Verify and fix all support links for "Help upon error".
+- Work done: Corrected 404s for mathebibel.de by using plural forms. Added Studyflix as a high-quality alternative for applications.
+- Next step: Final Handover.

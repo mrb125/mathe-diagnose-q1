@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vibe Coding – Lehrer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f7f5f2;
+        --card: #ffffff;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --accent: #1d4ed8;
+        --accent-2: #9333ea;
+        --border: #e5e7eb;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: radial-gradient(circle at top left, #ffffff, var(--bg));
+        color: var(--ink);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+        display: grid;
+        gap: 28px;
+      }
+
+      header {
+        text-align: center;
+        display: grid;
+        gap: 12px;
+      }
+
+      h1 {
+        font-family: "Fraunces", serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      .subtitle {
+        color: var(--muted);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .card h3 {
+        margin-bottom: 8px;
+        font-size: 1.05rem;
+      }
+
+      .card p, .card li {
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .badge {
+        display: inline-block;
+        background: #e0e7ff;
+        color: #3730a3;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+      }
+
+      .checklist {
+        display: grid;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .checklist div {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: #f8fafc;
+        border: 1px solid var(--border);
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        background: #111827;
+        color: #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <span class="badge">Lehrer-Version</span>
+        <h1>Vibe Coding im Unterricht – Konzept & Steuerung</h1>
+        <p class="subtitle">
+          Diese Version fokussiert Unterrichtsplanung, Bewertung, Datenschutz/Regeln und
+          ein klares Vorgehen fuer unterschiedliche Niveaus.
+        </p>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h3>Unterrichtsstruktur</h3>
+          <p>1) Einstieg & Prompt-Grundlagen, 2) Kleines Projekt, 3) Review & Tests, 4) Showcase.</p>
+          <div class="checklist">
+            <div>Ziel + Zielgruppe + Stil + No-Go's + Beispiel</div>
+            <div>Eine Aenderung pro Iteration</div>
+            <div>Tests und Erwartung vs. Ergebnis</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Bewertung (Rubrik)</h3>
+          <div class="checklist">
+            <div>Problemverstaendnis & Zielklarheit</div>
+            <div>Prompt-Qualitaet & Iterationen</div>
+            <div>Funktionalitaet & Tests</div>
+            <div>Dokumentation & Praesentation</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Datenschutz & Regeln</h3>
+          <p>Keine personenbezogenen Daten, keine echten Passwoerter, keine Kopie ohne Verstehen.</p>
+          <p>Nutze lokale Demos, wenn moeglich. Klare Freigaben bei externen Tools.</p>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="card">
+          <h3>Level-Differenzierung</h3>
+          <p>Einsteiger: Ziele + Stil + Beispiel. Fortgeschritten: Output-Format + Constraints. Experte: Edge-Cases + Tests.</p>
+        </div>
+        <div class="card">
+          <h3>Projektideen</h3>
+          <p>Schulweg-Tracker, Lerncoach, Pausen-Designer, Inventar light, Sensor-Dashboard.</p>
+        </div>
+        <div class="card">
+          <h3>Beispiel-Prompt (Lehrer)</h3>
+          <div class="mono">
+            Ziel: Schueler erstellen eine Lernpausen-App.<br />
+            Output: Eine `index.html` mit CSS/JS.<br />
+            Regeln: Keine Datenbank, keine Datenuebertragung.<br />
+            Tests: Leere Eingabe, Doppelklick, Mobile Layout.
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
